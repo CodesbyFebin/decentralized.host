@@ -20,6 +20,8 @@ from .detect import detect_stack, maybe_refine_with_ai
 app = typer.Typer(help="decentralized.host CLI")
 node_app = typer.Typer(help="Manage mesh nodes")
 app.add_typer(node_app, name="node")
+keys_app = typer.Typer(help="Manage SSH keys allowed to git push")
+app.add_typer(keys_app, name="keys")
 
 console = Console()
 
@@ -389,6 +391,50 @@ def credits(node_id: str):
     for entry in summary["ledger"]:
         table.add_row(str(entry["amount"]), entry.get("tx_signature") or "-", entry["created_at"])
     console.print(table)
+
+
+@keys_app.command("add")
+def keys_add(label: str, pubkey_path: Path = typer.Argument(..., help="Path to a public key, e.g. ~/.ssh/id_ed25519.pub")):
+    """Register an SSH public key allowed to 'git push' to this mesh's git server."""
+    if not pubkey_path.exists():
+        console.print(f"[red]No such file: {pubkey_path}[/]")
+        raise typer.Exit(1)
+    public_key = pubkey_path.read_text().strip()
+    with api.client() as http:
+        resp = http.post("/git/keys", json={"label": label, "public_key": public_key})
+        if resp.status_code == 409:
+            console.print("[yellow]That key is already registered.[/]")
+            return
+        resp.raise_for_status()
+    console.print(f"[bold green]⟡[/] Registered key '{label}'. It may take up to 30s to sync to the git server.")
+
+
+@keys_app.command("list")
+def keys_list():
+    """List SSH keys allowed to git push to this mesh."""
+    with api.client() as http:
+        resp = http.get("/git/keys")
+        resp.raise_for_status()
+        keys = resp.json()
+
+    table = Table(title="Authorized git-push keys")
+    for col in ["id", "label", "fingerprint", "added"]:
+        table.add_column(col)
+    for k in keys:
+        parts = k["public_key"].split()
+        fingerprint = (parts[1][:16] + "…") if len(parts) > 1 else "?"
+        table.add_row(k["id"][:8], k["label"], fingerprint, k["created_at"])
+    console.print(table)
+
+
+@app.command()
+def clone_url(name: str, ssh_host: str = typer.Option("localhost", help="Hostname/IP where the git server is reachable"), ssh_port: int = typer.Option(2222, help="Port the git server's SSH is published on")):
+    """Print the git remote URL for a repo (new or existing) on this mesh's git server."""
+    url = f"ssh://git@{ssh_host}:{ssh_port}/repos/{name}.git"
+    console.print(url)
+    console.print(f"\n[dim]# First push auto-creates the repo and deploys the default branch:[/]")
+    console.print(f"[dim]git remote add opengit {url}[/]")
+    console.print(f"[dim]git push opengit main[/]")
 
 
 if __name__ == "__main__":

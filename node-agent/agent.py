@@ -26,6 +26,11 @@ POLL_INTERVAL = int(os.getenv("POLL_INTERVAL", "3"))
 LOG_API_PORT = int(os.getenv("LOG_API_PORT", "8100"))
 TRAEFIK_DYNAMIC_DIR = Path(os.getenv("TRAEFIK_DYNAMIC_DIR", "/etc/traefik/dynamic"))
 MESH_NETWORK = os.getenv("MESH_NETWORK", "dhost-mesh")
+# How the control plane reaches *this* node's build/log/remove API. Default
+# assumes the same-compose case (a Docker-network hostname); a node on a
+# genuinely separate machine must set this to its own public host:port,
+# e.g. ADVERTISE_ADDRESS=203.0.113.5:8100 -- see DEPLOY.md.
+ADVERTISE_ADDRESS = os.getenv("ADVERTISE_ADDRESS", f"node-agent:{LOG_API_PORT}")
 
 docker_client = docker.from_env()
 state = {"node_id": None, "token": None}
@@ -46,6 +51,7 @@ def register() -> None:
                     "region": NODE_REGION,
                     "cpu_cores": psutil.cpu_count(logical=True),
                     "ram_total_mb": psutil.virtual_memory().total / (1024 * 1024),
+                    "advertise_address": ADVERTISE_ADDRESS,
                 },
                 timeout=10,
             )

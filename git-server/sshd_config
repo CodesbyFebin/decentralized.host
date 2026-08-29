@@ -1,0 +1,18 @@
+Port 22
+HostKey /etc/ssh/ssh_host_ed25519_key
+HostKey /etc/ssh/ssh_host_rsa_key
+# The 'git' user is a locked-password service account (useradd default) --
+# PAM's account phase rejects locked accounts even for pubkey auth unless
+# PAM is skipped. We don't need PAM for anything here (no password auth,
+# no login shell beyond opengit-shell).
+UsePAM no
+PermitRootLogin no
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+PubkeyAuthentication yes
+AllowUsers git
+X11Forwarding no
+AllowTcpForwarding no
+PermitTunnel no
+PrintMotd no
+Subsystem sftp /usr/lib/openssh/sftp-server

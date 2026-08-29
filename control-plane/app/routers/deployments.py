@@ -14,7 +14,7 @@ from ..auth import require_deploy_key
 from ..config import settings
 from ..database import get_db
 from ..detect import detect_stack
-from ..models import Deployment, Release
+from ..models import Deployment, Node, Release
 from ..schemas import DeploymentCreate, DeploymentOut, DetectResponse, ReleaseOut
 from ..scheduler import pick_node
 
@@ -23,6 +23,13 @@ router = APIRouter(
 )
 
 UPLOAD_CACHE_DIR = Path(os.getenv("UPLOAD_CACHE_DIR", "/tmp/dhost-uploads"))
+
+
+def _node_agent_url(node: Node) -> str:
+    """Always address the specific node a deployment actually landed on --
+    never a single global URL. See Node.advertise_address."""
+    address = node.advertise_address or settings.NODE_AGENT_LOG_BASE_URL.removeprefix("http://")
+    return f"http://{address}"
 
 
 def _effective_root(work_dir: Path) -> Path:
@@ -53,6 +60,19 @@ def _safe_join(base: Path, rel: str) -> Path:
     return target
 
 
+def _safe_extract_tar(tar_path: Path, dest_dir: Path) -> None:
+    """Same path-traversal guard as node-agent's build endpoint -- this
+    archive comes from a git push, which is untrusted input same as any
+    other upload."""
+    dest_root = dest_dir.resolve()
+    with tarfile.open(tar_path) as tar:
+        for member in tar.getmembers():
+            member_path = (dest_dir / member.name).resolve()
+            if member_path != dest_root and not str(member_path).startswith(str(dest_root) + os.sep):
+                raise HTTPException(400, f"Unsafe path in archive: {member.name}")
+        tar.extractall(dest_dir)  # noqa: S202 -- paths validated above
+
+
 def _deployment_out(d: Deployment) -> DeploymentOut:
     url = f"http://{d.subdomain}" if d.subdomain else None
     return DeploymentOut(
@@ -61,6 +81,79 @@ def _deployment_out(d: Deployment) -> DeploymentOut:
         subdomain=d.subdomain, url=url, error=d.error,
         created_at=d.created_at, updated_at=d.updated_at,
     )
+
+
+def _perform_ship(
+    db: Session, name: str, container_port: int, dockerfile: str, archive_bytes: bytes,
+    message: str = "", snapshot_id: str = "", custom_domain: str = "",
+) -> DeploymentOut:
+    """Shared by /ship (CLI, Launchpad) and /push (git server): picks a
+    node, upserts the Deployment row, forwards the build to that specific
+    node's agent, and records a Release. This is the one place that
+    actually talks to a node agent for a build -- every "front door"
+    (dhost ship, Launchpad, git push) funnels through here."""
+    node = pick_node(db)
+    if node is None:
+        raise HTTPException(503, "No healthy nodes available in the mesh. Run 'dhost node join'.")
+
+    subdomain = custom_domain.strip() or f"{name}.{settings.BASE_DOMAIN}"
+    deployment = db.query(Deployment).filter(Deployment.name == name).first()
+    if deployment:
+        deployment.node_id = node.id
+        deployment.container_port = container_port
+        deployment.subdomain = subdomain
+        deployment.status = "building"
+        deployment.error = None
+    else:
+        deployment = Deployment(
+            name=name, image=f"{name}:building", container_port=container_port,
+            node_id=node.id, subdomain=subdomain, status="building",
+        )
+        db.add(deployment)
+    db.commit()
+    db.refresh(deployment)
+
+    try:
+        resp = httpx.post(
+            f"{_node_agent_url(node)}/build",
+            data={
+                "name": name,
+                "container_port": str(container_port),
+                "subdomain": subdomain,
+                "dockerfile": dockerfile,
+            },
+            files={"archive": ("src.tar.gz", archive_bytes, "application/gzip")},
+            timeout=300,
+        )
+        result = resp.json()
+    except httpx.HTTPError as e:
+        deployment.status = "failed"
+        deployment.error = str(e)
+        db.commit()
+        raise HTTPException(502, f"Build request to node agent failed: {e}")
+
+    if result.get("status") == "running":
+        deployment.status = "running"
+        deployment.container_id = result.get("container_id")
+        deployment.image = result.get("image", deployment.image)
+        deployment.error = None
+    else:
+        deployment.status = "failed"
+        deployment.error = result.get("error", "unknown build error")
+
+    db.add(Release(
+        deployment_id=deployment.id,
+        deployment_name=deployment.name,
+        snapshot_id=snapshot_id or None,
+        message=message,
+        image=deployment.image,
+        status=deployment.status,
+        error=deployment.error,
+    ))
+
+    db.commit()
+    db.refresh(deployment)
+    return _deployment_out(deployment)
 
 
 @router.post("", response_model=DeploymentOut)
@@ -152,27 +245,6 @@ async def ship_deployment(
     needed for anything that must sit at a bare apex domain (e.g. the
     landing page at decentralized.host itself, not
     landing-page.decentralized.host)."""
-    node = pick_node(db)
-    if node is None:
-        raise HTTPException(503, "No healthy nodes available in the mesh. Run 'dhost node join'.")
-
-    subdomain = custom_domain.strip() or f"{name}.{settings.BASE_DOMAIN}"
-    deployment = db.query(Deployment).filter(Deployment.name == name).first()
-    if deployment:
-        deployment.node_id = node.id
-        deployment.container_port = container_port
-        deployment.subdomain = subdomain
-        deployment.status = "building"
-        deployment.error = None
-    else:
-        deployment = Deployment(
-            name=name, image=f"{name}:building", container_port=container_port,
-            node_id=node.id, subdomain=subdomain, status="building",
-        )
-        db.add(deployment)
-    db.commit()
-    db.refresh(deployment)
-
     if upload_id:
         cached = UPLOAD_CACHE_DIR / f"{upload_id}.tar.gz"
         if not cached.exists():
@@ -184,47 +256,42 @@ async def ship_deployment(
     else:
         raise HTTPException(400, "Provide either 'archive' or 'upload_id'")
 
+    return _perform_ship(
+        db, name, container_port, dockerfile, archive_bytes,
+        message=message, snapshot_id=snapshot_id, custom_domain=custom_domain,
+    )
+
+
+@router.post("/push", response_model=DeploymentOut)
+async def push_deployment(
+    name: str = Form(...),
+    container_port: int = Form(8080),
+    custom_domain: str = Form(""),
+    message: str = Form(""),
+    archive: UploadFile = File(...),
+    db: Session = Depends(get_db),
+):
+    """The git server's post-receive hook hits this directly: one tarball
+    of the pushed tree (from `git archive`, so already .gitignore-clean),
+    no separate detect step from the client -- this does detection and
+    build+deploy in a single call, same underlying pipeline as /ship."""
+    archive_bytes = await archive.read()
+    work_dir = UPLOAD_CACHE_DIR / f"push-{uuid.uuid4().hex}"
+    work_dir.mkdir(parents=True, exist_ok=True)
     try:
-        resp = httpx.post(
-            f"{settings.NODE_AGENT_LOG_BASE_URL}/build",
-            data={
-                "name": name,
-                "container_port": str(container_port),
-                "subdomain": subdomain,
-                "dockerfile": dockerfile,
-            },
-            files={"archive": ("src.tar.gz", archive_bytes, "application/gzip")},
-            timeout=300,
-        )
-        result = resp.json()
-    except httpx.HTTPError as e:
-        deployment.status = "failed"
-        deployment.error = str(e)
-        db.commit()
-        raise HTTPException(502, f"Build request to node agent failed: {e}")
+        tar_path = work_dir / "src.tar.gz"
+        tar_path.write_bytes(archive_bytes)
+        extract_dir = work_dir / "src"
+        extract_dir.mkdir()
+        _safe_extract_tar(tar_path, extract_dir)
+        stack, dockerfile = detect_stack(extract_dir)
+    finally:
+        shutil.rmtree(work_dir, ignore_errors=True)
 
-    if result.get("status") == "running":
-        deployment.status = "running"
-        deployment.container_id = result.get("container_id")
-        deployment.image = result.get("image", deployment.image)
-        deployment.error = None
-    else:
-        deployment.status = "failed"
-        deployment.error = result.get("error", "unknown build error")
-
-    db.add(Release(
-        deployment_id=deployment.id,
-        deployment_name=deployment.name,
-        snapshot_id=snapshot_id or None,
-        message=message,
-        image=deployment.image,
-        status=deployment.status,
-        error=deployment.error,
-    ))
-
-    db.commit()
-    db.refresh(deployment)
-    return _deployment_out(deployment)
+    return _perform_ship(
+        db, name, container_port, dockerfile, archive_bytes,
+        message=message or f"git push ({stack})", custom_domain=custom_domain,
+    )
 
 
 @router.get("/{name}/releases", response_model=list[ReleaseOut])
@@ -252,9 +319,11 @@ def get_deployment_logs(name: str, db: Session = Depends(get_db)):
         raise HTTPException(404, "Deployment not found")
     if not deployment.container_id:
         return {"logs": "(no container yet)"}
+    if deployment.node is None:
+        raise HTTPException(502, "Deployment has no assigned node")
     try:
         resp = httpx.get(
-            f"{settings.NODE_AGENT_LOG_BASE_URL}/logs/{deployment.container_id}",
+            f"{_node_agent_url(deployment.node)}/logs/{deployment.container_id}",
             timeout=10,
         )
         resp.raise_for_status()
@@ -273,10 +342,12 @@ def delete_deployment(name: str, db: Session = Depends(get_db)):
     deployment = db.query(Deployment).filter(Deployment.name == name).first()
     if deployment is None:
         raise HTTPException(404, "Deployment not found")
-    try:
-        httpx.post(f"{settings.NODE_AGENT_LOG_BASE_URL}/remove/{name}", timeout=15)
-    except httpx.HTTPError as e:
-        raise HTTPException(502, f"Could not reach node agent to tear down container: {e}")
+    if deployment.node is not None:
+        try:
+            httpx.post(f"{_node_agent_url(deployment.node)}/remove/{name}", timeout=15)
+        except httpx.HTTPError as e:
+            raise HTTPException(502, f"Could not reach node agent to tear down container: {e}")
+    db.query(Release).filter(Release.deployment_id == deployment.id).delete()
     db.delete(deployment)
     db.commit()
     return {"status": "deleted"}

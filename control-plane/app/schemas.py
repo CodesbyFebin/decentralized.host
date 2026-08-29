@@ -10,6 +10,7 @@ class NodeJoinRequest(BaseModel):
     region: str = "local"
     cpu_cores: float = 0
     ram_total_mb: float = 0
+    advertise_address: str = ""
 
 
 class NodeJoinResponse(BaseModel):
@@ -34,8 +35,24 @@ class NodeOut(BaseModel):
     cpu_used_pct: float
     ram_used_mb: float
     wallet_pubkey: Optional[str] = None
+    advertise_address: Optional[str] = None
     heartbeat_count: int
     last_heartbeat: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+class SSHKeyCreate(BaseModel):
+    label: str
+    public_key: str
+
+
+class SSHKeyOut(BaseModel):
+    id: str
+    label: str
+    public_key: str
+    created_at: datetime
 
     class Config:
         from_attributes = True

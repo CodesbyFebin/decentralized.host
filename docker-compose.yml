@@ -8,6 +8,8 @@ volumes:
   pgdata:
   registry-data:
   traefik-dynamic:
+  git-repos:
+  git-ssh-host-keys:
 
 services:
   postgres:
@@ -100,4 +102,24 @@ services:
       - ./dashboard:/usr/share/nginx/html:ro
     ports:
       - "4001:80"
+    networks: [dhost-mesh]
+
+  # Real git server: `git clone`/`git push` over SSH. First push to any
+  # repo name auto-creates it; pushing the default branch triggers a real
+  # build+deploy through the same pipeline as `dhost ship` (see
+  # git-server/post-receive.template -> POST /deployments/push).
+  git-server:
+    build:
+      context: .
+      dockerfile: git-server/Dockerfile
+    environment:
+      CONTROL_PLANE_URL: http://control-plane:8000
+      DEPLOY_API_KEY: ${DEPLOY_API_KEY:-dev-deploy-key}
+    volumes:
+      - git-repos:/repos
+      - git-ssh-host-keys:/etc/ssh
+    ports:
+      - "2222:22"
+    depends_on:
+      - control-plane
     networks: [dhost-mesh]

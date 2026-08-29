@@ -20,8 +20,10 @@ class Settings:
     )
     CREDITS_PER_REWARD: int = int(os.getenv("CREDITS_PER_REWARD", "10"))
     HEARTBEATS_PER_REWARD: int = int(os.getenv("HEARTBEATS_PER_REWARD", "6"))
-    # Single-node MVP: all nodes are reachable at this internal address for
-    # log streaming. Multi-node address-per-node tracking is a Phase 2 item.
+    # Fallback only, used if a node somehow has no advertise_address on file
+    # (shouldn't happen for any node that registered post-hardening). Each
+    # node now reports its own reachable address at join time and the
+    # control plane talks to *that* node specifically -- see Node.advertise_address.
     NODE_AGENT_LOG_BASE_URL: str = os.getenv(
         "NODE_AGENT_LOG_BASE_URL", "http://node-agent:8100"
     )

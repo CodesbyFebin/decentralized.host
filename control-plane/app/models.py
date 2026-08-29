@@ -29,6 +29,12 @@ class Node(Base):
     cpu_used_pct = Column(Float, default=0)
     ram_used_mb = Column(Float, default=0)
     wallet_pubkey = Column(String, nullable=True)
+    # host:port where THIS node's agent (build/log/remove API) is reachable
+    # from the control plane -- e.g. "node-agent:8100" for a same-compose
+    # node, or "203.0.113.5:8100" for a genuinely remote machine. Set at
+    # join time; the control plane must always address the node a
+    # deployment actually landed on by this, never a single global URL.
+    advertise_address = Column(String, nullable=True)
     heartbeat_count = Column(Integer, default=0)
     last_heartbeat = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=_now)
@@ -82,4 +88,16 @@ class CreditLedger(Base):
     amount = Column(Integer, nullable=False)
     tx_signature = Column(String, nullable=True)
     explorer_url = Column(String, nullable=True)
+    created_at = Column(DateTime, default=_now)
+
+
+class SSHKey(Base):
+    """Public keys allowed to git push. No per-user accounts exist in this
+    MVP (same single-operator trust model as NODE_JOIN_SECRET and
+    DEPLOY_API_KEY) -- any registered key can push to any repo."""
+    __tablename__ = "ssh_keys"
+
+    id = Column(String, primary_key=True, default=_uuid)
+    label = Column(String, nullable=False)
+    public_key = Column(Text, nullable=False, unique=True)
     created_at = Column(DateTime, default=_now)

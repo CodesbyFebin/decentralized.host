@@ -30,9 +30,11 @@ Traefik routes app.127.0.0.1.nip.io -> the container the node agent just started
   socket). Registers, sends heartbeats, **builds images from uploaded
   source** (`/build`), runs containers, writes Traefik's routing config.
 - **cli/** — The `dhost` command: `ship`, `update`, `history`, `rollback`,
-  `status`, `logs`, `node join`, `node list`, `wallet`, `credits` (plus the
-  older `init`/`deploy`, kept for anyone who wants to build locally — see
-  below).
+  `status`, `logs`, `node join`, `node list`, `wallet`, `credits`,
+  `keys add`/`keys list`, `clone-url` (plus the older `init`/`deploy`, kept
+  for anyone who wants to build locally — see below).
+- **git-server/** — A real SSH git server: `git push` to auto-create a repo
+  and deploy it, no separate CI config. See "Real git push deploys" below.
 - **blockchain/** — Solana devnet integration for node-operator credits.
   Optional, feature-flagged, fully documented in [blockchain/README.md](blockchain/README.md).
 - **web/** — The landing page / project overview. Not served by a
@@ -105,6 +107,35 @@ opengit-site --port 80`, then visit `http://opengit-site.<BASE_DOMAIN>`.
 This project dogfoods itself rather than running its own site on a
 special-cased container.
 
+## Real git push deploys
+
+A real SSH git server, not the Git-free ledger path above — the two are
+independent front doors into the same build pipeline. First register a
+key, then push:
+
+```bash
+dhost keys add my-laptop ~/.ssh/id_ed25519.pub   # takes up to 30s to sync
+dhost clone-url my-app                            # prints the remote URL + setup commands
+
+cd my-app
+git remote add opengit ssh://git@localhost:2222/repos/my-app.git
+git push opengit main
+```
+
+First push auto-creates the repo and deploys it; every push after that
+redeploys. No `.opengit.yml` needed for the common case (port 8080,
+`<name>.<BASE_DOMAIN>`) — add one at the repo root only to override:
+
+```yaml
+port: 3000
+domain: custom.example.com   # optional, same override dhost ship --domain provides
+```
+
+Deploys whatever branch you push, single-branch-is-live (like a classic
+Heroku git remote) — there's no multi-branch preview-environment support
+in this version. Auth is the same single-shared-secret model as the rest
+of the mesh: any registered key can push to any repo, no per-repo ACLs.
+
 ## Node-operator credits (optional)
 
 Off by default. To turn on real Solana-devnet credit minting, see
@@ -120,12 +151,35 @@ dhost wallet <node_id> <your-devnet-wallet-pubkey>
 
 ## Adding a second node
 
+For another container on this same Docker daemon (quick local testing):
+
 ```bash
 dhost node join --node-name node-2
 dhost node list   # should now show two healthy nodes
 ```
 
-The scheduler picks whichever node has the lowest combined CPU+RAM load.
+For a genuinely separate machine, the control plane now tracks each
+node's own reachable address (`Node.advertise_address`) and always talks
+to the specific node a deployment landed on — earlier versions of this
+project hardcoded one global node-agent URL, which would have silently
+misrouted builds/logs/teardown to the wrong machine the moment a second
+*real* node existed. Run the agent directly on the remote machine:
+
+```bash
+docker run -d --name dhost-node-agent \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -e CONTROL_PLANE_URL=https://api.<your-domain> \
+  -e NODE_JOIN_SECRET=<your real NODE_JOIN_SECRET> \
+  -e NODE_NAME=node-2 \
+  -e ADVERTISE_ADDRESS=<this machine's reachable host>:8100 \
+  -p 8100:8100 \
+  dhost/node-agent:latest
+```
+
+`ADVERTISE_ADDRESS` must be reachable *from the control plane*, not from
+you — a public IP/hostname for a real remote box, or the Docker network
+hostname for same-compose testing (the default). The scheduler picks
+whichever healthy node has the lowest combined CPU+RAM load.
 
 ## Configuration
 
@@ -156,12 +210,20 @@ Being upfront about scope, matching the roadmap on the landing page:
   (namespaces, cgroups, image layering, sandboxing) is a much bigger
   undertaking than is reasonable here, and a half-built version of it would
   be a real security downgrade from what Docker already gives us.
-- Single-machine by default — `dhost node join` runs another agent
-  container on the same Docker daemon, not a genuinely remote machine
-  (though the agent code itself has no such assumption baked in).
-- No real TLS/Let's Encrypt — `nip.io` + Traefik gets you real routing,
-  not HTTPS, for local development.
-- No per-user accounts/RBAC — one shared deploy key and one shared node
-  join secret, appropriate for a single operator running their own mesh.
+- Single-machine **by default** — `dhost node join` still runs another
+  agent container on the same Docker daemon for quick local testing. Real
+  multi-machine now works (each node reports its own reachable address
+  and the control plane addresses that node specifically — see "Adding a
+  second node"), but it hasn't been tested against an actual second
+  physical/cloud machine, only reasoned through and code-reviewed.
+- No real TLS/Let's Encrypt for **local dev** — `nip.io` + Traefik gets you
+  real routing, not HTTPS. Production deploys (`docker-compose.prod.yml`,
+  see DEPLOY.md) do get real Let's Encrypt certs.
+- No per-user accounts/RBAC — one shared deploy key, one shared node join
+  secret, and (new) any registered SSH key can push to any repo. Fine for
+  a single operator running their own mesh, not for a multi-tenant service.
+- The git server has no multi-branch preview environments, no per-repo
+  access control, and deploys whatever branch you last pushed — a single
+  shared "production" per repo, not a full CI/CD system.
 - Credits run on Solana **devnet** only, by design (see
   [blockchain/README.md](blockchain/README.md) for why).

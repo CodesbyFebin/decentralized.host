@@ -1,0 +1,63 @@
+#!/bin/bash
+# Installed into every repo's hooks/ dir (see opengit-shell.sh) with
+# CONTROL_PLANE_URL and DEPLOY_API_KEY already substituted in by
+# entrypoint.sh at container startup. Deploys whatever branch was just
+# pushed (single-branch-deploys-live model, like classic Heroku git remotes
+# -- no multi-branch preview environments in this version). We point HEAD
+# at the just-pushed ref rather than assuming main/master, since a fresh
+# bare repo has no HEAD target that actually exists yet until something
+# is pushed.
+set -euo pipefail
+
+LAST_REF=""
+while read -r oldrev newrev refname; do
+  LAST_REF="$refname"
+done
+if [ -z "$LAST_REF" ]; then
+  exit 0
+fi
+git symbolic-ref HEAD "$LAST_REF"
+
+REPO_NAME="$(basename "$(pwd)" .git)"
+WORKDIR="$(mktemp -d)"
+trap 'rm -rf "$WORKDIR"' EXIT
+
+git archive HEAD -o "$WORKDIR/src.tar"
+gzip "$WORKDIR/src.tar"
+ARCHIVE="$WORKDIR/src.tar.gz"
+
+PORT=8080
+DOMAIN=""
+mkdir -p "$WORKDIR/peek"
+tar -xzf "$ARCHIVE" -C "$WORKDIR/peek"
+if [ -f "$WORKDIR/peek/.opengit.yml" ]; then
+  FILE_PORT=$(grep -E '^port:' "$WORKDIR/peek/.opengit.yml" | sed -E 's/^port:[[:space:]]*//' || true)
+  FILE_DOMAIN=$(grep -E '^domain:' "$WORKDIR/peek/.opengit.yml" | sed -E 's/^domain:[[:space:]]*//' || true)
+  [ -n "$FILE_PORT" ] && PORT="$FILE_PORT"
+  [ -n "$FILE_DOMAIN" ] && DOMAIN="$FILE_DOMAIN"
+fi
+
+SHORT_SHA="$(git rev-parse --short HEAD)"
+
+echo "remote:"
+echo "remote: ⟡ opengit: building '${REPO_NAME}' from ${SHORT_SHA} (no CI config needed)..."
+
+HTTP_CODE=$(curl -s -o "$WORKDIR/response.json" -w "%{http_code}" -X POST \
+  "__CONTROL_PLANE_URL__/deployments/push" \
+  -H "Authorization: Bearer __DEPLOY_API_KEY__" \
+  -F "name=${REPO_NAME}" \
+  -F "container_port=${PORT}" \
+  -F "custom_domain=${DOMAIN}" \
+  -F "message=git push ${SHORT_SHA}" \
+  -F "archive=@${ARCHIVE};type=application/gzip")
+
+STATUS=$(jq -r '.status // "unknown"' "$WORKDIR/response.json" 2>/dev/null || echo "unknown")
+URL=$(jq -r '.url // empty' "$WORKDIR/response.json" 2>/dev/null || true)
+ERR=$(jq -r '.error // .detail // empty' "$WORKDIR/response.json" 2>/dev/null || true)
+
+if [ "$STATUS" = "running" ]; then
+  echo "remote: ✨ Live at ${URL}"
+else
+  echo "remote: ✗ Deploy failed (HTTP ${HTTP_CODE}): ${ERR:-unknown error}"
+fi
+echo "remote:"
