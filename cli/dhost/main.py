@@ -128,7 +128,7 @@ def _tar_from_dir(root: Path, files: list[str]) -> bytes:
     return buf.read()
 
 
-def _do_ship(project_dir: Path, name: str, port: int, message: str) -> dict:
+def _do_ship(project_dir: Path, name: str, port: int, message: str, domain: str = "") -> dict:
     stack, dockerfile_content = detect_stack(project_dir)
     console.print(f"[bold cyan]⟡[/] Detected: [bold]{stack}[/]")
     dockerfile_content = maybe_refine_with_ai(stack, dockerfile_content, project_dir)
@@ -149,7 +149,7 @@ def _do_ship(project_dir: Path, name: str, port: int, message: str) -> dict:
                 "/deployments/ship",
                 data={
                     "name": name, "container_port": str(port), "dockerfile": dockerfile_content,
-                    "message": message, "snapshot_id": snapshot["id"],
+                    "message": message, "snapshot_id": snapshot["id"], "custom_domain": domain,
                 },
                 files={"archive": ("src.tar.gz", archive_bytes, "application/gzip")},
             )
@@ -169,6 +169,7 @@ def ship(
     name: Optional[str] = typer.Argument(None, help="Deployment name (defaults to folder name)"),
     port: int = typer.Option(8080, help="Container port your app listens on"),
     message: str = typer.Option("ship", "--message", "-m", help="Snapshot message"),
+    domain: str = typer.Option("", "--domain", help="Bind a bare custom domain (e.g. --domain decentralized.host) instead of <name>.<BASE_DOMAIN>"),
 ):
     """Detect your stack, snapshot it (no Git), and build+deploy it on the mesh
     (no local Docker required -- the build happens on the node agent)."""
@@ -177,11 +178,13 @@ def ship(
     name = name or cfg.get("name") or project_dir.name
     cfg["name"] = name
     cfg["port"] = port
+    if domain:
+        cfg["domain"] = domain
     cfg.setdefault("api_url", os.getenv("DHOST_API_URL", "http://localhost:8000"))
     cfg.setdefault("deploy_key", os.getenv("DHOST_DEPLOY_KEY", "dev-deploy-key"))
     api.save_config(cfg)
 
-    deployment = _do_ship(project_dir, name, port, message)
+    deployment = _do_ship(project_dir, name, port, message, domain=domain or cfg.get("domain", ""))
 
     if deployment["status"] == "running":
         console.print(f"\n[bold green]🎉 Live at http://{deployment['subdomain']}[/]")
@@ -201,7 +204,7 @@ def update(message: str = typer.Argument(..., help="What changed")):
     name = cfg["name"]
     port = cfg.get("port", 8080)
 
-    deployment = _do_ship(project_dir, name, port, message)
+    deployment = _do_ship(project_dir, name, port, message, domain=cfg.get("domain", ""))
 
     if deployment["status"] == "running":
         console.print(f"\n[bold green]✔ Deployed![/] http://{deployment['subdomain']}")

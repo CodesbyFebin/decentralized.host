@@ -138,6 +138,7 @@ async def ship_deployment(
     upload_id: Optional[str] = Form(None),
     message: str = Form(""),
     snapshot_id: str = Form(""),
+    custom_domain: str = Form(""),
     db: Session = Depends(get_db),
 ):
     """Server-side build path used by `dhost ship`/`dhost update` and the
@@ -145,12 +146,17 @@ async def ship_deployment(
     reference via upload_id from a prior /detect call) plus a generated
     Dockerfile, and the node agent (which already has Docker) builds,
     pushes, and runs it. The developer's own machine never needs Docker
-    installed."""
+    installed.
+
+    custom_domain overrides the default `{name}.{BASE_DOMAIN}` subdomain --
+    needed for anything that must sit at a bare apex domain (e.g. the
+    landing page at decentralized.host itself, not
+    landing-page.decentralized.host)."""
     node = pick_node(db)
     if node is None:
         raise HTTPException(503, "No healthy nodes available in the mesh. Run 'dhost node join'.")
 
-    subdomain = f"{name}.{settings.BASE_DOMAIN}"
+    subdomain = custom_domain.strip() or f"{name}.{settings.BASE_DOMAIN}"
     deployment = db.query(Deployment).filter(Deployment.name == name).first()
     if deployment:
         deployment.node_id = node.id
