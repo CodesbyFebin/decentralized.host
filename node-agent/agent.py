@@ -26,6 +26,11 @@ POLL_INTERVAL = int(os.getenv("POLL_INTERVAL", "3"))
 LOG_API_PORT = int(os.getenv("LOG_API_PORT", "8100"))
 TRAEFIK_DYNAMIC_DIR = Path(os.getenv("TRAEFIK_DYNAMIC_DIR", "/etc/traefik/dynamic"))
 MESH_NETWORK = os.getenv("MESH_NETWORK", "dhost-mesh")
+# Used only to build real sitemap.xml/robots.txt URLs correctly -- local
+# dev has no TLS (nip.io + Traefik is plain HTTP), production does (see
+# docker-compose.prod.yml). Getting this wrong would make the sitemap
+# itself lie about the site's real scheme.
+PUBLIC_SCHEME = os.getenv("PUBLIC_SCHEME", "http")
 # How the control plane reaches *this* node's build/log/remove API. Default
 # assumes the same-compose case (a Docker-network hostname); a node on a
 # genuinely separate machine must set this to its own public host:port,
@@ -88,15 +93,23 @@ def heartbeat_loop() -> None:
 
 
 def write_traefik_config(name: str, subdomain: str, ip: str, port: int) -> None:
+    router = {
+        "rule": f"Host(`{subdomain}`)",
+        "service": name,
+    }
+    if PUBLIC_SCHEME == "https":
+        # Production: every app subdomain gets its own real Let's Encrypt
+        # cert via HTTP-01, same mechanism as the control-plane/dashboard
+        # static routes in docker-compose.prod.yml -- otherwise deployed
+        # apps would silently stay on plain HTTP in "production."
+        router["entryPoints"] = ["websecure"]
+        router["tls"] = {"certResolver": "letsencrypt"}
+    else:
+        router["entryPoints"] = ["web"]
+
     config = {
         "http": {
-            "routers": {
-                name: {
-                    "rule": f"Host(`{subdomain}`)",
-                    "service": name,
-                    "entryPoints": ["web"],
-                }
-            },
+            "routers": {name: router},
             "services": {
                 name: {
                     "loadBalancer": {"servers": [{"url": f"http://{ip}:{port}"}]}
@@ -169,6 +182,42 @@ def _safe_extract_tar(tar_path: str, dest_dir: str) -> None:
         tar.extractall(dest_dir)  # noqa: S202 -- paths validated above
 
 
+def _maybe_generate_seo_files(src_dir: str, subdomain: str) -> None:
+    """For static sites only (detected by an index.html at the root -- the
+    same signal detect_stack() itself uses): generate a real sitemap.xml
+    covering every actual .html file, and a robots.txt pointing at it.
+    Never overwrites files the project already has. Skipped entirely for
+    non-static stacks, since we can't know a Python/Node app's real routes
+    without route introspection we don't have -- no fake entries."""
+    root = Path(src_dir)
+    if not (root / "index.html").exists():
+        return
+
+    base_url = f"{PUBLIC_SCHEME}://{subdomain}"
+
+    sitemap_path = root / "sitemap.xml"
+    if not sitemap_path.exists():
+        html_files = sorted(p for p in root.rglob("*.html") if p.is_file())
+        urls = []
+        for p in html_files:
+            rel = p.relative_to(root).as_posix()
+            loc = base_url if rel == "index.html" else f"{base_url}/{rel}"
+            urls.append(f"  <url><loc>{loc}</loc></url>")
+        sitemap_path.write_text(
+            '<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+            + "\n".join(urls) + "\n</urlset>\n"
+        )
+        logger.info(f"Generated sitemap.xml ({len(urls)} URLs) for static site")
+
+    robots_path = root / "robots.txt"
+    if not robots_path.exists():
+        robots_path.write_text(
+            f"User-agent: *\nAllow: /\n\nSitemap: {base_url}/sitemap.xml\n"
+        )
+        logger.info("Generated robots.txt for static site")
+
+
 def build_and_run(name: str, port: int, subdomain: str, dockerfile: str, archive_path: str) -> dict:
     """Builds an image from an uploaded source tarball + Dockerfile, pushes it to
     the mesh registry, and starts it -- this is the whole reason the developer
@@ -179,6 +228,7 @@ def build_and_run(name: str, port: int, subdomain: str, dockerfile: str, archive
         src_dir = os.path.join(build_dir, "src")
         os.makedirs(src_dir, exist_ok=True)
         _safe_extract_tar(archive_path, src_dir)
+        _maybe_generate_seo_files(src_dir, subdomain)
         (Path(src_dir) / "Dockerfile").write_text(dockerfile)
 
         image_tag = f"{REGISTRY_HOST}/{name}:latest"

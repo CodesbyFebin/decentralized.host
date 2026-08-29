@@ -12,6 +12,11 @@
 #     node agent needs it, and the real deploy path (`dhost ship`) never
 #     has the CLI touch the registry directly, so nothing loses function.
 #   - Traefik's dashboard API stops running in insecure mode.
+#   - node-agent gets PUBLIC_SCHEME=https, which does two things: every
+#     future deployment's own subdomain also gets a real Let's Encrypt
+#     cert (not just control-plane/dashboard), and any generated
+#     sitemap.xml/robots.txt for static sites gets the right scheme in
+#     their URLs.
 
 services:
   traefik:
@@ -56,6 +61,10 @@ services:
       - "traefik.http.routers.dashboard.entrypoints=websecure"
       - "traefik.http.routers.dashboard.tls.certresolver=letsencrypt"
       - "traefik.http.services.dashboard.loadbalancer.server.port=80"
+
+  node-agent:
+    environment:
+      PUBLIC_SCHEME: "https"
 
 volumes:
   letsencrypt:

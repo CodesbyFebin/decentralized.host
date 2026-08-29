@@ -107,6 +107,17 @@ opengit-site --port 80`, then visit `http://opengit-site.<BASE_DOMAIN>`.
 This project dogfoods itself rather than running its own site on a
 special-cased container.
 
+## SEO files for static sites
+
+Any deployment the build detects as a static site (an `index.html` at the
+root) gets a real `sitemap.xml` (every `.html` file it actually finds,
+correct scheme/domain for the environment) and `robots.txt` generated
+automatically on build, unless the project already has its own — see
+`_maybe_generate_seo_files` in [node-agent/agent.py](node-agent/agent.py).
+Nothing is fabricated or auto-applied to non-static apps: there's no way
+to know a Python/Node backend's real routes without introspecting it, so
+this deliberately doesn't try.
+
 ## Real git push deploys
 
 A real SSH git server, not the Git-free ledger path above — the two are
