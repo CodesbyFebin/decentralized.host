@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OpenGit Console — Central Command Station</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.8/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5.0.6/index.css">
+<script>
+  tailwind.config = {
+    theme: { extend: { fontFamily: { sans: ['Inter','sans-serif'], mono: ['JetBrains Mono','monospace'] },
+      colors: { neon: { green:'#00ff88', blue:'#00d4ff', purple:'#a855f7', pink:'#ff006e' } } } }
+  }
+</script>
+<style>
+  * { scroll-behavior: smooth; }
+  body { font-family:'Inter',sans-serif; background:#0a0a0a; color:#e2e8f0; }
+  ::-webkit-scrollbar{width:6px;height:6px} ::-webkit-scrollbar-track{background:#0a0a0a} ::-webkit-scrollbar-thumb{background:rgba(100,116,139,.3);border-radius:3px}
+  .mono{font-family:'JetBrains Mono',monospace}
+  .gradient-text-solana{background:linear-gradient(135deg,#9945FF,#14F195);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .sidebar{background:rgba(10,10,10,.95);border-right:1px solid rgba(100,116,139,.1)}
+  .card{background:rgba(15,23,42,.6);border:1px solid rgba(100,116,139,.15);border-radius:12px;backdrop-filter:blur(12px);transition:all .3s}
+  .card:hover{border-color:rgba(0,212,255,.25)}
+  .code-block{background:rgba(0,0,0,.5);border:1px solid rgba(100,116,139,.2)}
+  .btn-primary{background:linear-gradient(135deg,#00ff88,#00d4ff);color:#0a0a0a;font-weight:700;transition:all .2s}
+  .btn-primary:hover{box-shadow:0 0 20px rgba(0,255,136,.3);transform:translateY(-1px)}
+  .btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+  .btn-secondary{background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.3);color:#00d4ff;transition:all .2s}
+  .btn-secondary:hover{background:rgba(0,212,255,.15);border-color:rgba(0,212,255,.5)}
+  .nav-item{transition:all .2s;border-left:2px solid transparent}
+  .nav-item:hover{background:rgba(0,212,255,.05)}
+  .nav-item.active{background:rgba(0,212,255,.1);border-left:2px solid #00d4ff}
+  .status-dot{width:8px;height:8px;border-radius:50%;animation:pulse 2s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+  .pill{display:inline-flex;align-items:center;gap:.35rem;padding:.2rem .65rem;border-radius:999px;font-size:.7rem;font-weight:700;letter-spacing:.02em;text-transform:uppercase}
+  .pill-running{background:rgba(0,255,136,.12);color:#00ff88}
+  .pill-building{background:rgba(251,191,36,.12);color:#fbbf24}
+  .pill-pending{background:rgba(148,163,184,.12);color:#94a3b8}
+  .pill-failed{background:rgba(239,68,68,.12);color:#f87171}
+  .pill-healthy{background:rgba(0,255,136,.12);color:#00ff88}
+  .pill-stale, .pill-offline{background:rgba(239,68,68,.12);color:#f87171}
+  .dot{width:6px;height:6px;border-radius:999px;background:currentColor}
+  .drop-zone{border:2px dashed rgba(100,116,139,.35);border-radius:16px;transition:all .2s}
+  .drop-zone.drag{border-color:#00d4ff;background:rgba(0,212,255,.05)}
+  textarea, input, select{background:rgba(0,0,0,.4);border:1px solid rgba(100,116,139,.25);color:#e2e8f0;border-radius:10px}
+  textarea:focus, input:focus, select:focus{outline:none;border-color:rgba(0,212,255,.5)}
+  table{width:100%;font-size:.85rem} th{text-align:left;color:#64748b;font-weight:500;padding:.5rem .75rem;border-bottom:1px solid rgba(100,116,139,.15)}
+  td{padding:.6rem .75rem;border-bottom:1px solid rgba(100,116,139,.08)}
+  tr:hover td{background:rgba(148,163,184,.04)}
+  .fade-in{animation:fadeIn .25s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+  .pulse-text{animation:pulseText 1.4s ease-in-out infinite}
+  @keyframes pulseText{0%,100%{opacity:1}50%{opacity:.4}}
+</style>
+</head>
+<body class="overflow-hidden">
+
+<div class="flex h-screen">
+  <!-- Sidebar -->
+  <aside class="sidebar w-64 flex flex-col shrink-0">
+    <div class="p-6 border-b border-slate-800/50">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-neon-green to-neon-blue flex items-center justify-center text-gray-900 font-bold">OG</div>
+        <div>
+          <div class="font-bold text-white">OpenGit Console</div>
+          <div class="text-xs text-slate-500">Central Command</div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
+      <a href="#" onclick="showSection('overview');return false" class="nav-item active flex items-center gap-3 px-4 py-3 rounded-lg text-sm" data-section="overview">
+        <span class="text-lg">📊</span><span class="text-slate-300">Dashboard</span>
+      </a>
+      <a href="#" onclick="showSection('launchpad');return false" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm" data-section="launchpad">
+        <span class="text-lg">🚀</span><span class="text-slate-300">Launchpad</span>
+      </a>
+      <a href="#" onclick="showSection('deployments');return false" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm" data-section="deployments">
+        <span class="text-lg">⚡</span><span class="text-slate-300">Deployments</span>
+      </a>
+      <a href="#" onclick="showSection('git');return false" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm" data-section="git">
+        <span class="text-lg">📦</span><span class="text-slate-300">Git Manager</span>
+      </a>
+      <a href="#" onclick="showSection('nodes');return false" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm" data-section="nodes">
+        <span class="text-lg">🌐</span><span class="text-slate-300">Mesh Nodes</span>
+      </a>
+      <a href="#" onclick="showSection('credits');return false" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm" data-section="credits">
+        <span class="text-lg">💎</span><span class="text-slate-300">Credits</span>
+      </a>
+      <a href="#" onclick="showSection('settings');return false" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm" data-section="settings">
+        <span class="text-lg">⚙️</span><span class="text-slate-300">Settings</span>
+      </a>
+    </nav>
+
+    <div class="p-4 border-t border-slate-800/50 text-xs text-slate-600">
+      No user accounts in this MVP — one shared deploy key per mesh.
+      <a href="#" onclick="showSection('settings');return false" class="text-neon-blue hover:underline">Configure it →</a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="flex-1 flex flex-col overflow-hidden">
+    <header class="h-16 border-b border-slate-800/50 flex items-center justify-between px-6 bg-slate-900/30 shrink-0">
+      <div class="flex items-center gap-4">
+        <h1 id="pageTitle" class="text-xl font-bold text-white">Dashboard</h1>
+        <div id="health-pill" class="flex items-center gap-2 px-3 py-1 rounded-full bg-neon-green/10 border border-neon-green/20">
+          <div class="status-dot bg-neon-green"></div>
+          <span class="text-xs text-neon-green font-medium">Checking…</span>
+        </div>
+      </div>
+      <button onclick="showSection('launchpad')" class="btn-primary px-4 py-2 rounded-lg text-sm font-bold">🚀 New Deploy</button>
+    </header>
+
+    <div class="flex-1 overflow-y-auto p-6">
+
+      <!-- Overview -->
+      <section id="sec-overview" class="fade-in">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div class="card p-6"><div class="flex items-center justify-between mb-4"><span class="text-2xl">🌐</span></div>
+            <div id="stat-nodes" class="text-3xl font-black text-white mb-1">–</div><div class="text-sm text-slate-400">Nodes healthy</div></div>
+          <div class="card p-6"><div class="flex items-center justify-between mb-4"><span class="text-2xl">⚡</span></div>
+            <div id="stat-deploys" class="text-3xl font-black text-white mb-1">–</div><div class="text-sm text-slate-400">Deployments running</div></div>
+          <div class="card p-6"><div class="flex items-center justify-between mb-4"><span class="text-2xl">📦</span></div>
+            <div id="stat-releases" class="text-3xl font-black text-white mb-1">–</div><div class="text-sm text-slate-400">Releases shipped</div></div>
+          <div class="card p-6"><div class="flex items-center justify-between mb-4"><span class="text-2xl">💎</span></div>
+            <div id="stat-blockchain" class="text-xl font-black mb-1">–</div><div class="text-sm text-slate-400">Node credits (devnet)</div></div>
+        </div>
+
+        <div class="card p-6 mb-6">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl font-bold text-white">Recent Deployments</h2>
+            <button onclick="showSection('deployments')" class="text-sm text-neon-blue hover:text-neon-green transition-colors">View All →</button>
+          </div>
+          <div id="overview-deploy-list" class="space-y-3"></div>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="card p-6 cursor-pointer hover:border-neon-green/30" onclick="showSection('launchpad')">
+            <div class="text-3xl mb-3">🚀</div><h3 class="text-lg font-bold text-white mb-2">New Project</h3>
+            <p class="text-sm text-slate-400">Drop a folder, ship it — no Dockerfile, no local Docker or Git.</p>
+          </div>
+          <div class="card p-6 cursor-pointer hover:border-neon-blue/30" onclick="showSection('git')">
+            <div class="text-3xl mb-3">📦</div><h3 class="text-lg font-bold text-white mb-2">Git Manager</h3>
+            <p class="text-sm text-slate-400">Real release history, no git commands.</p>
+          </div>
+          <div class="card p-6 cursor-pointer hover:border-neon-purple/30" onclick="showSection('nodes')">
+            <div class="text-3xl mb-3">🌐</div><h3 class="text-lg font-bold text-white mb-2">Mesh Nodes</h3>
+            <p class="text-sm text-slate-400">Live capacity and health of the mesh.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Launchpad -->
+      <section id="sec-launchpad" class="fade-in hidden">
+        <p class="text-slate-400 mb-6">Drop a project folder. It's detected, previewed, and shipped through the same real build pipeline as <code class="mono text-neon-green">dhost ship</code> -- no Dockerfile in your repo, no local Docker or Git required.</p>
+
+        <div id="drop-zone" class="drop-zone p-12 text-center cursor-pointer mb-6">
+          <div class="text-4xl mb-3">📁</div>
+          <div class="text-slate-300 font-medium mb-1">Drag & drop a project folder here</div>
+          <div class="text-slate-500 text-sm">or click to browse</div>
+          <input type="file" id="file-input" webkitdirectory directory multiple class="hidden">
+        </div>
+        <div id="launchpad-status" class="text-sm text-slate-500 mb-6"></div>
+
+        <div id="launchpad-result" class="hidden space-y-4">
+          <div class="card p-6">
+            <div class="flex items-center justify-between mb-3">
+              <div><div class="text-xs text-slate-500">Detected stack</div><div id="detected-stack" class="text-lg font-bold text-neon-green"></div></div>
+              <div id="ai-note-wrap" class="max-w-md text-xs text-slate-400 italic"></div>
+            </div>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div><label class="text-xs text-slate-500 block mb-1">Deployment name</label><input id="ship-name" class="w-full px-3 py-2 text-sm mono"></div>
+              <div><label class="text-xs text-slate-500 block mb-1">Container port</label><input id="ship-port" value="8080" class="w-full px-3 py-2 text-sm mono"></div>
+            </div>
+            <label class="text-xs text-slate-500 block mt-4 mb-1">Generated Dockerfile (editable)</label>
+            <textarea id="ship-dockerfile" rows="10" class="w-full px-3 py-2 text-xs mono"></textarea>
+            <button id="ship-btn" class="btn-primary w-full mt-4 py-3 rounded-lg text-sm">Ship it 🚀</button>
+          </div>
+          <div id="ship-result" class="card p-6 hidden"></div>
+        </div>
+      </section>
+
+      <!-- Deployments -->
+      <section id="sec-deployments" class="fade-in hidden">
+        <p class="text-slate-400 mb-6">Every app on the mesh.</p>
+        <div class="card overflow-hidden">
+          <table id="deploy-table"><thead><tr><th>Name</th><th>Status</th><th>Image</th><th>Node</th><th>URL</th><th></th></tr></thead><tbody></tbody></table>
+        </div>
+        <div id="deploy-detail" class="card p-6 mt-6 hidden"></div>
+      </section>
+
+      <!-- Git Manager -->
+      <section id="sec-git" class="fade-in hidden">
+        <p class="text-slate-400 mb-6">Version tracking without Git -- see <code class="mono text-neon-green">cli/dhost/ledger.py</code>. Source snapshots live on whichever machine ran the ship; this history is the server-side record of what was actually deployed.</p>
+
+        <div class="card p-6 mb-6">
+          <h3 class="text-lg font-bold text-white mb-4">Quick Commands</h3>
+          <div class="grid md:grid-cols-2 gap-3">
+            <div class="code-block rounded-lg p-4"><div class="flex items-center gap-2 mb-1"><span class="text-neon-green">$</span><code class="text-sm text-white">dhost ship &lt;name&gt;</code></div><p class="text-xs text-slate-500">Snapshot + build + deploy a new project</p></div>
+            <div class="code-block rounded-lg p-4"><div class="flex items-center gap-2 mb-1"><span class="text-neon-green">$</span><code class="text-sm text-white">dhost update "message"</code></div><p class="text-xs text-slate-500">Snapshot changes and redeploy</p></div>
+            <div class="code-block rounded-lg p-4"><div class="flex items-center gap-2 mb-1"><span class="text-neon-green">$</span><code class="text-sm text-white">dhost history</code></div><p class="text-xs text-slate-500">List local snapshots (with their ids)</p></div>
+            <div class="code-block rounded-lg p-4"><div class="flex items-center gap-2 mb-1"><span class="text-neon-green">$</span><code class="text-sm text-white">dhost rollback &lt;snapshot-id&gt;</code></div><p class="text-xs text-slate-500">Restore and redeploy an earlier snapshot</p></div>
+          </div>
+        </div>
+
+        <div class="card p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-bold text-white">Release History</h3>
+            <select id="git-deploy-select" class="px-3 py-2 text-sm"></select>
+          </div>
+          <div id="release-list" class="space-y-3"></div>
+        </div>
+      </section>
+
+      <!-- Nodes -->
+      <section id="sec-nodes" class="fade-in hidden">
+        <p class="text-slate-400 mb-6">Mesh capacity and health.</p>
+        <div class="card overflow-hidden">
+          <table id="node-table"><thead><tr><th>Name</th><th>Status</th><th>Region</th><th>CPU</th><th>RAM</th><th>Wallet</th></tr></thead><tbody></tbody></table>
+        </div>
+      </section>
+
+      <!-- Credits -->
+      <section id="sec-credits" class="fade-in hidden">
+        <p class="text-slate-400 mb-4">Solana devnet SPL token ledger, per node -- see blockchain/README.md for why this is devnet-only (and genuinely free).</p>
+        <div id="credits-status" class="text-sm text-slate-400 mb-4"></div>
+        <select id="credits-node-select" class="px-3 py-2 text-sm mb-4"></select>
+        <div id="credits-summary" class="card p-6"></div>
+      </section>
+
+      <!-- Settings -->
+      <section id="sec-settings" class="fade-in hidden">
+        <p class="text-slate-400 mb-6">The only two settings this console has -- who it talks to, and how it authenticates.</p>
+        <div class="card p-6 max-w-lg">
+          <h3 class="text-lg font-bold text-white mb-4">Console connection</h3>
+          <label class="text-xs text-slate-500 block mb-1">Control plane API URL</label>
+          <input id="settings-api" class="w-full px-3 py-2 text-sm mono mb-4">
+          <label class="text-xs text-slate-500 block mb-1">Deploy API key</label>
+          <input id="settings-key" class="w-full px-3 py-2 text-sm mono mb-4">
+          <p class="text-xs text-slate-600 mb-4">Stored in this browser's localStorage only. Local dev defaults match .env.example.</p>
+          <button class="btn-primary px-6 py-3 rounded-lg text-sm font-bold" onclick="saveSettings()">Save</button>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<script>
+// ---------- config ----------
+function apiBase() { return localStorage.getItem('dhost_api') || 'http://localhost:8000'; }
+function deployKey() { return localStorage.getItem('dhost_key') || 'dev-deploy-key'; }
+function authHeaders() { return { 'Authorization': `Bearer ${deployKey()}` }; }
+
+function saveSettings() {
+  localStorage.setItem('dhost_api', document.getElementById('settings-api').value.trim() || 'http://localhost:8000');
+  localStorage.setItem('dhost_key', document.getElementById('settings-key').value.trim() || 'dev-deploy-key');
+  refreshAll();
+}
+
+// ---------- nav ----------
+const TITLES = { overview:'Dashboard', launchpad:'Launchpad', deployments:'Deployments', git:'Git Manager', nodes:'Mesh Nodes', credits:'Credits', settings:'Settings' };
+function showSection(id) {
+  document.querySelectorAll('main section').forEach(s => s.classList.add('hidden'));
+  document.getElementById(`sec-${id}`).classList.remove('hidden');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.section === id));
+  document.getElementById('pageTitle').textContent = TITLES[id];
+  if (id === 'settings') {
+    document.getElementById('settings-api').value = apiBase();
+    document.getElementById('settings-key').value = deployKey();
+  }
+  refreshSection(id);
+}
+
+function statusPill(status) { return `<span class="pill pill-${status}"><span class="dot"></span>${status}</span>`; }
+function timeAgo(iso) {
+  const s = Math.floor((Date.now() - new Date(iso)) / 1000);
+  if (s < 60) return `${s}s ago`;
+  if (s < 3600) return `${Math.floor(s/60)}m ago`;
+  if (s < 86400) return `${Math.floor(s/3600)}h ago`;
+  return `${Math.floor(s/86400)}d ago`;
+}
+function stackIcon(image) {
+  if (!image) return '📦';
+  if (image.includes('node') || image.includes('next')) return '⚡';
+  if (image.includes('python') || image.includes('fastapi')) return '🐍';
+  return '📦';
+}
+
+async function apiGet(path) {
+  const r = await fetch(apiBase() + path, { headers: authHeaders() });
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+
+// ---------- health ----------
+async function refreshHealth() {
+  const pill = document.getElementById('health-pill');
+  try {
+    const r = await fetch(apiBase() + '/healthz');
+    if (!r.ok) throw new Error();
+    pill.innerHTML = `<div class="status-dot bg-neon-green"></div><span class="text-xs text-neon-green font-medium">All Systems Operational</span>`;
+    pill.className = 'flex items-center gap-2 px-3 py-1 rounded-full bg-neon-green/10 border border-neon-green/20';
+  } catch {
+    pill.innerHTML = `<div class="status-dot bg-red-400"></div><span class="text-xs text-red-400 font-medium">Control plane unreachable</span>`;
+    pill.className = 'flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20';
+  }
+}
+
+// ---------- Overview ----------
+async function refreshOverview() {
+  try {
+    const [nodes, deploys, bc] = await Promise.all([apiGet('/nodes'), apiGet('/deployments'), fetch(apiBase()+'/blockchain/status').then(r=>r.json())]);
+    document.getElementById('stat-nodes').textContent = `${nodes.filter(n=>n.status==='healthy').length}/${nodes.length}`;
+    document.getElementById('stat-deploys').textContent = `${deploys.filter(d=>d.status==='running').length}/${deploys.length}`;
+    document.getElementById('stat-blockchain').innerHTML = bc.enabled ? `<span class="text-neon-green">enabled</span>` : `<span class="text-slate-500">off (devnet)</span>`;
+
+    let totalReleases = 0;
+    for (const d of deploys.slice(0, 8)) {
+      try { totalReleases += (await apiGet(`/deployments/${d.name}/releases`)).length; } catch {}
+    }
+    document.getElementById('stat-releases').textContent = totalReleases;
+
+    const list = document.getElementById('overview-deploy-list');
+    list.innerHTML = deploys.slice(0, 6).map(d => `
+      <div class="flex items-center justify-between p-4 rounded-lg bg-slate-800/30 hover:bg-slate-800/50 cursor-pointer" onclick="showSection('deployments')">
+        <div class="flex items-center gap-4">
+          <div class="w-10 h-10 rounded-lg bg-neon-green/10 flex items-center justify-center text-xl">${stackIcon(d.image)}</div>
+          <div><div class="font-medium text-white">${d.name}</div><div class="text-xs text-slate-500 mono">${d.image} • ${timeAgo(d.updated_at)}</div></div>
+        </div>
+        <div class="flex items-center gap-3">${statusPill(d.status)}${d.url?`<a href="${d.url}" target="_blank" onclick="event.stopPropagation()" class="text-sm text-neon-blue hover:text-neon-green">View →</a>`:''}</div>
+      </div>`).join('') || `<div class="text-slate-600 text-sm">No deployments yet -- try Launchpad.</div>`;
+  } catch (e) {}
+}
+
+// ---------- Deployments ----------
+async function refreshDeployments() {
+  const deploys = await apiGet('/deployments').catch(() => []);
+  const tbody = document.querySelector('#deploy-table tbody');
+  tbody.innerHTML = deploys.map(d => `
+    <tr class="cursor-pointer" onclick="showDeployDetail('${d.name}')">
+      <td class="mono">${stackIcon(d.image)} ${d.name}</td><td>${statusPill(d.status)}</td>
+      <td class="text-xs text-slate-400 mono">${d.image}</td>
+      <td class="text-xs text-slate-500">${(d.node_id||'').slice(0,8)}</td>
+      <td>${d.url ? `<a href="${d.url}" target="_blank" class="text-neon-blue hover:underline text-xs" onclick="event.stopPropagation()">${d.url}</a>` : '-'}</td>
+      <td class="text-xs text-slate-500">→</td>
+    </tr>`).join('') || `<tr><td colspan="6" class="text-slate-600 text-sm">No deployments yet -- try Launchpad.</td></tr>`;
+}
+
+async function showDeployDetail(name) {
+  const box = document.getElementById('deploy-detail');
+  box.classList.remove('hidden');
+  box.innerHTML = `<div class="text-slate-500 text-sm pulse-text">Loading ${name}...</div>`;
+  const [d, logs] = await Promise.all([apiGet(`/deployments/${name}`), apiGet(`/deployments/${name}/logs`).catch(()=>({logs:'(unavailable)'}))]);
+  box.innerHTML = `
+    <div class="flex items-center justify-between mb-3">
+      <h3 class="text-lg font-bold text-white mono">${d.name}</h3>
+      <div class="flex items-center gap-3">${statusPill(d.status)}
+        <button class="text-xs text-red-400 hover:text-red-300 border border-red-900/50 rounded-lg px-3 py-1" onclick="deleteDeployment('${d.name}')">Delete</button>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 gap-3 text-xs text-slate-400 mb-4">
+      <div>Image: <span class="mono text-slate-300">${d.image}</span></div>
+      <div>Container: <span class="mono text-slate-300">${(d.container_id||'-').slice(0,12)}</span></div>
+      <div>URL: ${d.url ? `<a class="text-neon-blue" href="${d.url}" target="_blank">${d.url}</a>` : '-'}</div>
+      <div>Error: <span class="text-red-400">${d.error || '-'}</span></div>
+    </div>
+    <div class="text-xs text-slate-500 mb-1">Logs (last 200 lines)</div>
+    <pre class="mono text-xs bg-black/40 rounded-lg p-3 overflow-x-auto max-h-64 overflow-y-auto text-slate-300">${(logs.logs||'').replace(/</g,'&lt;')}</pre>
+  `;
+}
+
+async function deleteDeployment(name) {
+  if (!confirm(`Tear down '${name}'? This stops and removes its container.`)) return;
+  await fetch(`${apiBase()}/deployments/${name}`, { method: 'DELETE', headers: authHeaders() });
+  document.getElementById('deploy-detail').classList.add('hidden');
+  refreshDeployments();
+}
+
+// ---------- Git Manager ----------
+async function populateGitSelect() {
+  const deploys = await apiGet('/deployments').catch(() => []);
+  const select = document.getElementById('git-deploy-select');
+  const current = select.value;
+  select.innerHTML = deploys.map(d => `<option value="${d.name}">${d.name}</option>`).join('') || `<option value="">(no deployments)</option>`;
+  if (current && deploys.some(d => d.name === current)) select.value = current;
+  return select.value;
+}
+async function refreshReleases() {
+  const name = document.getElementById('git-deploy-select').value;
+  const box = document.getElementById('release-list');
+  if (!name) { box.innerHTML = `<div class="text-slate-600 text-sm">No deployments yet -- try Launchpad.</div>`; return; }
+  const releases = await apiGet(`/deployments/${name}/releases`).catch(() => []);
+  box.innerHTML = releases.map((r, i) => `
+    <div class="flex items-start gap-3 p-3 rounded-lg bg-slate-800/30">
+      <div class="w-2 h-2 rounded-full mt-2 ${i===0?'bg-neon-green':'bg-slate-600'}"></div>
+      <div class="flex-1">
+        <div class="text-sm font-medium text-white">${r.message || '(no message)'} ${i===0?'<span class="text-xs text-neon-green">• latest</span>':''}</div>
+        <div class="text-xs text-slate-500 mono">${r.snapshot_id || '-'} • ${statusPill(r.status)} • ${timeAgo(r.created_at)}</div>
+      </div>
+    </div>`).join('') || `<div class="text-slate-600 text-sm">No releases yet for ${name} -- ship one from Launchpad or 'dhost ship'.</div>`;
+}
+document.addEventListener('change', e => { if (e.target.id === 'git-deploy-select') refreshReleases(); });
+
+// ---------- Nodes ----------
+async function refreshNodes() {
+  const nodes = await apiGet('/nodes').catch(() => []);
+  const tbody = document.querySelector('#node-table tbody');
+  tbody.innerHTML = nodes.map(n => `
+    <tr><td class="mono">${n.name}</td><td>${statusPill(n.status)}</td><td>${n.region}</td>
+    <td class="mono text-xs">${n.cpu_used_pct.toFixed(1)}%</td><td class="mono text-xs">${n.ram_used_mb.toFixed(0)}MB</td>
+    <td class="mono text-xs text-slate-500">${n.wallet_pubkey ? n.wallet_pubkey.slice(0,10)+'…' : '-'}</td></tr>
+  `).join('') || `<tr><td colspan="6" class="text-slate-600 text-sm">No nodes registered -- run 'dhost node join'.</td></tr>`;
+
+  const select = document.getElementById('credits-node-select');
+  const current = select.value;
+  select.innerHTML = nodes.map(n => `<option value="${n.id}">${n.name}</option>`).join('');
+  if (current) select.value = current;
+}
+
+// ---------- Credits ----------
+async function refreshCredits() {
+  const bc = await fetch(apiBase() + '/blockchain/status').then(r => r.json()).catch(() => ({enabled:false}));
+  document.getElementById('credits-status').innerHTML = bc.enabled
+    ? `Solana devnet minting <span class="text-neon-green">enabled</span> -- mint <span class="mono">${bc.mint_address || '(none)'}</span>, ${bc.credits_per_reward} credits every ${bc.heartbeats_per_reward} heartbeats.`
+    : `Blockchain credits are <span class="text-slate-400">off</span> (ENABLE_BLOCKCHAIN=false). See blockchain/README.md to turn them on -- devnet only, no real funds.`;
+
+  const nodeId = document.getElementById('credits-node-select').value;
+  const box = document.getElementById('credits-summary');
+  if (!nodeId) { box.innerHTML = `<div class="text-slate-600 text-sm">No node selected.</div>`; return; }
+  try {
+    const summary = await apiGet(`/blockchain/credits/${nodeId}`);
+    box.innerHTML = `
+      <div class="flex items-center justify-between mb-3">
+        <div class="text-sm text-slate-400">Wallet: <span class="mono text-slate-300">${summary.wallet_pubkey || '(not linked -- dhost wallet ' + nodeId.slice(0,8) + ' <pubkey>)'}</span></div>
+        <div class="text-2xl font-black text-neon-purple">${summary.total_credits} <span class="text-xs text-slate-500 font-normal">credits</span></div>
+      </div>
+      <table><thead><tr><th>Amount</th><th>Tx</th><th>When</th></tr></thead><tbody>
+        ${summary.ledger.map(e => `<tr><td class="mono">${e.amount}</td>
+          <td class="mono text-xs">${e.explorer_url ? `<a href="${e.explorer_url}" target="_blank" class="text-neon-blue hover:underline">${(e.tx_signature||'').slice(0,16)}…</a>` : '-'}</td>
+          <td class="text-xs text-slate-500">${timeAgo(e.created_at)}</td></tr>`).join('') || `<tr><td colspan="3" class="text-slate-600 text-sm">No credits minted yet.</td></tr>`}
+      </tbody></table>`;
+  } catch { box.innerHTML = `<div class="text-slate-600 text-sm">Could not load ledger.</div>`; }
+}
+document.addEventListener('change', e => { if (e.target.id === 'credits-node-select') refreshCredits(); });
+
+// ---------- Launchpad ----------
+const DEFAULT_IGNORES = ['.dhost', '.git', '__pycache__', 'node_modules', '.venv', 'venv', '.DS_Store', 'dist', 'build', '.next'];
+function shouldIgnore(relPath) { return relPath.split('/').some(part => DEFAULT_IGNORES.includes(part)); }
+
+async function walkDataTransferItems(items) {
+  const files = [];
+  async function walk(entry, prefix) {
+    if (entry.isFile) {
+      const file = await new Promise((res, rej) => entry.file(res, rej));
+      files.push({ file, relPath: prefix + entry.name });
+    } else if (entry.isDirectory) {
+      const reader = entry.createReader();
+      const entries = await new Promise((res, rej) => reader.readEntries(res, rej));
+      for (const e of entries) await walk(e, prefix + entry.name + '/');
+    }
+  }
+  for (const item of items) { const entry = item.webkitGetAsEntry && item.webkitGetAsEntry(); if (entry) await walk(entry, ''); }
+  return files;
+}
+
+let currentUpload = null;
+
+async function handleFiles(fileEntries) {
+  const filtered = fileEntries.filter(f => !shouldIgnore(f.relPath));
+  if (filtered.length === 0) { document.getElementById('launchpad-status').textContent = 'No usable files found.'; return; }
+  const statusEl = document.getElementById('launchpad-status');
+  statusEl.innerHTML = `<span class="pulse-text">⟡ Uploading ${filtered.length} files and detecting stack...</span>`;
+  document.getElementById('launchpad-result').classList.add('hidden');
+
+  const fd = new FormData();
+  for (const { file, relPath } of filtered) fd.append('files', file, relPath);
+
+  try {
+    const resp = await fetch(apiBase() + '/deployments/detect', { method: 'POST', headers: authHeaders(), body: fd });
+    if (!resp.ok) throw new Error(await resp.text());
+    const result = await resp.json();
+    currentUpload = result;
+    statusEl.textContent = '';
+    document.getElementById('launchpad-result').classList.remove('hidden');
+    document.getElementById('detected-stack').textContent = result.stack;
+    document.getElementById('ai-note-wrap').innerHTML = result.ai_note
+      ? `🤖 ${result.ai_note}` : `<span class="text-slate-600">AI assistance not configured (set GOOGLE_API_KEY on the control plane) -- showing rule-based detection.</span>`;
+    document.getElementById('ship-dockerfile').value = result.dockerfile;
+    document.getElementById('ship-name').value = (filtered[0].relPath.split('/')[0]) || 'my-app';
+    document.getElementById('ship-result').classList.add('hidden');
+  } catch (e) {
+    statusEl.innerHTML = `<span class="text-red-400">Detect failed: ${e.message}</span>`;
+  }
+}
+
+document.getElementById('ship-btn').addEventListener('click', async () => {
+  if (!currentUpload) return;
+  const btn = document.getElementById('ship-btn');
+  btn.disabled = true; btn.textContent = 'Building on the mesh...';
+  const resultBox = document.getElementById('ship-result');
+  resultBox.classList.remove('hidden');
+  resultBox.innerHTML = `<div class="pulse-text text-sm text-slate-400">⟡ Building and deploying (no local Docker involved)...</div>`;
+
+  const fd = new FormData();
+  fd.append('name', document.getElementById('ship-name').value.trim());
+  fd.append('container_port', document.getElementById('ship-port').value.trim() || '8080');
+  fd.append('dockerfile', document.getElementById('ship-dockerfile').value);
+  fd.append('upload_id', currentUpload.upload_id);
+  fd.append('message', 'shipped from Launchpad');
+
+  try {
+    const resp = await fetch(apiBase() + '/deployments/ship', { method: 'POST', headers: authHeaders(), body: fd });
+    const d = await resp.json();
+    if (resp.ok && d.status === 'running') {
+      resultBox.innerHTML = `<div class="text-neon-green font-bold">🎉 Live at <a href="${d.url}" target="_blank" class="underline">${d.url}</a></div>`;
+    } else {
+      resultBox.innerHTML = `<div class="text-red-400">Failed: ${d.error || d.detail || 'unknown error'}</div>`;
+    }
+  } catch (e) {
+    resultBox.innerHTML = `<div class="text-red-400">Ship failed: ${e.message}</div>`;
+  } finally {
+    btn.disabled = false; btn.textContent = 'Ship it 🚀';
+    currentUpload = null;
+    refreshDeployments();
+  }
+});
+
+const dropZone = document.getElementById('drop-zone');
+dropZone.addEventListener('click', () => document.getElementById('file-input').click());
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag'));
+dropZone.addEventListener('drop', async e => {
+  e.preventDefault(); dropZone.classList.remove('drag');
+  if (e.dataTransfer.items) handleFiles(await walkDataTransferItems(e.dataTransfer.items));
+});
+document.getElementById('file-input').addEventListener('change', e => {
+  handleFiles(Array.from(e.target.files).map(f => ({ file: f, relPath: f.webkitRelativePath || f.name })));
+});
+
+// ---------- polling ----------
+function refreshSection(id) {
+  if (id === 'overview') refreshOverview();
+  if (id === 'deployments') refreshDeployments();
+  if (id === 'git') populateGitSelect().then(refreshReleases);
+  if (id === 'nodes') refreshNodes();
+  if (id === 'credits') refreshNodes().then(refreshCredits);
+}
+function refreshAll() {
+  refreshHealth();
+  const active = document.querySelector('.nav-item.active')?.dataset.section || 'overview';
+  refreshSection(active);
+}
+refreshAll();
+setInterval(refreshAll, 5000);
+</script>
+</body>
+</html>

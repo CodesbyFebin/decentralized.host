@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grant & Funding Templates — decentralized.host</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.8/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5.0.6/index.css">
+<script>
+  tailwind.config = { theme: { extend: { fontFamily: { sans:['Inter','sans-serif'], mono:['JetBrains Mono','monospace'] },
+    colors: { neon: { green:'#00ff88', blue:'#00d4ff', purple:'#a855f7', pink:'#ff006e', yellow:'#fbbf24' } } } } }
+</script>
+<style>
+  body{font-family:'Inter',sans-serif;background:#030712;color:#e2e8f0}
+  .mono{font-family:'JetBrains Mono',monospace}
+  ::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-thumb{background:rgba(100,116,139,.3);border-radius:3px}
+  .card{background:rgba(15,23,42,.6);border:1px solid rgba(100,116,139,.15);border-radius:14px}
+  .tab{padding:.6rem 1rem;border-radius:10px;font-size:.85rem;color:#94a3b8;cursor:pointer;border:1px solid rgba(100,116,139,.2);white-space:nowrap}
+  .tab:hover{color:#fff;border-color:rgba(0,212,255,.3)}
+  .tab.active{background:rgba(0,212,255,.1);color:#00d4ff;border-color:rgba(0,212,255,.4)}
+  textarea{background:rgba(0,0,0,.4);border:1px solid rgba(100,116,139,.25);color:#e2e8f0;border-radius:10px;width:100%}
+  textarea:focus{outline:none;border-color:rgba(0,212,255,.5)}
+  .btn{background:linear-gradient(135deg,#00ff88,#00d4ff);color:#030712;font-weight:700;transition:all .2s;border-radius:10px}
+  .btn:hover{box-shadow:0 0 20px rgba(0,255,136,.25)}
+  mark{background:rgba(251,191,36,.18);color:#fbbf24;padding:0 2px;border-radius:3px}
+</style>
+</head>
+<body>
+
+<div class="max-w-5xl mx-auto px-6 py-12">
+  <h1 class="text-3xl font-black text-white mb-2">Grant & Funding Templates</h1>
+  <p class="text-slate-400 mb-6">Draft applications for real, existing grant/funding programs — for <span class="text-white font-medium">you to personalize and submit yourself</span> through each program's actual process.</p>
+
+  <div class="card p-5 mb-8 border-yellow-600/30">
+    <div class="flex gap-3">
+      <span class="text-xl">⚠️</span>
+      <div class="text-sm text-slate-300">
+        <p class="mb-2"><span class="text-yellow-400 font-bold">These are drafts, not live claims.</span> Every <mark>[bracketed]</mark> field is a real placeholder — fill in your own name, links, and ask before sending anything. Nothing here claims an existing relationship, endorsement, or funding that hasn't happened.</p>
+        <p>Application processes, forms, and URLs change over time — verify the current process on each program's own site before submitting. Where a program relates to tech this project doesn't use yet (Filecoin, IPFS, Akash), the draft proposes <span class="text-white">building</span> that integration with the grant, rather than claiming it already exists.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="tabs" class="flex flex-wrap gap-2 mb-8"></div>
+  <div id="panel"></div>
+</div>
+
+<script>
+const BLURB = `decentralized.host is an open-source, self-hostable hosting mesh: a FastAPI control plane, a Docker-based node agent, a Traefik edge proxy, a Git-free content-addressed local versioning system (no git dependency), a CLI ("dhost") and web console ("OpenGit Console") for zero-Dockerfile, zero-local-Docker deployment via server-side builds, and an optional Solana-devnet node-operator credit system. The single-machine mesh is built and working end-to-end -- this project already hosts its own landing page and console through itself, not a special-cased static server.`;
+
+const PROGRAMS = [
+  {
+    id: 'gitcoin', name: 'Gitcoin Grants', icon: '💚',
+    about: `Quadratic-funding rounds for public goods and open-source projects. You list your project; community donations during an active round get matched from a pooled fund. No application gatekeeping beyond project review -- open to any legitimate OSS project.`,
+    link: 'https://www.gitcoin.co',
+    draft: `Project title: decentralized.host
+Tagline: [One line -- e.g. "An open-source hosting mesh you can run yourself"]
+Category: Web3 Infrastructure / Developer Tooling
+
+Description:
+${BLURB}
+
+What this grant would fund:
+[e.g. "Hardening the multi-node scheduler for Phase 2" / "Security audit of the node-agent build pipeline" -- be specific and real]
+
+Links:
+GitHub: [your repo URL once pushed]
+Live demo: [your deployed URL, e.g. from 'dhost ship']
+Docs: [README URL]
+
+Contact: [your name / email / GitHub handle]`
+  },
+  {
+    id: 'solana', name: 'Solana Foundation', icon: '◎',
+    about: `Solana Foundation funds ecosystem projects building tooling, infrastructure, and public goods on Solana. Application is a form covering the team, the project, Solana-specific integration, and a funding ask tied to milestones.`,
+    link: 'https://solana.org/grants',
+    draft: `Project: decentralized.host
+One-line pitch: An open-source hosting mesh with a real Solana-devnet node-operator incentive system.
+
+Description:
+${BLURB}
+
+Solana integration (what's actually built today):
+Node operators earn "DHOST Credits," a real SPL token minted on Solana devnet, automatically every N healthy heartbeats. This is implemented (see blockchain/creditor.py) and tested against live devnet RPC -- mint creation, associated-token-account creation, and mint-to transactions all work. It is currently devnet-only by design (see blockchain/README.md).
+
+What this grant would fund:
+[e.g. "A path from devnet credits to a real mainnet token economy" / "On-chain proof-of-uptime instead of trusted heartbeats" -- pick real, honest milestones, not speculative claims]
+
+Team: [your name / background]
+Ask: [$X tied to the milestones above]
+Links: GitHub [repo URL], demo [deployed URL]`
+  },
+  {
+    id: 'filecoin', name: 'Filecoin Foundation', icon: '📦',
+    about: `Filecoin Foundation (and related programs like FFDW) fund projects that extend Filecoin and decentralized storage. This project doesn't use Filecoin today -- the draft below proposes building that integration with grant funding, which is the honest way to apply.`,
+    link: 'https://fil.org',
+    draft: `Project: decentralized.host
+Proposal: Filecoin-backed image/artifact storage for a self-hosted deployment mesh
+
+Current state (honest baseline):
+${BLURB}
+Container images currently live in a plain Docker Registry v2 instance -- no Filecoin/IPFS involvement yet.
+
+Proposed work (what the grant funds):
+Replace or supplement the registry backend with Filecoin-backed storage for built images and release artifacts, so self-hosted mesh operators get durable, verifiable, content-addressed storage without running their own object storage. [Be specific about scope once you've scoped it -- e.g. "a registry storage driver targeting Filecoin via web3.storage" or similar -- don't commit to a specific SDK/vendor here until you've actually evaluated one.]
+
+Why this fits: the project already has a content-addressed, Git-free versioning system (cli/dhost/ledger.py, SHA-256 blob store) -- Filecoin-backed storage is a natural extension of a pattern that already exists in the codebase, not a bolt-on.
+
+Milestones: [concrete, dated deliverables]
+Ask: [$X]
+Links: GitHub [repo URL], demo [deployed URL]
+Contact: [you]`
+  },
+  {
+    id: 'ipfs', name: 'IPFS / Protocol Labs', icon: '🌐',
+    about: `IPFS ecosystem grants (via Protocol Labs and related programs) fund tooling that extends IPFS adoption. Same honesty note as Filecoin: this project doesn't use IPFS yet -- propose building it.`,
+    link: 'https://ipfs.tech',
+    draft: `Project: decentralized.host
+Proposal: IPFS-backed distribution for content-addressed deployment snapshots
+
+Current state (honest baseline):
+${BLURB}
+"dhost ship"/"dhost update" already snapshot a project into a local SHA-256 content-addressed blob store (cli/dhost/ledger.py) as a Git replacement -- today that store is purely local to whichever machine ran the ship.
+
+Proposed work (what the grant funds):
+Make those snapshots optionally publishable to IPFS, so a deployment's exact source history is durable, content-addressed, and verifiable independent of any single machine -- a natural fit since the local versioning system already speaks the same content-addressing language IPFS does.
+
+Milestones: [concrete, dated deliverables]
+Ask: [$X]
+Links: GitHub [repo URL], demo [deployed URL]
+Contact: [you]`
+  },
+  {
+    id: 'akash', name: 'Akash Network', icon: '⚡',
+    about: `Akash is a decentralized compute marketplace; it has run grant/incentive programs for projects deploying on or integrating with it. This project's node agents currently run on hardware the operator owns/rents directly -- not on Akash. Propose the integration honestly.`,
+    link: 'https://akash.network',
+    draft: `Project: decentralized.host
+Proposal: Run dhost node agents on Akash-leased compute as an additional capacity source
+
+Current state (honest baseline):
+${BLURB}
+Node operators currently run the node agent on hardware they already have (a VPS, a home server, this same machine for local dev). There's no Akash integration today.
+
+Proposed work (what the grant funds):
+A path for a node operator to lease compute on Akash and run a dhost node agent on it with minimal setup -- effectively letting Akash's marketplace supply capacity to the mesh alongside self-owned hardware.
+
+Milestones: [concrete, dated deliverables]
+Ask: [$X]
+Links: GitHub [repo URL], demo [deployed URL]
+Contact: [you]`
+  },
+  {
+    id: 'general', name: 'General Web3 Foundation / VC', icon: '🏛️',
+    about: `An adaptable cover note for any web3 foundation, ecosystem fund, or VC not listed above. Fill in the organization name and tailor the "why this fits you" paragraph to what that specific org actually funds -- a generic blast reads as spam and gets ignored.`,
+    link: '',
+    draft: `Subject: Funding inquiry -- decentralized.host (open-source hosting mesh)
+
+Dear [Organization Name] team,
+
+${BLURB}
+
+Why I'm reaching out to [Organization Name] specifically:
+[One real, specific reason -- e.g. "your ecosystem fund has backed several self-hosting/infra projects" -- don't reuse this line for every org, actually check what they've funded]
+
+What I'm asking for:
+[$X / an intro call / inclusion in an accelerator -- be specific about the actual ask]
+
+Links:
+GitHub: [repo URL]
+Live demo: [deployed URL]
+
+Happy to do a short call if useful.
+
+Best,
+[Your name]`
+  },
+  {
+    id: 'oss', name: 'Open Source Crowdfunding', icon: '🌱',
+    about: `GitHub Sponsors and Open Collective are real, individually-accessible platforms for optional one-time or recurring support -- no application/gatekeeping, you just set up a real profile yourself. This is the most honest funding path since there's no claim to verify, just an optional ask.`,
+    link: 'https://github.com/sponsors',
+    draft: `GitHub Sponsors / Open Collective profile blurb:
+
+decentralized.host is an open-source hosting mesh I'm building independently -- a control plane, node agent, CLI, and web console that let you deploy apps without Docker or Git on your own machine, and an optional Solana-devnet credit system for node operators. It's a working Phase 1 (single-machine) implementation today; the roadmap moves toward real multi-machine federation.
+
+If this is useful to you or aligned with something you care about (self-hosting, open infrastructure, decentralization), sponsorship helps me spend more time on it. No perks promised beyond what I can actually deliver as one person -- [add real perks only if you can actually fulfill them, e.g. "priority on bug reports" -- don't promise NFTs, governance tokens, or tiers you haven't built].
+
+Set up your real accounts here (this project doesn't have either configured yet):
+- GitHub Sponsors: https://github.com/sponsors
+- Open Collective: https://opencollective.com`
+  },
+];
+
+function render(id) {
+  const p = PROGRAMS.find(x => x.id === id);
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.id === id));
+  document.getElementById('panel').innerHTML = `
+    <div class="card p-6">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-xl font-bold text-white">${p.icon} ${p.name}</h2>
+        ${p.link ? `<a href="${p.link}" target="_blank" class="text-sm text-neon-blue hover:underline">${p.link} →</a>` : ''}
+      </div>
+      <p class="text-sm text-slate-400 mb-5">${p.about}</p>
+      <div class="flex items-center justify-between mb-2">
+        <label class="text-xs text-slate-500">Draft (edit freely, then copy)</label>
+        <button onclick="copyDraft('${p.id}')" id="copy-${p.id}" class="text-xs px-3 py-1.5 btn">📋 Copy</button>
+      </div>
+      <textarea id="draft-${p.id}" rows="18" class="p-4 text-xs mono">${p.draft}</textarea>
+    </div>`;
+}
+
+function copyDraft(id) {
+  const ta = document.getElementById('draft-' + id);
+  navigator.clipboard.writeText(ta.value).then(() => {
+    const btn = document.getElementById('copy-' + id);
+    const original = btn.textContent;
+    btn.textContent = '✓ Copied';
+    setTimeout(() => btn.textContent = original, 1500);
+  });
+}
+
+document.getElementById('tabs').innerHTML = PROGRAMS.map(p =>
+  `<div class="tab" data-id="${p.id}" onclick="render('${p.id}')">${p.icon} ${p.name}</div>`
+).join('');
+render(PROGRAMS[0].id);
+</script>
+</body>
+</html>

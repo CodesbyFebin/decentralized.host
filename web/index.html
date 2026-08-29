@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>decentralized.host — Ship Code. No Git. No Docker. No Cloud. Just Ship.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.8/index.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5.0.6/index.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        neon: {
+                            green: '#00ff88',
+                            blue: '#00d4ff',
+                            purple: '#a855f7',
+                            pink: '#ff006e',
+                            orange: '#ff8800',
+                            yellow: '#fbbf24',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; background: #030712; color: #e2e8f0; }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #00ff88, #00d4ff, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .gradient-text-fire {
+            background: linear-gradient(135deg, #ff8800, #ff006e, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .gradient-text-solana {
+            background: linear-gradient(135deg, #9945FF, #14F195);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-bg {
+            background: radial-gradient(ellipse at 50% 0%, rgba(0,212,255,0.08) 0%, transparent 60%),
+                        radial-gradient(ellipse at 80% 50%, rgba(168,85,247,0.06) 0%, transparent 50%),
+                        radial-gradient(ellipse at 20% 80%, rgba(0,255,136,0.04) 0%, transparent 50%);
+        }
+
+        .card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(100, 116, 139, 0.15);
+            backdrop-filter: blur(12px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card:hover {
+            border-color: rgba(0, 212, 255, 0.3);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.06), inset 0 1px 0 rgba(255,255,255,0.05);
+            transform: translateY(-4px);
+        }
+
+        .code-block {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(100, 116, 139, 0.2);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .terminal-cursor {
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .grid-bg {
+            background-image:
+                linear-gradient(rgba(100,116,139,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(100,116,139,0.05) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .slide-up {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .slide-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .nav-blur {
+            background: rgba(3, 7, 18, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(100,116,139,0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00ff88, #00d4ff);
+            color: #030712;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+        .btn-primary:hover {
+            box-shadow: 0 0 30px rgba(0,255,136,0.3), 0 0 60px rgba(0,212,255,0.15);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            border: 1px solid rgba(0,212,255,0.4);
+            color: #00d4ff;
+            transition: all 0.3s;
+        }
+        .btn-secondary:hover {
+            background: rgba(0,212,255,0.1);
+            border-color: rgba(0,212,255,0.7);
+            box-shadow: 0 0 20px rgba(0,212,255,0.15);
+        }
+
+        .btn-solana {
+            background: linear-gradient(135deg, #9945FF, #14F195);
+            color: #030712;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+        .btn-solana:hover {
+            box-shadow: 0 0 30px rgba(153,69,255,0.3), 0 0 60px rgba(20,241,149,0.15);
+            transform: translateY(-2px);
+        }
+
+        .marquee-track {
+            animation: marquee 40s linear infinite;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #030712; }
+        ::-webkit-scrollbar-thumb { background: rgba(100,116,139,0.3); border-radius: 3px; }
+
+        .mesh-line {
+            stroke-dasharray: 8 4;
+            animation: dashFlow 2s linear infinite;
+        }
+        @keyframes dashFlow {
+            to { stroke-dashoffset: -24; }
+        }
+
+        .tab-active {
+            background: rgba(0,212,255,0.1);
+            border-color: #00d4ff;
+            color: #00d4ff;
+        }
+
+        .comparison-bad {
+            background: rgba(239, 68, 68, 0.05);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .comparison-good {
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+        }
+
+        .feature-card {
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 2px;
+            background: linear-gradient(90deg, var(--accent-color, #00ff88), transparent);
+        }
+
+        .pulse-dot {
+            animation: pulseDot 2s ease-in-out infinite;
+        }
+        @keyframes pulseDot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .glow-border {
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.1), inset 0 1px 0 rgba(255,255,255,0.05);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step-connector {
+            position: relative;
+        }
+        .step-connector::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: -20px;
+            width: 20px;
+            height: 2px;
+            background: linear-gradient(90deg, rgba(0,212,255,0.5), transparent);
+        }
+
+        .solana-gradient-bg {
+            background: linear-gradient(135deg, rgba(153,69,255,0.05), rgba(20,241,149,0.05));
+        }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 nav-blur transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="#" class="flex items-center gap-3 group">
+                <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-neon-green to-neon-blue flex items-center justify-center text-gray-900 font-bold text-sm">dh</div>
+                <span class="font-bold text-lg text-white">decentralized<span class="text-neon-green">.host</span></span>
+            </a>
+            <div class="hidden lg:flex items-center gap-6">
+                <a href="#workflow" class="text-sm text-slate-400 hover:text-white transition-colors">Workflow</a>
+                <a href="#features" class="text-sm text-slate-400 hover:text-white transition-colors">100 Features</a>
+                <a href="#comparison" class="text-sm text-slate-400 hover:text-white transition-colors">vs Vercel</a>
+                <a href="#solana" class="text-sm text-slate-400 hover:text-white transition-colors">Solana</a>
+                <a href="#architecture" class="text-sm text-slate-400 hover:text-white transition-colors">Architecture</a>
+                <a href="#pricing" class="text-sm text-slate-400 hover:text-white transition-colors">Pricing</a>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="#quickstart" class="hidden sm:inline-flex btn-secondary px-4 py-2 rounded-lg text-sm font-medium">Get Started</a>
+                <a href="#" class="btn-primary px-4 py-2 rounded-lg text-sm">GitHub ↗</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-bg grid-bg min-h-screen flex items-center relative pt-20">
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+            <div class="absolute top-1/4 left-1/4 w-2 h-2 bg-neon-green/30 rounded-full float-animation"></div>
+            <div class="absolute top-1/3 right-1/4 w-1.5 h-1.5 bg-neon-blue/30 rounded-full float-animation" style="animation-delay: 1s;"></div>
+            <div class="absolute top-2/3 left-1/3 w-1 h-1 bg-neon-purple/30 rounded-full float-animation" style="animation-delay: 2s;"></div>
+            <div class="absolute top-1/2 right-1/3 w-2.5 h-2.5 bg-neon-green/20 rounded-full float-animation" style="animation-delay: 3s;"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6 py-20 relative z-10">
+            <div class="text-center max-w-6xl mx-auto">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-slate-700/50 bg-slate-800/40 mb-8 slide-up">
+                    <span class="w-2 h-2 bg-neon-green rounded-full animate-pulse"></span>
+                    <span class="text-sm text-slate-300">No Git. No Docker. No Vercel. Just Ship.</span>
+                </div>
+
+                <h1 class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black leading-[0.95] tracking-tight mb-6 slide-up" style="transition-delay: 0.1s;">
+                    <span class="text-white">Even Your Grandma</span><br>
+                    <span class="gradient-text">Can Deploy Code</span>
+                </h1>
+
+                <p class="text-lg sm:text-xl md:text-2xl text-slate-400 max-w-4xl mx-auto mb-10 leading-relaxed slide-up" style="transition-delay: 0.2s;">
+                    <span class="text-white font-semibold">decentralized.host</span> kills the Git/Docker/Kubernetes nightmare.
+                    <span class="text-neon-green font-medium">Two commands.</span> Your app is live on a global decentralized mesh.
+                    Powered by <span class="gradient-text-solana font-medium">Solana</span> for trustless payments.
+                </p>
+
+                <!-- Terminal Demo -->
+                <div class="code-block rounded-xl p-1 max-w-3xl mx-auto mb-10 slide-up" style="transition-delay: 0.3s;">
+                    <div class="flex items-center gap-2 px-4 py-3 border-b border-slate-700/30">
+                        <div class="w-3 h-3 rounded-full bg-red-500/80"></div>
+                        <div class="w-3 h-3 rounded-full bg-yellow-500/80"></div>
+                        <div class="w-3 h-3 rounded-full bg-green-500/80"></div>
+                        <span class="text-xs text-slate-500 ml-2 font-mono">~/my-app — terminal</span>
+                    </div>
+                    <div class="p-6 text-left font-mono text-sm sm:text-base space-y-3">
+                        <div>
+                            <span class="text-neon-green">$</span>
+                            <span class="text-slate-300" id="typingLine1"></span>
+                            <span class="terminal-cursor text-neon-green" id="cursor1">▌</span>
+                        </div>
+                        <div id="output1" class="hidden space-y-1">
+                            <p class="text-neon-blue">🔍 AI Stack Analyzer: Detected <span class="text-neon-green">Next.js 14 + PostgreSQL</span></p>
+                            <p class="text-neon-blue">📦 Auto-generating optimized container...</p>
+                            <p class="text-neon-blue">🚀 Broadcasting to decentralized mesh...</p>
+                            <p class="text-neon-green font-bold mt-2">✨ Live at https://my-app.decentralized.host</p>
+                        </div>
+                        <div class="mt-4">
+                            <span class="text-neon-green">$</span>
+                            <span class="text-slate-300" id="typingLine2"></span>
+                            <span class="terminal-cursor text-neon-green" id="cursor2">▌</span>
+                        </div>
+                        <div id="output2" class="hidden space-y-1">
+                            <p class="text-neon-blue">📦 Packaging updates: "fixed login bug"</p>
+                            <p class="text-neon-green font-bold">✔ Deployed globally in 2.3 seconds!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 slide-up" style="transition-delay: 0.4s;">
+                    <a href="#quickstart" class="btn-primary px-8 py-4 rounded-xl text-base font-bold w-full sm:w-auto text-center">
+                        Ship Your App →
+                    </a>
+                    <a href="#comparison" class="btn-secondary px-8 py-4 rounded-xl text-base font-medium w-full sm:w-auto text-center">
+                        See Why We Kill Vercel
+                    </a>
+                </div>
+
+                <!-- Stats -->
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-6 mt-16 max-w-4xl mx-auto slide-up" style="transition-delay: 0.5s;">
+                    <div class="text-center">
+                        <div class="text-3xl font-black text-white">2</div>
+                        <div class="text-xs text-slate-500 mt-1">Commands Total</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-black text-white">&lt;3s</div>
+                        <div class="text-xs text-slate-500 mt-1">Deploy Time</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-black text-white">100+</div>
+                        <div class="text-xs text-slate-500 mt-1">Features</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-black text-white">$0</div>
+                        <div class="text-xs text-slate-500 mt-1">Free Forever</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-black gradient-text-solana">SOL</div>
+                        <div class="text-xs text-slate-500 mt-1">Blockchain Native</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- The Problem Section -->
+    <section class="py-24 md:py-32 relative">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16 slide-up">
+                <span class="text-red-400 text-sm font-mono font-bold tracking-wider uppercase">The Nightmare</span>
+                <h2 class="text-4xl md:text-5xl font-black text-white mt-4 mb-6">Git + Docker + K8s = <span class="text-red-400">Pain</span></h2>
+                <p class="text-slate-400 max-w-3xl mx-auto text-lg">Vercel, Fly.io, Coolify, Dockploy — they all force you into complex workflows. SSH keys. YAML files. Merge conflicts. Container orchestration. <span class="text-white font-medium">Your grandma could never.</span></p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+                <div class="card rounded-2xl p-6 slide-up">
+                    <div class="text-4xl mb-4">🔐</div>
+                    <h3 class="text-lg font-bold text-white mb-2">Git Hell</h3>
+                    <p class="text-sm text-slate-400">SSH keys, personal access tokens, merge conflicts, detached HEAD states, rebasing nightmares...</p>
+                    <div class="mt-4 code-block rounded-lg p-3 text-xs">
+                        <code class="text-red-400">git push origin main</code><br>
+                        <code class="text-red-500">ERROR: Permission denied</code>
+                    </div>
+                </div>
+                <div class="card rounded-2xl p-6 slide-up" style="transition-delay:0.1s">
+                    <div class="text-4xl mb-4">🐳</div>
+                    <h3 class="text-lg font-bold text-white mb-2">Docker Complexity</h3>
+                    <p class="text-sm text-slate-400">Multi-stage Dockerfiles, layer caching, image optimization, registry auth, compose files...</p>
+                    <div class="mt-4 code-block rounded-lg p-3 text-xs">
+                        <code class="text-slate-500">FROM node:18-alpine AS builder</code><br>
+                        <code class="text-slate-500">RUN npm ci --only=production</code><br>
+                        <code class="text-red-400"># 50 more lines...</code>
+                    </div>
+                </div>
+                <div class="card rounded-2xl p-6 slide-up" style="transition-delay:0.2s">
+                    <div class="text-4xl mb-4">☸️</div>
+                    <h3 class="text-lg font-bold text-white mb-2">Kubernetes Pain</h3>
+                    <p class="text-sm text-slate-400">Pods, deployments, services, ingress, configmaps, secrets, helm charts, YAML indentation...</p>
+                    <div class="mt-4 code-block rounded-lg p-3 text-xs">
+                        <code class="text-slate-500">apiVersion: apps/v1</code><br>
+                        <code class="text-slate-500">kind: Deployment</code><br>
+                        <code class="text-red-400"># 100 lines of YAML...</code>
+                    </div>
+                </div>
+                <div class="card rounded-2xl p-6 slide-up" style="transition-delay:0.3s">
+                    <div class="text-4xl mb-4">💸</div>
+                    <h3 class="text-lg font-bold text-white mb-2">Vendor Lock-in</h3>
+                    <p class="text-sm text-slate-400">Vercel's edge functions, Fly's config, Heroku's buildpacks — all proprietary. Impossible to migrate.</p>
+                    <div class="mt-4 code-block rounded-lg p-3 text-xs">
+                        <code class="text-slate-500">// vercel.json</code><br>
+                        <code class="text-red-400">// Only works on Vercel</code><br>
+                        <code class="text-red-400">// Can't migrate anywhere</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center slide-up">
+                <div class="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-neon-green/10 border border-neon-green/20">
+                    <span class="text-2xl">💡</span>
+                    <span class="text-neon-green font-bold">What if deployment was as simple as: <code class="bg-black/30 px-2 py-1 rounded">dhost ship</code></span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- The Solution: Grandma-Proof Workflow -->
+    <section id="workflow" class="py-24 md:py-32 relative bg-slate-900/20">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16 slide-up">
+                <span class="text-neon-green text-sm font-mono font-bold tracking-wider uppercase">The Solution</span>
+                <h2 class="text-4xl md:text-5xl font-black text-white mt-4 mb-6">Two Commands. <span class="gradient-text">That's It.</span></h2>
+                <p class="text-slate-400 max-w-3xl mx-auto text-lg">No Git. No Docker. No Kubernetes. No YAML. No SSH keys. No CI/CD pipelines. Just <span class="text-white font-bold">dhost ship</span> and <span class="text-white font-bold">dhost update</span>.</p>
+            </div>
+
+            <!-- Workflow Steps -->
+            <div class="max-w-5xl mx-auto space-y-8">
+                <!-- Step 1 -->
+                <div class="card rounded-2xl p-8 slide-up">
+                    <div class="flex items-start gap-6">
+                        <div class="w-16 h-16 rounded-2xl bg-neon-green/10 flex items-center justify-center text-3xl flex-shrink-0">1️⃣</div>
+                        <div class="flex-1">
+                            <h3 class="text-2xl font-bold text-white mb-2">Ship Your App</h3>
+                            <p class="text-slate-400 mb-4">Navigate to your project folder and run one command. The AI detects your stack, generates the container, and deploys to the global mesh.</p>
+                            <div class="code-block rounded-lg p-4">
+                                <code class="text-sm"><span class="text-neon-green">$</span> <span class="text-white">dhost ship</span></code>
+                            </div>
+                            <div class="mt-4 grid md:grid-cols-3 gap-4">
+                                <div class="bg-slate-800/50 rounded-lg p-3">
+                                    <div class="text-neon-blue text-sm font-bold mb-1">🔍 AI Detection</div>
+                                    <p class="text-xs text-slate-500">Scans package.json, requirements.txt, Cargo.toml, etc.</p>
+                                </div>
+                                <div class="bg-slate-800/50 rounded-lg p-3">
+                                    <div class="text-neon-purple text-sm font-bold mb-1">📦 Auto-Build</div>
+                                    <p class="text-xs text-slate-500">Generates optimized multi-stage container automatically</p>
+                                </div>
+                                <div class="bg-slate-800/50 rounded-lg p-3">
+                                    <div class="text-neon-green text-sm font-bold mb-1">🚀 Mesh Deploy</div>
+                                    <p class="text-xs text-slate-500">Broadcasts to global decentralized node network</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="card rounded-2xl p-8 slide-up" style="transition-delay:0.1s">
+                    <div class="flex items-start gap-6">
+                        <div class="w-16 h-16 rounded-2xl bg-neon-blue/10 flex items-center justify-center text-3xl flex-shrink-0">2️⃣</div>
+                        <div class="flex-1">
+                            <h3 class="text-2xl font-bold text-white mb-2">Update Instantly</h3>
+                            <p class="text-slate-400 mb-4">Made changes? Just tell us what you fixed. We handle the versioning, building, and global deployment automatically.</p>
+                            <div class="code-block rounded-lg p-4">
+                                <code class="text-sm"><span class="text-neon-green">$</span> <span class="text-white">dhost update "fixed the login bug"</span></code>
+                            </div>
+                            <div class="mt-4 flex flex-wrap gap-2">
+                                <span class="px-3 py-1 rounded-full text-xs bg-neon-green/10 text-neon-green">✓ Auto versioning</span>
+                                <span class="px-3 py-1 rounded-full text-xs bg-neon-green/10 text-neon-green">✓ Zero downtime</span>
+                                <span class="px-3 py-1 rounded-full text-xs bg-neon-green/10 text-neon-green">✓ Global rollback</span>
+                                <span class="px-3 py-1 rounded-full text-xs bg-neon-green/10 text-neon-green">✓ Instant propagation</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comparison -->
+            <div class="mt-16 max-w-5xl mx-auto slide-up">
+                <h3 class="text-2xl font-bold text-white text-center mb-8">The Old Way vs The <span class="gradient-text">dhost</span> Way</h3>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="comparison-bad rounded-2xl p-6">
+                        <h4 class="text-lg font-bold text-red-400 mb-4">❌ Traditional (Vercel/Fly/Coolify)</h4>
+                        <ul class="space-y-3 text-sm text-slate-400">
+                            <li class="flex items-start gap-2"><span class="text-red-400">1.</span> Create GitHub account</li>
+                            <li class="flex items-start gap-2"><span class="text-red-400">2.</span> Generate SSH keys</li>
+                            <li class="flex items-start gap-2"><span class="text-red-400">3.</span> Configure git remote</li>
+                            <li class="flex items-start gap-2"><span class="text-red-400">4.</span> Write Dockerfile</li>
+                            <li class="flex items-start gap-2"><span class="text-red-400">5.</span> Set up CI/CD pipeline</li>
+                            <li class="flex items-start gap-2"><span class="text-red-400">6.</span> Configure environment variables</li>
+                            <li class="flex items-start gap-2"><span class="text-red-400">7.</span> Set up domain & SSL</li>
+                            <li class="flex items-start gap-2"><span class="text-red-400">8.</span> Deploy and pray</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-good rounded-2xl p-6">
+                        <h4 class="text-lg font-bold text-neon-green mb-4">✅ decentralized.host</h4>
+                        <ul class="space-y-3 text-sm text-slate-400">
+                            <li class="flex items-start gap-2"><span class="text-neon-green">1.</span> <code class="bg-black/30 px-2 py-0.5 rounded text-neon-green">dhost ship</code></li>
+                            <li class="flex items-start gap-2"><span class="text-neon-green">2.</span> <span class="text-neon-green font-bold">That's it. You're live.</span></li>
+                            <li class="flex items-start gap-2"><span class="text-neon-green">3.</span> Made changes? <code class="bg-black/30 px-2 py-0.5 rounded text-neon-green">dhost update "msg"</code></li>
+                            <li class="flex items-start gap-2"><span class="text-neon-green">4.</span> <span class="text-neon-green font-bold">Done. Globally deployed.</span></li>
+                        </ul>
+                        <div class="mt-6 p-4 bg-neon-green/5 rounded-lg border border-neon-green/20">
+                            <p class="text-sm text-neon-green font-medium">🎉 Total time: 3 seconds</p>
+                            <p class="text-xs text-slate-500 mt-1">Even your grandma can do it.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 100 Features Section -->
+    <section id="features" class="py-24 md:py-32 relative">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16 slide-up">
+                <span class="text-neon-purple text-sm font-mono font-bold tracking-wider uppercase">100 Monopoly Features</span>
+                <h2 class="text-4xl md:text-5xl font-black text-white mt-4 mb-6">Built to <span class="gradient-text-fire">Dominate</span></h2>
+                <p class="text-slate-400 max-w-3xl mx-auto text-lg">100 hyper-differentiated features across AI, blockchain, security, and developer experience. A category-defining monopoly.</p>
+            </div>
+
+            <!-- Feature Categories Tabs -->
+            <div class="flex flex-wrap justify-center gap-2 mb-10 slide-up">
+                <button onclick="showFeatureCategory(0)" class="feat-tab tab-active px-4 py-2 rounded-lg text-sm font-medium border border-slate-700 transition-all" data-idx="0">🧠 AI (10)</button>
+                <button onclick="showFeatureCategory(1)" class="feat-tab px-4 py-2 rounded-lg text-sm font-medium border border-slate-700 text-slate-400 transition-all" data-idx="1">⛓️ Solana (10)</button>
+                <button onclick="showFeatureCategory(2)" class="feat-tab px-4 py-2 rounded-lg text-sm font-medium border border-slate-700 text-slate-400 transition-all" data-idx="2">🔒 Security (10)</button>
+                <button onclick="showFeatureCategory(3)" class="feat-tab px-4 py-2 rounded-lg text-sm font-medium border border-slate-700 text-slate-400 transition-all" data-idx="3">🚀 DX (10)</button>
+                <button onclick="showFeatureCategory(4)" class="feat-tab px-4 py-2 rounded-lg text-sm font-medium border border-slate-700 text-slate-400 transition-all" data-idx="4">🌐 Ecosystem (10)</button>
+                <button onclick="showFeatureCategory(5)" class="feat-tab px-4 py-2 rounded-lg text-sm font-medium border border-slate-700 text-slate-400 transition-all" data-idx="5">⚡ Performance (10)</button>
+                <button onclick="showFeatureCategory(6)" class="feat-tab px-4 py-2 rounded-lg text-sm font-medium border border-slate-700 text-slate-400 transition-all" data-idx="6">📊 Analytics (10)</button>
+                <button onclick="showFeatureCategory(7)" class="feat-tab px-4 py-2 rounded-lg text-sm font-medium border border-slate-700 text-slate-400 transition-all" data-idx="7">🤝 Community (10)</button>
+                <button onclick="showFeatureCategory(8)" class="feat-tab px-4 py-2 rounded-lg text-sm font-medium border border-slate-700 text-slate-400 transition-all" data-idx="8">👑 Moat (10)</button>
+                <button onclick="showFeatureCategory(9)" class="feat-tab px-4 py-2 rounded-lg text-sm font-medium border border-slate-700 text-slate-400 transition-all" data-idx="9">🔮 Future (10)</button>
+            </div>
+
+            <div id="featureDetails" class="slide-up">
+                <!-- Filled by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Comparison Section -->
+    <section id="comparison" class="py-24 md:py-32 relative bg-slate-900/20">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16 slide-up">
+                <span class="text-neon-pink text-sm font-mono font-bold tracking-wider uppercase">The Kill Shot</span>
+                <h2 class="text-4xl md:text-5xl font-black text-white mt-4 mb-6">Why We <span class="gradient-text-fire">Murder</span> Vercel</h2>
+                <p class="text-slate-400 max-w-3xl mx-auto text-lg">Vercel, Fly.io, Coolify, Dockploy, Instapod — they're all playing checkers. We're playing 4D chess.</p>
+            </div>
+
+            <div class="overflow-x-auto slide-up">
+                <table class="w-full text-sm min-w-[800px]">
+                    <thead>
+                        <tr class="border-b border-slate-700/50">
+                            <th class="text-left py-4 px-4 text-slate-400 font-medium">Feature</th>
+                            <th class="text-center py-4 px-4 text-red-400 font-medium">Vercel</th>
+                            <th class="text-center py-4 px-4 text-red-400 font-medium">Fly.io</th>
+                            <th class="text-center py-4 px-4 text-red-400 font-medium">Coolify</th>
+                            <th class="text-center py-4 px-4 text-neon-green font-medium">dhost</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b border-slate-800/50">
+                            <td class="py-4 px-4 text-white font-medium">Commands to Deploy</td>
+                            <td class="py-4 px-4 text-center text-red-400">8+</td>
+                            <td class="py-4 px-4 text-center text-red-400">5+</td>
+                            <td class="py-4 px-4 text-center text-red-400">10+</td>
+                            <td class="py-4 px-4 text-center text-neon-green font-bold">2</td>
+                        </tr>
+                        <tr class="border-b border-slate-800/50">
+                            <td class="py-4 px-4 text-white font-medium">Git Required</td>
+                            <td class="py-4 px-4 text-center text-red-400">✓ Required</td>
+                            <td class="py-4 px-4 text-center text-red-400">✓ Required</td>
+                            <td class="py-4 px-4 text-center text-red-400">✓ Required</td>
+                            <td class="py-4 px-4 text-center text-neon-green font-bold">✗ None</td>
+                        </tr>
+                        <tr class="border-b border-slate-800/50">
+                            <td class="py-4 px-4 text-white font-medium">Docker Required</td>
+                            <td class="py-4 px-4 text-center text-red-400">Hidden</td>
+                            <td class="py-4 px-4 text-center text-red-400">✓ Required</td>
+                            <td class="py-4 px-4 text-center text-red-400">✓ Required</td>
+                            <td class="py-4 px-4 text-center text-neon-green font-bold">✗ Auto</td>
+                        </tr>
+                        <tr class="border-b border-slate-800/50">
+                            <td class="py-4 px-4 text-white font-medium">Vendor Lock-in</td>
+                            <td class="py-4 px-4 text-center text-red-400">Extreme</td>
+                            <td class="py-4 px-4 text-center text-red-400">High</td>
+                            <td class="py-4 px-4 text-center text-yellow-400">Medium</td>
+                            <td class="py-4 px-4 text-center text-neon-green font-bold">Zero</td>
+                        </tr>
+                        <tr class="border-b border-slate-800/50">
+                            <td class="py-4 px-4 text-white font-medium">Decentralized</td>
+                            <td class="py-4 px-4 text-center text-red-400">✗</td>
+                            <td class="py-4 px-4 text-center text-red-400">✗</td>
+                            <td class="py-4 px-4 text-center text-red-400">✗</td>
+                            <td class="py-4 px-4 text-center text-neon-green font-bold">✓ Global Mesh</td>
+                        </tr>
+                        <tr class="border-b border-slate-800/50">
+                            <td class="py-4 px-4 text-white font-medium">Blockchain Payments</td>
+                            <td class="py-4 px-4 text-center text-red-400">✗</td>
+                            <td class="py-4 px-4 text-center text-red-400">✗</td>
+                            <td class="py-4 px-4 text-center text-red-400">✗</td>
+                            <td class="py-4 px-4 text-center text-neon-green font-bold">✓ Solana</td>
+                        </tr>
+                        <tr class="border-b border-slate-800/50">
+                            <td class="py-4 px-4 text-white font-medium">AI Stack Detection</td>
+                            <td class="py-4 px-4 text-center text-yellow-400">Basic</td>
+                            <td class="py-4 px-4 text-center text-red-400">✗</td>
+                            <td class="py-4 px-4 text-center text-red-400">✗</td>
+                            <td class="py-4 px-4 text-center text-neon-green font-bold">✓ Advanced</td>
+                        </tr>
+                        <tr class="border-b border-slate-800/50">
+                            <td class="py-4 px-4 text-white font-medium">Grandma-Friendly</td>
+                            <td class="py-4 px-4 text-center text-red-400">✗</td>
+                            <td class="py-4 px-4 text-center text-red-400">✗</td>
+                            <td class="py-4 px-4 text-center text-red-400">✗</td>
+                            <td class="py-4 px-4 text-center text-neon-green font-bold">✓✓✓</td>
+                        </tr>
+                        <tr class="border-b border-slate-800/50">
+                            <td class="py-4 px-4 text-white font-medium">Open Source</td>
+                            <td class="py-4 px-4 text-center text-red-400">✗</td>
+                            <td class="py-4 px-4 text-center text-yellow-400">Partial</td>
+                            <td class="py-4 px-4 text-center text-neon-green">✓</td>
+                            <td class="py-4 px-4 text-center text-neon-green font-bold">✓ 100%</td>
+                        </tr>
+                        <tr>
+                            <td class="py-4 px-4 text-white font-medium">Pricing at Scale</td>
+                            <td class="py-4 px-4 text-center text-red-400">$$$</td>
+                            <td class="py-4 px-4 text-center text-red-400">$$</td>
+                            <td class="py-4 px-4 text-center text-yellow-400">$</td>
+                            <td class="py-4 px-4 text-center text-neon-green font-bold">$0 Free</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Solana Integration -->
+    <section id="solana" class="py-24 md:py-32 relative solana-gradient-bg">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16 slide-up">
+                <span class="text-sm font-mono font-bold tracking-wider uppercase gradient-text-solana">Blockchain Native</span>
+                <h2 class="text-4xl md:text-5xl font-black text-white mt-4 mb-6">Powered by <span class="gradient-text-solana">Solana</span></h2>
+                <p class="text-slate-400 max-w-3xl mx-auto text-lg">Trustless micro-payments. Instant node staking. Zero gas fees. The first hosting protocol with native blockchain economics.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6 mb-12">
+                <div class="card rounded-2xl p-6 slide-up">
+                    <div class="text-4xl mb-4">💎</div>
+                    <h3 class="text-xl font-bold text-white mb-3">Node Staking</h3>
+                    <p class="text-sm text-slate-400 mb-4">Node operators stake SOL to join the mesh. Slashing for downtime. Rewards for uptime.</p>
+                    <div class="code-block rounded-lg p-3 text-xs">
+                        <code class="text-neon-green">$</code> <code class="text-slate-300">dhost node stake 10</code><br>
+                        <code class="text-slate-500">✔ Staked 10 SOL. Earning rewards.</code>
+                    </div>
+                </div>
+                <div class="card rounded-2xl p-6 slide-up" style="transition-delay:0.1s">
+                    <div class="text-4xl mb-4">⚡</div>
+                    <h3 class="text-xl font-bold text-white mb-3">Micro-Escrow</h3>
+                    <p class="text-sm text-slate-400 mb-4">Users lock funds in escrow. Payments stream to nodes every 10 seconds based on verified uptime.</p>
+                    <div class="code-block rounded-lg p-3 text-xs">
+                        <code class="text-slate-500">Heartbeat #1: +0.0001 SOL</code><br>
+                        <code class="text-slate-500">Heartbeat #2: +0.0001 SOL</code><br>
+                        <code class="text-neon-green">Total earned: 0.0002 SOL</code>
+                    </div>
+                </div>
+                <div class="card rounded-2xl p-6 slide-up" style="transition-delay:0.2s">
+                    <div class="text-4xl mb-4">🔐</div>
+                    <h3 class="text-xl font-bold text-white mb-3">Proof of Uptime</h3>
+                    <p class="text-sm text-slate-400 mb-4">Zero-knowledge proofs verify node integrity every 10 seconds without exposing data.</p>
+                    <div class="code-block rounded-lg p-3 text-xs">
+                        <code class="text-slate-500">ZKP submitted ✓</code><br>
+                        <code class="text-slate-500">Node verified ✓</code><br>
+                        <code class="text-neon-green">Payout triggered ✓</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card rounded-2xl p-8 max-w-4xl mx-auto slide-up">
+                <h3 class="text-2xl font-bold text-white mb-6 text-center">Solana Smart Contract Architecture</h3>
+                <div class="code-block rounded-lg p-6 text-sm">
+                    <pre class="text-slate-300 overflow-x-auto"><code><span class="text-neon-purple">use</span> anchor_lang::prelude::*;
+
+<span class="text-neon-blue">#[program]</span>
+<span class="text-neon-purple">pub mod</span> mesh_escrow {
+    <span class="text-neon-purple">pub fn</span> <span class="text-neon-green">register_node</span>(ctx: Context&lt;RegisterNode&gt;, stake: u64) -> Result&lt;()&gt; {
+        <span class="text-slate-500">// Node operator stakes SOL to join the mesh</span>
+        node.staked_lamports = stake;
+        node.is_active = <span class="text-neon-orange">true</span>;
+        Ok(())
+    }
+
+    <span class="text-neon-purple">pub fn</span> <span class="text-neon-green">distribute_payout</span>(ctx: Context&lt;DistributePayout&gt;, amount: u64) -> Result&lt;()&gt; {
+        <span class="text-slate-500">// Stream payments to verified nodes every 10s</span>
+        escrow.amount -= amount;
+        operator.lamports += amount;
+        Ok(())
+    }
+}</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture Section -->
+    <section id="architecture" class="py-24 md:py-32 relative">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16 slide-up">
+                <span class="text-neon-blue text-sm font-mono font-bold tracking-wider uppercase">Under The Hood</span>
+                <h2 class="text-4xl md:text-5xl font-black text-white mt-4 mb-6">The Python Engine</h2>
+                <p class="text-slate-400 max-w-3xl mx-auto text-lg">A lightweight Python core that replaces Git, Docker, and Kubernetes with intelligent automation.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+                <div class="card rounded-2xl p-6 slide-up">
+                    <h3 class="text-lg font-bold text-white mb-4">🔍 Stack Detection</h3>
+                    <p class="text-sm text-slate-400 mb-4">AI scans your project and auto-generates the perfect container configuration.</p>
+                    <div class="code-block rounded-lg p-4 text-xs">
+                        <code class="text-slate-500">if</code> <code class="text-neon-blue">package.json</code> <code class="text-slate-500">exists:</code><br>
+                        <code class="text-slate-500">    stack =</code> <code class="text-neon-green">"Next.js"</code><br>
+                        <code class="text-slate-500">elif</code> <code class="text-neon-blue">requirements.txt</code> <code class="text-slate-500">exists:</code><br>
+                        <code class="text-slate-500">    stack =</code> <code class="text-neon-green">"FastAPI"</code><br>
+                        <code class="text-slate-500">elif</code> <code class="text-neon-blue">Cargo.toml</code> <code class="text-slate-500">exists:</code><br>
+                        <code class="text-slate-500">    stack =</code> <code class="text-neon-green">"Rust"</code>
+                    </div>
+                </div>
+                <div class="card rounded-2xl p-6 slide-up" style="transition-delay:0.1s">
+                    <h3 class="text-lg font-bold text-white mb-4">📦 Auto-Build</h3>
+                    <p class="text-sm text-slate-400 mb-4">Generates optimized multi-stage Dockerfiles automatically. Zero manual configuration.</p>
+                    <div class="code-block rounded-lg p-4 text-xs">
+                        <code class="text-neon-purple">FROM</code> <code class="text-slate-300">node:18-alpine</code> <code class="text-neon-purple">AS</code> <code class="text-slate-300">builder</code><br>
+                        <code class="text-neon-purple">WORKDIR</code> <code class="text-slate-300">/app</code><br>
+                        <code class="text-neon-purple">COPY</code> <code class="text-slate-300">. .</code><br>
+                        <code class="text-neon-purple">RUN</code> <code class="text-slate-300">npm ci && npm run build</code><br>
+                        <code class="text-neon-purple">CMD</code> <code class="text-slate-300">["npm", "start"]</code>
+                    </div>
+                </div>
+                <div class="card rounded-2xl p-6 slide-up" style="transition-delay:0.2s">
+                    <h3 class="text-lg font-bold text-white mb-4">🚀 Mesh Broadcast</h3>
+                    <p class="text-sm text-slate-400 mb-4">Pushes your app to the global decentralized node network via secure WebSockets.</p>
+                    <div class="code-block rounded-lg p-4 text-xs">
+                        <code class="text-slate-500">Connecting to mesh...</code><br>
+                        <code class="text-neon-blue">✓ Node eu-west-1: online</code><br>
+                        <code class="text-neon-blue">✓ Node us-east-3: online</code><br>
+                        <code class="text-neon-blue">✓ Node ap-south-2: online</code><br>
+                        <code class="text-neon-green">✓ Deployed to 3 nodes</code>
+                    </div>
+                </div>
+                <div class="card rounded-2xl p-6 slide-up" style="transition-delay:0.3s">
+                    <h3 class="text-lg font-bold text-white mb-4">🔐 Local Ledger</h3>
+                    <p class="text-sm text-slate-400 mb-4">Built-in version tracking without Git. Cryptographic snapshots of every deployment.</p>
+                    <div class="code-block rounded-lg p-4 text-xs">
+                        <code class="text-slate-500"># v1.0.0 - Initial deploy</code><br>
+                        <code class="text-neon-green">sha256:a3f8b2c...</code><br>
+                        <code class="text-slate-500"># v1.0.1 - Fixed login bug</code><br>
+                        <code class="text-neon-green">sha256:e7d9f1a...</code><br>
+                        <code class="text-slate-500"># Rollback: dhost rollback v1.0.0</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-24 md:py-32 relative bg-slate-900/20">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16 slide-up">
+                <span class="text-neon-yellow text-sm font-mono font-bold tracking-wider uppercase">Pricing</span>
+                <h2 class="text-4xl md:text-5xl font-black text-white mt-4 mb-6">Free Forever. <span class="gradient-text">Really.</span></h2>
+                <p class="text-slate-400 max-w-3xl mx-auto text-lg">No credit card. No trial period. No hidden fees. Just free hosting powered by community nodes.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                <div class="card rounded-2xl p-8 text-center slide-up">
+                    <div class="text-4xl mb-4">🆓</div>
+                    <h3 class="text-2xl font-bold text-white mb-2">Free</h3>
+                    <div class="text-5xl font-black text-neon-green mb-4">$0</div>
+                    <ul class="space-y-3 text-left text-sm text-slate-400 mb-6">
+                        <li class="flex items-center gap-2"><span class="text-neon-green">✓</span> 1 app (512MB RAM)</li>
+                        <li class="flex items-center gap-2"><span class="text-neon-green">✓</span> *.decentralized.host</li>
+                        <li class="flex items-center gap-2"><span class="text-neon-green">✓</span> Free SSL</li>
+                        <li class="flex items-center gap-2"><span class="text-neon-green">✓</span> Community support</li>
+                        <li class="flex items-center gap-2"><span class="text-neon-green">✓</span> Unlimited deploys</li>
+                    </ul>
+                    <a href="#" class="btn-primary w-full py-3 rounded-lg text-sm font-bold">Start Free</a>
+                </div>
+                <div class="card rounded-2xl p-8 text-center relative border-neon-blue/30 slide-up" style="transition-delay:0.1s">
+                    <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-neon-blue/20 text-neon-blue text-xs font-bold">POPULAR</div>
+                    <div class="text-4xl mb-4">⚡</div>
+                    <h3 class="text-2xl font-bold text-white mb-2">Pro</h3>
+                    <div class="text-5xl font-black text-neon-blue mb-4">$10<span class="text-lg text-slate-500">/mo</span></div>
+                    <ul class="space-y-3 text-left text-sm text-slate-400 mb-6">
+                        <li class="flex items-center gap-2"><span class="text-neon-blue">✓</span> 10 apps (16GB RAM each)</li>
+                        <li class="flex items-center gap-2"><span class="text-neon-blue">✓</span> Custom domains</li>
+                        <li class="flex items-center gap-2"><span class="text-neon-blue">✓</span> Priority support</li>
+                        <li class="flex items-center gap-2"><span class="text-neon-blue">✓</span> Advanced analytics</li>
+                        <li class="flex items-center gap-2"><span class="text-neon-blue">✓</span> Team collaboration</li>
+                    </ul>
+                    <a href="#" class="btn-secondary w-full py-3 rounded-lg text-sm font-medium">Go Pro</a>
+                </div>
+                <div class="card rounded-2xl p-8 text-center slide-up" style="transition-delay:0.2s">
+                    <div class="text-4xl mb-4">🖥️</div>
+                    <h3 class="text-2xl font-bold text-white mb-2">Node Operator</h3>
+                    <div class="text-5xl font-black gradient-text-solana mb-4">Earn SOL</div>
+                    <ul class="space-y-3 text-left text-sm text-slate-400 mb-6">
+                        <li class="flex items-center gap-2"><span class="text-neon-purple">✓</span> Run nodes on spare hardware</li>
+                        <li class="flex items-center gap-2"><span class="text-neon-purple">✓</span> Earn SOL per uptime hour</li>
+                        <li class="flex items-center gap-2"><span class="text-neon-purple">✓</span> Governance voting</li>
+                        <li class="flex items-center gap-2"><span class="text-neon-purple">✓</span> Leaderboard badges</li>
+                        <li class="flex items-center gap-2"><span class="text-neon-purple">✓</span> Community recognition</li>
+                    </ul>
+                    <a href="#" class="btn-solana w-full py-3 rounded-lg text-sm font-bold">Join Mesh</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Start -->
+    <section id="quickstart" class="py-24 md:py-32 relative">
+        <div class="max-w-4xl mx-auto px-6">
+            <div class="text-center mb-12 slide-up">
+                <h2 class="text-4xl md:text-5xl font-black text-white mb-6">Get Started in <span class="gradient-text">30 Seconds</span></h2>
+                <p class="text-slate-400 text-lg">Install. Ship. Done.</p>
+            </div>
+
+            <div class="space-y-6">
+                <div class="card rounded-2xl p-6 slide-up">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-10 h-10 rounded-full bg-neon-green/10 text-neon-green font-bold flex items-center justify-center">1</div>
+                        <h3 class="text-xl font-bold text-white">Install</h3>
+                    </div>
+                    <div class="code-block rounded-lg p-4">
+                        <code class="text-sm"><span class="text-neon-green">$</span> <span class="text-slate-300">pip install dhost</span></code>
+                    </div>
+                </div>
+
+                <div class="card rounded-2xl p-6 slide-up" style="transition-delay:0.1s">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-10 h-10 rounded-full bg-neon-blue/10 text-neon-blue font-bold flex items-center justify-center">2</div>
+                        <h3 class="text-xl font-bold text-white">Ship</h3>
+                    </div>
+                    <div class="code-block rounded-lg p-4">
+                        <code class="text-sm"><span class="text-neon-green">$</span> <span class="text-slate-300">cd my-app && dhost ship</span></code>
+                        <div class="mt-2 text-xs text-slate-500">
+                            <p>🔍 Detected: Next.js 14</p>
+                            <p>📦 Building container...</p>
+                            <p class="text-neon-green font-bold">✨ Live at https://my-app.decentralized.host</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card rounded-2xl p-6 slide-up" style="transition-delay:0.2s">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-10 h-10 rounded-full bg-neon-purple/10 text-neon-purple font-bold flex items-center justify-center">3</div>
+                        <h3 class="text-xl font-bold text-white">Update</h3>
+                    </div>
+                    <div class="code-block rounded-lg p-4">
+                        <code class="text-sm"><span class="text-neon-green">$</span> <span class="text-slate-300">dhost update "added dark mode"</span></code>
+                        <div class="mt-2 text-xs text-neon-green font-bold">
+                            <p>✔ Deployed globally in 2.3 seconds!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="py-24 md:py-32 relative hero-bg">
+        <div class="max-w-4xl mx-auto px-6 text-center">
+            <div class="slide-up">
+                <h2 class="text-4xl md:text-6xl font-black text-white mb-6">
+                    Stop Fighting Git.<br>
+                    <span class="gradient-text">Start Shipping.</span>
+                </h2>
+                <p class="text-xl text-slate-400 max-w-2xl mx-auto mb-10">
+                    Join thousands of developers who ditched Vercel, Fly.io, and Docker for the simplest deployment experience ever built.
+                </p>
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <a href="#" class="btn-primary px-10 py-4 rounded-xl text-lg font-bold w-full sm:w-auto">
+                        Ship Your First App →
+                    </a>
+                    <a href="#" class="btn-solana px-10 py-4 rounded-xl text-lg font-bold w-full sm:w-auto">
+                        Run a Node & Earn SOL
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800/50 py-16 bg-slate-950">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid md:grid-cols-4 gap-10 mb-12">
+                <div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-neon-green to-neon-blue flex items-center justify-center text-gray-900 font-bold text-xs">dh</div>
+                        <span class="font-bold text-white">decentralized<span class="text-neon-green">.host</span></span>
+                    </div>
+                    <p class="text-sm text-slate-500">No Git. No Docker. No Vercel. Just ship.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-white mb-4 text-sm">Product</h4>
+                    <ul class="space-y-2 text-sm text-slate-500">
+                        <li><a href="#workflow" class="hover:text-white transition-colors">Workflow</a></li>
+                        <li><a href="#features" class="hover:text-white transition-colors">Features</a></li>
+                        <li><a href="#pricing" class="hover:text-white transition-colors">Pricing</a></li>
+                        <li><a href="#solana" class="hover:text-white transition-colors">Solana</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-white mb-4 text-sm">Developers</h4>
+                    <ul class="space-y-2 text-sm text-slate-500">
+                        <li><a href="#quickstart" class="hover:text-white transition-colors">Quick Start</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Documentation</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">API Reference</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">CLI Reference</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-white mb-4 text-sm">Community</h4>
+                    <ul class="space-y-2 text-sm text-slate-500">
+                        <li><a href="#" class="hover:text-white transition-colors">GitHub</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Discord</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Twitter</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Blog</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-slate-800/50 pt-8 text-center">
+                <p class="text-xs text-slate-600">© 2024 decentralized.host — Open Source Protocol. Built with 💚 for developers who hate Git.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Feature categories data
+        const featureCategories = [
+            {
+                name: '🧠 AI & Autonomous Orchestration',
+                features: [
+                    'Zero-Config Intent Deployments — Natural language parsing for instant architecture',
+                    'Predictive Mesh Auto-Scaling — ML pre-warms nodes before traffic hits',
+                    'Self-Healing Container Migration — Live-migrates containers from failing nodes',
+                    'AI-Powered Cost Optimizer — Routes to cheapest nodes globally',
+                    'Automated Zero-Day Patching — AI scans and patches vulnerabilities',
+                    'Smart Multi-Stage Dockerfile Synthesizer — Builds optimal containers from legacy code',
+                    'Autonomous Database Sharding — AI sets up distributed read-replicas',
+                    'Semantic Log Anomaly Detection — Edge models alert before crashes',
+                    'Natural Language CLI Assistant — "dhost fix my memory leak"',
+                    'Dynamic CDN Edge Caching AI — Learns asset consumption patterns'
+                ]
+            },
+            {
+                name: '⛓️ Solana & Web3 Native',
+                features: [
+                    'Instant Trustless Micro-Escrow — Streaming payments per heartbeat',
+                    'Proof-of-Uptime ZKPs — Zero-knowledge proofs verify integrity',
+                    'Dynamic Staking Slashing — Auto-slash for SLA violations',
+                    'Decentralized Node Marketplace — Order book for compute capacity',
+                    'Protocol Revenue Sharing — Staker yield from hosting fees',
+                    'Gasless Developer Experience — Protocol sponsors transaction fees',
+                    'Dynamic Hardware Bonding — Collateral proportional to security tier',
+                    'Cross-Chain Bridge Support — Solana, Ethereum, USDC',
+                    'Decentralized Domain Registry — .sol and ENS integration',
+                    'Reputation-Based Node Scoring — On-chain reputation for priority'
+                ]
+            },
+            {
+                name: '🔒 Military-Grade Security',
+                features: [
+                    'Hardware-Enforced Enclaves (TEE) — AMD SEV and Intel SGX support',
+                    'Zero-Knowledge Identity — Anonymous provisioning',
+                    'End-to-End Encrypted Volumes — Client-side encryption',
+                    'Decentralized WAF — Community-driven DDoS protection',
+                    'Automated Image Signing — Sigstore/Cosign verification',
+                    'Ephemeral Sandbox Isolation — gVisor/Kata Containers',
+                    'Censorship-Resistant DNS — Resists ISP blocks',
+                    'Automated Secret Rotation — Decentralized Vault',
+                    'Zero-Trust Node Handshakes — mTLS everywhere',
+                    'Immutable Audit Trails — Append-only verifiable ledger'
+                ]
+            },
+            {
+                name: '🚀 Developer Experience',
+                features: [
+                    'GitHub Native CI/CD Action — Auto-deploy on git push',
+                    'Instant Preview Environments — Unique URL per PR',
+                    'Instant Rollback Engine — Millisecond rollbacks',
+                    'Multi-Region Global Scatter — Deploy to 50 countries with --global',
+                    'Unified CLI & Web Dashboard — Terminal + web control center',
+                    'Built-in Real-Time Telemetry — CPU/RAM/network graphs',
+                    'Zero-Downtime Rolling Updates — Smooth traffic shifting',
+                    'One-Command Env Sync — Secure .env distribution',
+                    'Built-In Edge Functions — Serverless at Traefik edge',
+                    'Custom Domain Auto-Provisioning — Wildcard SSL'
+                ]
+            },
+            {
+                name: '🌐 Ecosystem & Network Effects',
+                features: [
+                    'One-Click Template Marketplace — WordPress, Ghost, Supabase',
+                    'Decentralized CDN (dCDN) — 90% cheaper than Cloudflare',
+                    'AI Model Hosting — Optimized for LLMs on consumer GPUs',
+                    'Autonomous Bug Bounty — Smart contract payouts',
+                    'Enterprise SSO & RBAC — SAML/OIDC integration',
+                    'Multi-Tenant Namespace Isolation — Agency-friendly',
+                    'Automated Compliance Reports — SOC2/GDPR one-click',
+                    'Community Governance DAO — Token holder voting',
+                    'Developer Referral Program — Hosting credits for invites',
+                    'Hardware Agnostic SDK — Raspberry Pi to rack servers'
+                ]
+            },
+            {
+                name: '⚡ Advanced Performance',
+                features: [
+                    'Anycast IP Routing — Global entry points',
+                    'Kernel Bypass Networking (DPDK) — Ultra-low latency',
+                    'Distributed Object Storage — S3-compatible buckets',
+                    'Automated DB Backups — Point-in-time recovery',
+                    'Zero-Copy Container Pulls — P2P BitTorrent distribution',
+                    'WebTransport & HTTP/3 — Ultra-fast protocols',
+                    'Granular Rate Limiting — DDoS protection per deploy',
+                    'Cross-Container Mesh VPN — WireGuard microservices',
+                    'Real-Time WebSocket Scaling — Sticky sessions',
+                    'Automated Garbage Collection — Purge orphaned resources'
+                ]
+            },
+            {
+                name: '📊 Analytics & Observability',
+                features: [
+                    'Distributed Request Tracing — OpenTelemetry native',
+                    'AI Cost Forecasting — Budget caps with auto-throttling',
+                    'Real-User Monitoring (RUM) — Core Web Vitals tracking',
+                    'Custom Metric Alerting — Discord/Slack webhooks',
+                    'Visual Topology Mapper — 3D node visualization',
+                    'API Usage Analytics — Geographic distribution',
+                    'Exportable Audit Logs — Datadog/Splunk/S3',
+                    'Container Health Scorecards — Security posture rating',
+                    'Historical Uptime SLA Reports — Cryptographic certificates',
+                    'Developer Productivity Metrics — CI/CD speed tracking'
+                ]
+            },
+            {
+                name: '🤝 Community & Growth',
+                features: [
+                    'Fork-and-Deploy Architecture — Templates are OSS repos',
+                    'Node Operator Leaderboard — Gamification & badges',
+                    'Hackathon Sponsorship Engine — Free credits for events',
+                    'Localized Community Nodes — Regional sub-meshes',
+                    'One-Click Migration Importers — From Heroku/Vercel/AWS',
+                    'Transparent Public Roadmap — Community-voted priorities',
+                    'SDKs for Every Language — Python, Node, Go, Rust, Ruby, PHP',
+                    'Embedded AI Tutor — Context-aware documentation',
+                    'Decentralized Bug Bounty — Token-granted code reviews',
+                    'Open-Core Extension Plugins — Traefik middleware marketplace'
+                ]
+            },
+            {
+                name: '👑 The Monopoly Moat',
+                features: [
+                    'Network Effects Flywheel — More nodes → better service → more devs',
+                    'Proprietary Kernel Modules — Optimized for distributed scheduling',
+                    'Exclusive Enterprise Agreements — Fortune 500 anti-censorship',
+                    'Cross-Cloud Hybrid Mesh — Bridge AWS/GCP into decentralized',
+                    'Zero-Knowledge Billing Audits — Privacy + compliance',
+                    'Autonomous Pricing Equilibrium — 80% cheaper than AWS permanently',
+                    'Immutability Guarantee — Permanent pinning option',
+                    'Decentralized Identity (DID) — Passwordless Web3 auth',
+                    'Self-Sustaining Treasury — Automated ecosystem funding',
+                    'Unstoppable Brand Identity — The sovereign internet layer'
+                ]
+            },
+            {
+                name: '🔮 Future-Proofing',
+                features: [
+                    'Quantum-Resistant Encryption — Post-quantum cryptography',
+                    'Edge IoT Mesh Integration — Industrial IoT gateways',
+                    'Multi-Agent AI Swarm Hosting — Ultra-low inter-agent latency',
+                    'Decentralized GPU Rendering — Blender/Unreal on idle GPUs',
+                    'Zero-Latency Satellite Routing — LEO satellite compatibility',
+                    'Biometric Node Verification — Proof-of-personhood',
+                    'Carbon-Neutral Routing — Favor renewable energy nodes',
+                    'Decentralized DNS Root — Handshake/Namebase support',
+                    'Self-Replicating Node Deployers — Single-command sub-nodes',
+                    'Ultimate Kill-Switch Immunity — Cannot be shut down'
+                ]
+            }
+        ];
+
+        function showFeatureCategory(idx) {
+            const cat = featureCategories[idx];
+
+            document.querySelectorAll('.feat-tab').forEach((tab, i) => {
+                if (i === idx) {
+                    tab.classList.add('tab-active');
+                    tab.classList.remove('text-slate-400');
+                } else {
+                    tab.classList.remove('tab-active');
+                    tab.classList.add('text-slate-400');
+                }
+            });
+
+            const container = document.getElementById('featureDetails');
+            container.innerHTML = `
+                <div class="card rounded-2xl p-8">
+                    <h3 class="text-2xl font-bold text-white mb-6">${cat.name}</h3>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        ${cat.features.map((f, i) => `
+                            <div class="flex items-start gap-3 p-3 rounded-lg bg-slate-800/30 hover:bg-slate-800/50 transition-colors">
+                                <span class="text-neon-green font-bold text-sm mt-0.5">${String(i + 1).padStart(2, '0')}</span>
+                                <span class="text-sm text-slate-300">${f}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        showFeatureCategory(0);
+
+        // Terminal typing animations
+        const typingText1 = 'dhost ship';
+        const typingText2 = 'dhost update "fixed login bug"';
+        let charIdx1 = 0;
+        let charIdx2 = 0;
+        const typingEl1 = document.getElementById('typingLine1');
+        const typingEl2 = document.getElementById('typingLine2');
+        const output1 = document.getElementById('output1');
+        const output2 = document.getElementById('output2');
+        const cursor1 = document.getElementById('cursor1');
+        const cursor2 = document.getElementById('cursor2');
+
+        function typeLine1() {
+            if (charIdx1 < typingText1.length) {
+                typingEl1.textContent += typingText1[charIdx1];
+                charIdx1++;
+                setTimeout(typeLine1, 100);
+            } else {
+                cursor1.style.display = 'none';
+                setTimeout(() => {
+                    output1.classList.remove('hidden');
+                    output1.style.animation = 'fadeIn 0.5s ease';
+                    setTimeout(typeLine2, 1500);
+                }, 500);
+            }
+        }
+
+        function typeLine2() {
+            if (charIdx2 < typingText2.length) {
+                typingEl2.textContent += typingText2[charIdx2];
+                charIdx2++;
+                setTimeout(typeLine2, 80);
+            } else {
+                cursor2.style.display = 'none';
+                setTimeout(() => {
+                    output2.classList.remove('hidden');
+                    output2.style.animation = 'fadeIn 0.5s ease';
+                }, 500);
+            }
+        }
+
+        setTimeout(typeLine1, 1000);
+
+        // Intersection Observer
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+        document.querySelectorAll('.slide-up').forEach(el => observer.observe(el));
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+name: dhost
+
+networks:
+  dhost-mesh:
+    name: dhost-mesh
+
+volumes:
+  pgdata:
+  registry-data:
+  traefik-dynamic:
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: dhost
+      POSTGRES_PASSWORD: dhost
+      POSTGRES_DB: dhost
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks: [dhost-mesh]
+
+  registry:
+    image: registry:2
+    ports:
+      - "5000:5000"
+    volumes:
+      - registry-data:/var/lib/registry
+    environment:
+      REGISTRY_STORAGE_DELETE_ENABLED: "true"
+    networks: [dhost-mesh]
+
+  traefik:
+    image: traefik:v3.3
+    # Routing config comes from the node agent, which writes one file per
+    # deployment into traefik-dynamic/ (see node-agent/agent.py). We use the
+    # file provider rather than the docker provider: Traefik's docker
+    # provider fails Docker API version negotiation against Colima's socket
+    # ("client version 1.24 is too old"), a known Traefik/Colima
+    # incompatibility unrelated to this project. The file provider sidesteps
+    # it entirely and also means Traefik doesn't need docker.sock access.
+    command:
+      - "--providers.file.directory=/etc/traefik/dynamic"
+      - "--providers.file.watch=true"
+      - "--entrypoints.web.address=:80"
+      - "--api.dashboard=true"
+      - "--api.insecure=true"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - traefik-dynamic:/etc/traefik/dynamic
+    networks: [dhost-mesh]
+
+  control-plane:
+    build:
+      context: .
+      dockerfile: control-plane/Dockerfile
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg2://dhost:dhost@postgres:5432/dhost
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [dhost-mesh]
+
+  node-agent:
+    build:
+      context: .
+      dockerfile: node-agent/Dockerfile
+    env_file: .env
+    environment:
+      CONTROL_PLANE_URL: http://control-plane:8000
+      NODE_NAME: local-node-1
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - traefik-dynamic:/etc/traefik/dynamic
+    ports:
+      - "8100:8100"
+    depends_on:
+      - control-plane
+    networks: [dhost-mesh]
+
+  # The landing page (web/) is no longer served by a standalone container --
+  # it's shipped through the mesh itself as a real deployment ("dhost ship"
+  # from inside web/), the same way any other app is. That's the whole
+  # point: this project hosts its own site. See it via the OpenGit Console
+  # or at http://<name>.<BASE_DOMAIN> after shipping.
+
+  dashboard:
+    image: nginx:alpine
+    volumes:
+      - ./dashboard:/usr/share/nginx/html:ro
+    ports:
+      - "4001:80"
+    networks: [dhost-mesh]
