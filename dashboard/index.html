@@ -88,6 +88,9 @@
       <a href="#" onclick="showSection('credits');return false" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm" data-section="credits">
         <span class="text-lg">💎</span><span class="text-slate-300">Credits</span>
       </a>
+      <a href="#" onclick="showSection('assistant');return false" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm" data-section="assistant">
+        <span class="text-lg">🤖</span><span class="text-slate-300">Assistant</span>
+      </a>
       <a href="#" onclick="showSection('settings');return false" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm" data-section="settings">
         <span class="text-lg">⚙️</span><span class="text-slate-300">Settings</span>
       </a>
@@ -229,6 +232,17 @@
         <div id="credits-summary" class="card p-6"></div>
       </section>
 
+      <!-- Assistant -->
+      <section id="sec-assistant" class="fade-in hidden">
+        <p class="text-slate-400 mb-4">One real model (Gemini), with read-only tool access to actual deployment status, logs, node health, and release history. It cannot deploy, delete, or change anything -- only look and answer.</p>
+        <div id="assistant-status" class="text-sm text-slate-400 mb-4"></div>
+        <div id="assistant-chat" class="card p-4 mb-4 space-y-3 overflow-y-auto" style="max-height:50vh; min-height:200px;"></div>
+        <div class="flex gap-2">
+          <input id="assistant-input" placeholder="Ask about a deployment, node, or error..." class="flex-1 px-3 py-2 text-sm" onkeydown="if(event.key==='Enter') sendAssistantMessage()">
+          <button id="assistant-send-btn" class="btn-primary px-5 py-2 rounded-lg text-sm" onclick="sendAssistantMessage()">Send</button>
+        </div>
+      </section>
+
       <!-- Settings -->
       <section id="sec-settings" class="fade-in hidden">
         <p class="text-slate-400 mb-6">The only two settings this console has -- who it talks to, and how it authenticates.</p>
@@ -260,7 +274,7 @@ function saveSettings() {
 }
 
 // ---------- nav ----------
-const TITLES = { overview:'Dashboard', launchpad:'Launchpad', deployments:'Deployments', git:'Git Manager', nodes:'Mesh Nodes', credits:'Credits', settings:'Settings' };
+const TITLES = { overview:'Dashboard', launchpad:'Launchpad', deployments:'Deployments', git:'Git Manager', nodes:'Mesh Nodes', credits:'Credits', assistant:'Assistant', settings:'Settings' };
 function showSection(id) {
   document.querySelectorAll('main section').forEach(s => s.classList.add('hidden'));
   document.getElementById(`sec-${id}`).classList.remove('hidden');
@@ -539,6 +553,67 @@ document.getElementById('file-input').addEventListener('change', e => {
   handleFiles(Array.from(e.target.files).map(f => ({ file: f, relPath: f.webkitRelativePath || f.name })));
 });
 
+// ---------- Assistant ----------
+let assistantHistory = [];
+
+function renderAssistantChat() {
+  const box = document.getElementById('assistant-chat');
+  box.innerHTML = assistantHistory.map(m => `
+    <div class="flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}">
+      <div class="max-w-[85%] px-3 py-2 rounded-lg text-sm ${m.role === 'user' ? 'bg-neon-blue/15 text-slate-100' : 'bg-slate-800/60 text-slate-200'}">
+        <div class="whitespace-pre-wrap">${m.text.replace(/</g, '&lt;')}</div>
+        ${m.tool_calls && m.tool_calls.length ? `<div class="text-xs text-slate-500 mt-1 mono">used: ${m.tool_calls.join(', ')}</div>` : ''}
+      </div>
+    </div>`).join('') || `<div class="text-slate-600 text-sm">Ask something real -- "is hello-world running?", "why did the last deploy fail?", "what's node health look like?"</div>`;
+  box.scrollTop = box.scrollHeight;
+}
+
+async function refreshAssistantStatus() {
+  const el = document.getElementById('assistant-status');
+  try {
+    const s = await fetch(apiBase() + '/assistant/status', { headers: authHeaders() }).then(r => r.json());
+    el.innerHTML = s.enabled
+      ? `<span class="text-neon-green">● enabled</span> -- model: <span class="mono">${s.model}</span>`
+      : `<span class="text-slate-500">● not configured</span> -- set GOOGLE_API_KEY on the control plane to enable (see control-plane/app/ai.py's pattern)`;
+    document.getElementById('assistant-send-btn').disabled = !s.enabled;
+    document.getElementById('assistant-input').disabled = !s.enabled;
+  } catch {
+    el.innerHTML = `<span class="text-red-400">● could not reach control plane</span>`;
+  }
+  if (assistantHistory.length === 0) renderAssistantChat();
+}
+
+async function sendAssistantMessage() {
+  const input = document.getElementById('assistant-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  assistantHistory.push({ role: 'user', text });
+  renderAssistantChat();
+
+  const btn = document.getElementById('assistant-send-btn');
+  btn.disabled = true; btn.textContent = '...';
+
+  try {
+    const resp = await fetch(apiBase() + '/assistant/chat', {
+      method: 'POST',
+      headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: text,
+        history: assistantHistory.slice(0, -1).map(m => ({ role: m.role === 'user' ? 'user' : 'model', text: m.text })),
+      }),
+    });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.detail || 'request failed');
+    assistantHistory.push({ role: 'model', text: data.reply, tool_calls: data.tool_calls });
+  } catch (e) {
+    assistantHistory.push({ role: 'model', text: `⚠️ ${e.message}` });
+  } finally {
+    btn.disabled = false; btn.textContent = 'Send';
+    renderAssistantChat();
+  }
+}
+
 // ---------- polling ----------
 function refreshSection(id) {
   if (id === 'overview') refreshOverview();
@@ -546,6 +621,7 @@ function refreshSection(id) {
   if (id === 'git') populateGitSelect().then(refreshReleases);
   if (id === 'nodes') refreshNodes();
   if (id === 'credits') refreshNodes().then(refreshCredits);
+  if (id === 'assistant') refreshAssistantStatus();
 }
 function refreshAll() {
   refreshHealth();

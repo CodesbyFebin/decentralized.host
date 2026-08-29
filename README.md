@@ -107,6 +107,23 @@ opengit-site --port 80`, then visit `http://opengit-site.<BASE_DOMAIN>`.
 This project dogfoods itself rather than running its own site on a
 special-cased container.
 
+## AI assistant (optional)
+
+A real chat assistant in the console's Assistant tab -- one model
+(Gemini, same `GOOGLE_API_KEY` as the Launchpad's stack notes), not a
+router across "100 free models." It has **read-only** tool access to
+actual deployment status, logs, node health, and release history
+(`control-plane/app/routers/assistant.py`) -- it cannot deploy, delete,
+or change anything, and it's instructed to say so and point at the right
+CLI command instead if asked to. Off by default; the console shows "not
+configured" honestly rather than a fake response when no key is set.
+
+```bash
+# in .env
+GOOGLE_API_KEY=your-real-key
+docker compose restart control-plane
+```
+
 ## SEO files for static sites
 
 Any deployment the build detects as a static site (an `index.html` at the

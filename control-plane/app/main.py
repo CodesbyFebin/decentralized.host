@@ -7,7 +7,7 @@ from sqlalchemy import text
 from sqlalchemy.exc import OperationalError
 
 from .database import Base, engine
-from .routers import auth, blockchain, deployments, git_keys, nodes
+from .routers import assistant, auth, blockchain, deployments, git_keys, nodes
 
 # There's no migration tool (Alembic, etc.) in this project -- for a single
 # operator's local/self-hosted mesh that's a deliberate simplicity choice,
@@ -63,3 +63,4 @@ app.include_router(nodes.router)
 app.include_router(deployments.router)
 app.include_router(blockchain.router)
 app.include_router(git_keys.router)
+app.include_router(assistant.router)
