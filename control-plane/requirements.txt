@@ -3,9 +3,9 @@ uvicorn[standard]==0.30.6
 sqlalchemy==2.0.35
 psycopg2-binary==2.9.9
 pyjwt==2.13.0
-pydantic==2.9.2
+pydantic==2.13.5
 httpx==0.28.1
 python-multipart==0.0.32
 google-generativeai==0.8.3
-solana==0.34.3
-solders==0.21.0
+solana==0.40.3
+solders==0.29.0
