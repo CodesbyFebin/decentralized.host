@@ -2,6 +2,9 @@
 
 [![CI](https://github.com/CodesbyFebin/decentralized.host/actions/workflows/ci.yml/badge.svg)](https://github.com/CodesbyFebin/decentralized.host/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Dependabot](https://img.shields.io/badge/Dependabot-enabled-025E8C?logo=dependabot)](https://github.com/CodesbyFebin/decentralized.host/network/updates)
+[![Contributors](https://img.shields.io/github/contributors/CodesbyFebin/decentralized.host)](https://github.com/CodesbyFebin/decentralized.host/graphs/contributors)
+[![Stars](https://img.shields.io/github/stars/CodesbyFebin/decentralized.host)](https://github.com/CodesbyFebin/decentralized.host/stargazers)
 
 A working local MVP of an open-source, decentralized hosting mesh: a
 FastAPI control plane, a Docker-based node agent, a Traefik edge proxy, a
@@ -11,6 +14,13 @@ node-operator credit system.
 This is **Phase 1 and 2** of the [live roadmap](https://decentralized.host/roadmap/)
 — a real, runnable mesh, not a mockup. Confidential-computing enclaves and
 an optional mainnet credit migration are later phases.
+
+### Why decentralized.host?
+
+- **No vendor lock-in** — standard Docker containers, your own server, no proprietary APIs to migrate off of later.
+- **No platform markup** — the software is free (MIT); you pay only your own VPS/hardware provider, same as running anything else yourself.
+- **Multi-node scheduling** — deploy across whatever machines you register to your own mesh, scheduled by live CPU/RAM load.
+- **Open source, no open-core trap** — every capability described here is in this repository, not gated behind a paid tier.
 
 ### Project facts (machine-readable)
 
