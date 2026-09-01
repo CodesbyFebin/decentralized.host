@@ -51,13 +51,10 @@ async function prerender(): Promise<void> {
   const startedAt = Date.now();
 
   const browser = await launchBrowser();
-  // Reuse a single page across every route instead of newPage()/close() per
-  // route. @sparticuz/chromium has a documented issue where browser/page
-  // close() can hang in serverless-style environments (Sparticuz/chromium#85)
-  // -- an actual production build showed ~2.5min between routes after the
-  // first, which lines up with exactly this. Closing once at the end avoids
-  // the repeated close cycle entirely.
-  const page = await browser.newPage();
+  // A single reused page was tried and made things worse in an actual Vercel
+  // build (most routes hit a hard 20s networkidle0 timeout instead of just
+  // being slow) -- reverted to a fresh page per route, which reliably
+  // prerenders the first several routes before the time budget below kicks in.
 
   let ok = 0;
   let failed = 0;
@@ -71,6 +68,7 @@ async function prerender(): Promise<void> {
     }
 
     const routeStartedAt = Date.now();
+    const page = await browser.newPage();
     try {
       const url = `${BASE_URL}${route}`;
       await page.goto(url, { waitUntil: 'networkidle0', timeout: 20000 });
@@ -88,10 +86,11 @@ async function prerender(): Promise<void> {
     } catch (err) {
       console.error(`✘ ${route} failed after ${Date.now() - routeStartedAt}ms:`, (err as Error).message);
       failed++;
+    } finally {
+      await page.close();
     }
   }
 
-  await page.close();
   await browser.close();
   console.log(`\nPrerendered ${ok}/${routes.length} routes (${failed} failed, ${skipped} skipped) in ${Math.round((Date.now() - startedAt) / 1000)}s.`);
 
