@@ -9,6 +9,11 @@ updates:
     directory: "/control-plane"
     schedule:
       interval: "weekly"
+    groups:
+      solana-sdk:
+        patterns:
+          - "solana"
+          - "solders"
 
   - package-ecosystem: "pip"
     directory: "/node-agent"
@@ -24,6 +29,11 @@ updates:
     directory: "/blockchain"
     schedule:
       interval: "weekly"
+    groups:
+      solana-sdk:
+        patterns:
+          - "solana"
+          - "solders"
 
   - package-ecosystem: "github-actions"
     directory: "/"
