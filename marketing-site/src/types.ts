@@ -13,7 +13,8 @@ export type ContentType =
   | 'deploy-recipe'
   | 'depin'
   | 'roadmap'
-  | 'about';
+  | 'about'
+  | 'faq';
 
 export type AudienceType = 'developers' | 'devops' | 'system-architects' | 'node-operators' | 'engineering-leads';
 

@@ -17,6 +17,7 @@ import { DepinView } from './views/DepinView';
 import { RoadmapView } from './views/RoadmapView';
 import { AboutView } from './views/AboutView';
 import { OpenSourceView } from './views/OpenSourceView';
+import { FAQView } from './views/FAQView';
 import { MachineReadableViewer } from './views/MachineReadableViewer';
 import { CONTENT_REGISTRY } from './data/registry';
 
@@ -126,6 +127,9 @@ export default function App() {
       case '/open-source/':
       case '/open-source':
         return <OpenSourceView onNavigate={handleNavigate} />;
+      case '/faq/':
+      case '/faq':
+        return <FAQView onNavigate={handleNavigate} />;
       case '/llms.txt':
         return <MachineReadableViewer endpoint="llms.txt" onNavigate={handleNavigate} />;
       case '/llms-full.txt':

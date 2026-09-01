@@ -139,11 +139,11 @@ export const CONTENT_REGISTRY: Record<string, PageFrontmatter> = {
     id: 'page-alternatives',
     slug: '/alternatives/',
     title: 'Open-Source PaaS Alternatives & Comparison — Decentralized.Host',
-    description: 'Evidence-based comparisons between Decentralized.Host and Coolify, Dokploy, CapRover, Dokku, Heroku, Vercel, and Fly.io with verified capability dates.',
+    description: 'Evidence-based comparisons between Decentralized.Host and Coolify, Dokploy, CapRover, Dokku, Heroku, Vercel, and AWS with verified capability dates.',
     h1: 'Decentralized.Host vs Self-Hosted & Managed PaaS Platforms',
     intent: 'Commercial Comparison & Evaluation',
     primaryEntity: 'PaaS Alternatives',
-    secondaryEntities: ['Coolify', 'Dokploy', 'CapRover', 'Dokku', 'Heroku', 'Vercel', 'Fly.io'],
+    secondaryEntities: ['Coolify', 'Dokploy', 'CapRover', 'Dokku', 'Heroku', 'Vercel', 'AWS'],
     contentType: 'comparison',
     audience: 'engineering-leads',
     claimStatus: 'IMPLEMENTED',
@@ -258,7 +258,7 @@ export const CONTENT_REGISTRY: Record<string, PageFrontmatter> = {
     schemaTypes: ['TechArticle', 'BreadcrumbList'],
     publishedAt: '2025-02-25T00:00:00Z',
     updatedAt: '2025-08-30T00:00:00Z',
-    extractableAnswer: 'The Decentralized.Host engineering roadmap establishes verifiable milestone phases from single-cluster control planes (Phase 1) to distributed multi-node meshes (Phase 2), verifiable compute receipts (Phase 3), and autonomous P2P routing (Phase 4).'
+    extractableAnswer: 'The Decentralized.Host engineering roadmap covers a single-node control plane and CLI (Phase 1), a distributed multi-node mesh with real Git-push deploys, production TLS, and Solana devnet node-operator credits (Phase 2, both complete), confidential-computing enclaves (Phase 3, planned), and an optional Solana mainnet migration with automated node failover (Phase 4, planned).'
   },
   '/about/': {
     id: 'page-about',
@@ -299,5 +299,25 @@ export const CONTENT_REGISTRY: Record<string, PageFrontmatter> = {
     publishedAt: '2025-02-28T00:00:00Z',
     updatedAt: '2025-08-30T00:00:00Z',
     extractableAnswer: 'Decentralized.Host is licensed under MIT, welcoming community contributions to its Python/FastAPI control plane, Python node agent, Bash git server hooks, and Python dhost CLI.'
+  },
+  '/faq/': {
+    id: 'page-faq',
+    slug: '/faq/',
+    title: 'Frequently Asked Questions — Decentralized.Host',
+    description: 'Honest answers about what Decentralized.Host actually is and isn\'t: no IPFS/Arweave/Filecoin, no smart contracts, no per-user accounts, and what the optional Solana devnet credit system does and doesn\'t do.',
+    h1: 'Frequently Asked Questions',
+    intent: 'Buyer Qualification & Scope Clarification',
+    primaryEntity: 'Decentralized.Host FAQ',
+    secondaryEntities: ['Solana devnet credits', 'self-hosting', 'multi-node mesh', 'single-operator trust model', 'blockchain storage'],
+    contentType: 'faq',
+    audience: 'developers',
+    claimStatus: 'IMPLEMENTED',
+    sources: ['README.md', 'blockchain/README.md', 'DEPLOY.md', 'control-plane/app/main.py'],
+    relatedPages: ['/docs/', '/architecture/', '/depin/', '/roadmap/'],
+    canonical: 'https://decentralized.host/faq/',
+    schemaTypes: ['FAQPage', 'BreadcrumbList'],
+    publishedAt: '2026-09-01T00:00:00Z',
+    updatedAt: '2026-09-01T00:00:00Z',
+    extractableAnswer: 'Decentralized.Host is a self-hosted Docker deployment mesh (FastAPI control plane + node agents + Traefik), not a blockchain storage network -- it does not use IPFS, Arweave, or Filecoin, and its only blockchain component is an optional Solana devnet credit system for node operators.'
   }
 };

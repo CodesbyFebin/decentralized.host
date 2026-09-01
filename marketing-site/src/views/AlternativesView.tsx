@@ -28,7 +28,7 @@ export const AlternativesView: React.FC<Props> = ({ onNavigate }) => {
           Decentralized.Host vs Alternatives
         </h1>
         <p className="text-white/60 text-sm leading-relaxed font-sans">
-          Objective architectural comparisons between Decentralized.Host and self-hosted tools (Coolify, Dokploy, CapRover, Dokku) as well as managed cloud providers (Heroku, Vercel).
+          Objective architectural comparisons between Decentralized.Host and self-hosted tools (Coolify, Dokploy, CapRover, Dokku) as well as managed cloud providers (Heroku, Vercel, AWS).
         </p>
       </div>
 

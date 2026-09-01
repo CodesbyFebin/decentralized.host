@@ -100,6 +100,11 @@ export const Footer: React.FC<Props> = ({ onNavigate, onOpenAudit }) => {
                   Mission &amp; Philosophy
                 </button>
               </li>
+              <li>
+                <button onClick={() => onNavigate('/faq/')} className="hover:text-[#00FF41] transition-colors">
+                  FAQ
+                </button>
+              </li>
             </ul>
           </div>
 

@@ -138,6 +138,29 @@ export const COMPARISONS_DATA: CompetitorComparison[] = [
     lastVerifiedAt: '2025-08-05',
     evidenceSource: 'https://vercel.com/docs',
     summaryComparison: 'Vercel is the premier frontend cloud platform for Next.js. Decentralized.Host gives developers self-hosted sovereignty to run stateful long-running background workers, WebSockets, Python APIs, and full Docker workloads that exceed serverless constraints.'
+  },
+  {
+    id: 'comp-aws',
+    name: 'AWS (EC2 / ECS / Elastic Beanstalk)',
+    slug: 'aws',
+    officialUrl: 'https://aws.amazon.com',
+    license: 'Proprietary Cloud Service',
+    deploymentModel: 'Managed multi-tenant cloud; you assemble EC2/ECS/ALB/Route53 yourself, or use Elastic Beanstalk\'s opinionated wrapper around them',
+    runtime: 'EC2 VMs, ECS/Fargate containers, or Elastic Beanstalk-managed instances',
+    multiServerSupport: 'Yes, via ECS clusters, Auto Scaling Groups, or multi-AZ Elastic Beanstalk environments -- powerful, but real infrastructure-as-code work to configure',
+    gitDeployment: 'Not native -- typically wired up via CodePipeline/CodeDeploy or a third-party CI, not a plain `git push`',
+    cliTool: 'AWS CLI / SAM CLI / EB CLI -- broad and powerful, but AWS-specific and with a real learning curve',
+    dashboard: 'AWS Console -- comprehensive but famously dense, spanning dozens of separate services',
+    dockerSupport: 'Yes, via ECR + ECS/Fargate',
+    composeSupport: 'Not native (ECS uses its own task-definition JSON format, not docker-compose.yml directly)',
+    automaticTls: 'ACM (Certificate Manager) issues certs, but wiring them to an ALB/CloudFront is manual setup, not automatic per-deploy',
+    databaseTemplates: 'RDS/DynamoDB -- managed, mature, and billed separately per instance-hour',
+    rollbackSupport: 'Yes, via ECS task-definition revisions or Elastic Beanstalk application versions -- both require deliberate configuration',
+    observability: 'CloudWatch Logs/Metrics -- powerful, but a separate billed service you configure explicitly',
+    decentralizedOrMesh: 'Fully centralized, single-vendor cloud -- the opposite of a self-hosted node mesh',
+    lastVerifiedAt: '2026-08-30',
+    evidenceSource: 'https://docs.aws.amazon.com/AmazonECS/, https://docs.aws.amazon.com/elasticbeanstalk/',
+    summaryComparison: 'AWS is the deepest, most capable cloud platform that exists, but that depth is also the cost: real infrastructure-as-code, IAM policies, and per-service billing to assemble something as simple as "git push, get a URL." Decentralized.Host does not compete with AWS\'s breadth (no managed databases, no global CDN, no serverless functions) -- it competes with the specific job of running your own containers on your own or rented VPS/bare-metal hardware without needing to learn ECS task definitions or pay per-service markup. Nothing here is a drop-in AWS replacement for teams that need RDS, Lambda, or S3 specifically; it is a much simpler alternative for teams that just need to run Docker containers with Git-push deploys and automatic TLS.'
   }
 ];
 
