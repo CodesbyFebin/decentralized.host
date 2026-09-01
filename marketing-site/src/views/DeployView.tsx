@@ -3,6 +3,7 @@ import { DEPLOY_RECIPES } from '../data/deployRecipes';
 import { CONTENT_REGISTRY } from '../data/registry';
 import { AeoAnswerBlock } from '../components/AeoAnswerBlock';
 import { JsonLd } from '../components/JsonLd';
+import { LastUpdated } from '../components/LastUpdated';
 import { ClaimBadge } from '../components/ClaimBadge';
 import { Layers, Terminal, Copy, Check, CheckCircle2, ArrowRight } from 'lucide-react';
 
@@ -26,6 +27,7 @@ export const DeployView: React.FC<Props> = ({ onNavigate }) => {
   return (
     <div className="space-y-12">
       <JsonLd frontmatter={frontmatter} />
+      <LastUpdated updatedAt={frontmatter.updatedAt} />
 
       {/* Header */}
       <div className="space-y-4 text-center max-w-3xl mx-auto">

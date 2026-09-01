@@ -5,6 +5,7 @@ import { COMPARISONS_DATA } from '../data/comparisons';
 import { CONTENT_REGISTRY } from '../data/registry';
 import { AeoAnswerBlock } from '../components/AeoAnswerBlock';
 import { JsonLd } from '../components/JsonLd';
+import { LastUpdated } from '../components/LastUpdated';
 import { Layers, Shield, Calendar, ExternalLink, ArrowRight } from 'lucide-react';
 
 interface Props {
@@ -17,6 +18,7 @@ export const AlternativesView: React.FC<Props> = ({ onNavigate }) => {
   return (
     <div className="space-y-12">
       <JsonLd frontmatter={frontmatter} />
+      <LastUpdated updatedAt={frontmatter.updatedAt} />
 
       {/* Header */}
       <div className="space-y-4 text-center max-w-3xl mx-auto">

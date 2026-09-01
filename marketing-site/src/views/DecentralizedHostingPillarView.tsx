@@ -2,6 +2,7 @@ import React from 'react';
 import { CONTENT_REGISTRY } from '../data/registry';
 import { AeoAnswerBlock } from '../components/AeoAnswerBlock';
 import { JsonLd } from '../components/JsonLd';
+import { LastUpdated } from '../components/LastUpdated';
 import { ClaimBadge } from '../components/ClaimBadge';
 import { Globe, Server, Shield, Cpu, Network, ArrowRight, Check, BookOpen, Layers } from 'lucide-react';
 
@@ -15,6 +16,7 @@ export const DecentralizedHostingPillarView: React.FC<Props> = ({ onNavigate }) 
   return (
     <article className="max-w-4xl mx-auto space-y-12 text-slate-300 font-sans">
       <JsonLd frontmatter={frontmatter} />
+      <LastUpdated updatedAt={frontmatter.updatedAt} />
 
       {/* Header */}
       <header className="space-y-4 text-center">

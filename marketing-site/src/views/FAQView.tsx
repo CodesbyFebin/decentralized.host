@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { CONTENT_REGISTRY } from '../data/registry';
 import { AeoAnswerBlock } from '../components/AeoAnswerBlock';
 import { JsonLd } from '../components/JsonLd';
+import { LastUpdated } from '../components/LastUpdated';
 import { ClaimBadge } from '../components/ClaimBadge';
 import { HelpCircle, ChevronDown } from 'lucide-react';
 
@@ -175,6 +176,7 @@ export const FAQView: React.FC<Props> = ({ onNavigate }) => {
         frontmatter={frontmatter}
         faqEntries={FAQ_ENTRIES.map((e) => ({ question: e.question, answerText: e.answerText }))}
       />
+      <LastUpdated updatedAt={frontmatter.updatedAt} />
 
       <div className="space-y-4 text-center">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 text-xs font-mono">

@@ -2,6 +2,7 @@ import React from 'react';
 import { CONTENT_REGISTRY } from '../data/registry';
 import { AeoAnswerBlock } from '../components/AeoAnswerBlock';
 import { JsonLd } from '../components/JsonLd';
+import { LastUpdated } from '../components/LastUpdated';
 import { Terminal, Heart, Github, Shield, Code, ArrowRight } from 'lucide-react';
 
 interface Props {
@@ -14,6 +15,7 @@ export const AboutView: React.FC<Props> = ({ onNavigate }) => {
   return (
     <div className="max-w-4xl mx-auto space-y-12 text-slate-300 font-sans">
       <JsonLd frontmatter={frontmatter} />
+      <LastUpdated updatedAt={frontmatter.updatedAt} />
 
       {/* Header */}
       <div className="space-y-4 text-center">
