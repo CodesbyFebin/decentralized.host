@@ -24,6 +24,7 @@ jobs:
   python-syntax:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         component: [control-plane, node-agent, cli, blockchain]
     steps:
