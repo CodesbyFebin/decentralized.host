@@ -3,9 +3,10 @@ import { PageFrontmatter } from '../types';
 
 interface Props {
   frontmatter: PageFrontmatter;
+  faqEntries?: { question: string; answerText: string }[];
 }
 
-export const JsonLd: React.FC<Props> = ({ frontmatter }) => {
+export const JsonLd: React.FC<Props> = ({ frontmatter, faqEntries }) => {
   const schemas: any[] = [];
 
   // SoftwareApplication schema for product & root
@@ -43,6 +44,17 @@ export const JsonLd: React.FC<Props> = ({ frontmatter }) => {
     });
   }
 
+  // WebSite schema
+  if (frontmatter.schemaTypes.includes('WebSite')) {
+    schemas.push({
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      'name': 'Decentralized.Host',
+      'url': 'https://decentralized.host/',
+      'inLanguage': 'en-US'
+    });
+  }
+
   // TechArticle / HowTo schema for docs, guides, and pillars
   if (frontmatter.schemaTypes.includes('TechArticle') || frontmatter.schemaTypes.includes('HowTo')) {
     schemas.push({
@@ -57,12 +69,28 @@ export const JsonLd: React.FC<Props> = ({ frontmatter }) => {
       'mainEntityOfPage': frontmatter.canonical,
       'author': {
         '@type': 'Organization',
-        'name': 'Decentralized.Host Core Team'
+        'name': 'Decentralized.Host'
       },
       'publisher': {
         '@type': 'Organization',
         'name': 'Decentralized.Host'
       }
+    });
+  }
+
+  // FAQPage schema -- only emitted when real Q&A content is passed in
+  if (frontmatter.schemaTypes.includes('FAQPage') && faqEntries && faqEntries.length > 0) {
+    schemas.push({
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      'mainEntity': faqEntries.map((entry) => ({
+        '@type': 'Question',
+        'name': entry.question,
+        'acceptedAnswer': {
+          '@type': 'Answer',
+          'text': entry.answerText
+        }
+      }))
     });
   }
 

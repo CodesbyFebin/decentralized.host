@@ -11,12 +11,14 @@ interface Props {
 
 interface FAQEntry {
   question: string;
+  answerText: string;
   answer: React.ReactNode;
 }
 
 const FAQ_ENTRIES: FAQEntry[] = [
   {
     question: 'Is Decentralized.Host a blockchain storage network like IPFS, Arweave, or Filecoin?',
+    answerText: 'No. The core platform is a self-hosted Docker deployment mesh -- a FastAPI control plane, Python node agents, and Traefik edge routing -- with no dependency on any blockchain to function. "Decentralized" refers to distributing container workloads across independently operated compute nodes you control, not to content-addressed or blockchain-based storage. The only blockchain component is optional and narrow: a Solana devnet credit system that rewards node operators for healthy uptime.',
     answer: (
       <>
         No. Despite the name, the core platform is a self-hosted Docker deployment mesh -- a FastAPI control plane,
@@ -33,6 +35,7 @@ const FAQ_ENTRIES: FAQEntry[] = [
   },
   {
     question: 'Does the Solana integration involve real money or a real token I can buy or sell?',
+    answerText: "No. It runs on Solana's public devnet cluster, not mainnet -- devnet SOL and tokens have no monetary value, are funded by a free public faucet, and exist purely for testing. Every mint is a real on-chain transaction with a real Explorer link, but nothing here is a security, an investment, or a purchase. A mainnet migration is an explicit future decision on the roadmap, not something this version does quietly.",
     answer: (
       <>
         No. It runs on Solana's public <strong>devnet</strong> cluster, not mainnet -- devnet SOL and tokens have no
@@ -44,6 +47,7 @@ const FAQ_ENTRIES: FAQEntry[] = [
   },
   {
     question: 'Do I need Docker or Git installed on my own laptop to deploy?',
+    answerText: "No for either, if you use dhost ship/dhost update: the CLI snapshots your project (SHA-256 content-addressed, no Git involved) and the node agent builds the Docker image server-side. If you'd rather use git push, you do need Git locally, but still not Docker -- the same server-side build pipeline runs on the other end of the SSH push.",
     answer: (
       <>
         No for either, if you use <code>dhost ship</code>/<code>dhost update</code>: the CLI snapshots your project
@@ -55,6 +59,7 @@ const FAQ_ENTRIES: FAQEntry[] = [
   },
   {
     question: 'Is this a multi-tenant SaaS I can sign up for?',
+    answerText: "No. You run your own control plane (locally via Docker Compose, or on your own server for production) and deploy your own applications to it. There's no hosted signup, no per-user accounts, and no billing -- authentication is a single shared deploy key and a single shared node-join secret, the same trust model as running your own server. It's built for one operator (or a small trusted team) running their own mesh, not for reselling hosting to strangers.",
     answer: (
       <>
         No. You run your own control plane (locally via Docker Compose, or on your own server for production) and
@@ -67,6 +72,7 @@ const FAQ_ENTRIES: FAQEntry[] = [
   },
   {
     question: 'Can I host WordPress, or anything besides a Docker-buildable app?',
+    answerText: 'Anything that can run in a Docker container, yes -- including a WordPress container, if you bring your own Dockerfile or docker-compose setup for it. The automatic stack detection recognizes common frameworks (FastAPI, Flask, Django, Express, Next.js, static HTML) and generates a Dockerfile for those; anything else needs its own Dockerfile at the project root, which the detector will pick up and use directly.',
     answer: (
       <>
         Anything that can run in a Docker container, yes -- including a WordPress container, if you bring your own
@@ -78,6 +84,7 @@ const FAQ_ENTRIES: FAQEntry[] = [
   },
   {
     question: 'How is this different from just running Coolify, Dokploy, or Dokku on my server?',
+    answerText: 'Architecturally: those tools centralize around one coordinator server that reaches out to workers over SSH or Docker Swarm. Decentralized.Host instead runs a decoupled node-agent daemon on every machine, each reporting its own address and telemetry to a lightweight control plane that schedules by load -- closer to a small distributed system than a single-server dashboard. See the full comparison page for a feature-by-feature breakdown against each one, with sources.',
     answer: (
       <>
         Architecturally: those tools centralize around one coordinator server that reaches out to workers over SSH or
@@ -93,6 +100,7 @@ const FAQ_ENTRIES: FAQEntry[] = [
   },
   {
     question: 'Does deploying get me real HTTPS out of the box?',
+    answerText: "Locally, no -- local dev uses nip.io wildcard DNS over plain HTTP for zero-config routing. In production (the docker-compose.prod.yml overlay, with PUBLIC_SCHEME=https and a real domain), yes -- Traefik requests real Let's Encrypt certificates via the HTTP-01 challenge for the control plane, the console, and every deployed app automatically, no DNS-provider API key required.",
     answer: (
       <>
         Locally, no -- local dev uses <code>nip.io</code> wildcard DNS over plain HTTP for zero-config routing. In
@@ -104,6 +112,7 @@ const FAQ_ENTRIES: FAQEntry[] = [
   },
   {
     question: 'What happens if one of my nodes goes down?',
+    answerText: "The scheduler places new deployments only on nodes reporting healthy heartbeats, so a down node stops receiving new work. It does not currently migrate an already-running container off a node that goes down mid-flight -- that container stays down until the node recovers or you redeploy it elsewhere manually. There's no automatic failover yet.",
     answer: (
       <>
         The scheduler places new deployments only on nodes reporting healthy heartbeats, so a down node stops
@@ -115,6 +124,7 @@ const FAQ_ENTRIES: FAQEntry[] = [
   },
   {
     question: 'Is there a public node network I can join to earn credits, like a DePIN marketplace?',
+    answerText: "No. Every mesh is private and self-hosted -- you run your own control plane and invite only the nodes you choose to join it with your own shared secret. There's no public registry of nodes, no marketplace matching strangers' hardware to workloads, and no way to earn credits on someone else's mesh.",
     answer: (
       <>
         No. Every mesh is private and self-hosted -- you run your own control plane and invite only the nodes you
@@ -126,6 +136,7 @@ const FAQ_ENTRIES: FAQEntry[] = [
   },
   {
     question: 'Can I roll back a bad deployment?',
+    answerText: "Yes, two ways. If you shipped with the CLI, dhost rollback <snapshot-id> restores a local snapshot from .dhost/ledger/ and redeploys it (snapshots are local to whichever machine ran the ship, not centrally synced). Separately, the console's Git Manager tab and GET /deployments/{name}/releases show read-only release history from any machine.",
     answer: (
       <>
         Yes, two ways. If you shipped with the CLI, <code>dhost rollback &lt;snapshot-id&gt;</code> restores a local
@@ -138,6 +149,7 @@ const FAQ_ENTRIES: FAQEntry[] = [
   },
   {
     question: 'What still isn\'t built?',
+    answerText: "Being direct about scope: no automatic failover for a crashed node, no per-user accounts or per-repo access control (one shared deploy key trusts everyone equally), no multi-branch preview environments in the git server, and the node agent still runs Docker internally to build/run containers (developer machines don't need Docker, but the mesh itself does). See the roadmap for what's planned next.",
     answer: (
       <>
         Being direct about scope: no automatic failover for a crashed node, no per-user accounts or per-repo access
@@ -159,7 +171,10 @@ export const FAQView: React.FC<Props> = ({ onNavigate }) => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-10 text-slate-300 font-sans">
-      <JsonLd frontmatter={frontmatter} />
+      <JsonLd
+        frontmatter={frontmatter}
+        faqEntries={FAQ_ENTRIES.map((e) => ({ question: e.question, answerText: e.answerText }))}
+      />
 
       <div className="space-y-4 text-center">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 text-xs font-mono">

@@ -92,7 +92,7 @@ export const CONTENT_REGISTRY: Record<string, PageFrontmatter> = {
     canonical: 'https://decentralized.host/security/',
     schemaTypes: ['TechArticle', 'BreadcrumbList'],
     publishedAt: '2025-02-01T00:00:00Z',
-    updatedAt: '2025-08-30T00:00:00Z',
+    updatedAt: '2026-09-01T00:00:00Z',
     extractableAnswer: 'Decentralized.Host enforces security through bearer API key authentication on the control plane, SSH public key verification for Git workflows, process and network namespace isolation in Docker containers, and scoped communication between node agents and the coordinator.'
   },
   '/docs/': {
@@ -112,7 +112,7 @@ export const CONTENT_REGISTRY: Record<string, PageFrontmatter> = {
     canonical: 'https://decentralized.host/docs/',
     schemaTypes: ['TechArticle', 'BreadcrumbList'],
     publishedAt: '2025-02-05T00:00:00Z',
-    updatedAt: '2025-08-30T00:00:00Z',
+    updatedAt: '2026-09-01T00:00:00Z',
     extractableAnswer: 'The Decentralized.Host documentation provides step-by-step instructions for installing the dhost CLI, configuring self-hosted control planes, connecting worker nodes, and automating app deployments.'
   },
   '/guides/': {
@@ -132,7 +132,7 @@ export const CONTENT_REGISTRY: Record<string, PageFrontmatter> = {
     canonical: 'https://decentralized.host/guides/',
     schemaTypes: ['HowTo', 'TechArticle', 'BreadcrumbList'],
     publishedAt: '2025-02-10T00:00:00Z',
-    updatedAt: '2025-08-30T00:00:00Z',
+    updatedAt: '2026-09-01T00:00:00Z',
     extractableAnswer: 'Decentralized.Host guides offer end-to-end recipes covering Git push workflows, multi-server clustering, automated Let’s Encrypt TLS setup, and single-command rollbacks.'
   },
   '/alternatives/': {
@@ -152,7 +152,7 @@ export const CONTENT_REGISTRY: Record<string, PageFrontmatter> = {
     canonical: 'https://decentralized.host/alternatives/',
     schemaTypes: ['TechArticle', 'BreadcrumbList'],
     publishedAt: '2025-02-15T00:00:00Z',
-    updatedAt: '2025-08-30T00:00:00Z',
+    updatedAt: '2026-09-01T00:00:00Z',
     extractableAnswer: 'Unlike single-server PaaS tools like Dokku or single-orchestrator tools like Coolify and Dokploy, Decentralized.Host is designed around a lightweight decoupled node agent mesh architecture with built-in remote execution and multi-node scheduling.'
   },
   '/deploy/': {
@@ -257,7 +257,7 @@ export const CONTENT_REGISTRY: Record<string, PageFrontmatter> = {
     canonical: 'https://decentralized.host/roadmap/',
     schemaTypes: ['TechArticle', 'BreadcrumbList'],
     publishedAt: '2025-02-25T00:00:00Z',
-    updatedAt: '2025-08-30T00:00:00Z',
+    updatedAt: '2026-09-01T00:00:00Z',
     extractableAnswer: 'The Decentralized.Host engineering roadmap covers a single-node control plane and CLI (Phase 1), a distributed multi-node mesh with real Git-push deploys, production TLS, and Solana devnet node-operator credits (Phase 2, both complete), confidential-computing enclaves (Phase 3, planned), and an optional Solana mainnet migration with automated node failover (Phase 4, planned).'
   },
   '/about/': {
