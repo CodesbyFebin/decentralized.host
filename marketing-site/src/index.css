@@ -1,0 +1,132 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-mono: 'JetBrains Mono', monospace;
+    --font-sans: 'Plus Jakarta Sans', sans-serif;
+    --font-display: 'Space Grotesk', sans-serif;
+    --color-matrix: #00FF41;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: #050505;
+    color: #e0e0e0;
+    overflow-x: hidden;
+    background-image: radial-gradient(circle at 50% 50%, #0a110a 0%, #050505 100%);
+    background-attachment: fixed;
+  }
+
+  code, pre, kbd, samp {
+    font-family: var(--font-mono);
+  }
+
+  h1, h2, h3, .font-display {
+    font-family: var(--font-display);
+  }
+}
+
+/* Immersive Matrix Cyber Grid */
+.bg-matrix-grid {
+  background-image: 
+    linear-gradient(#00FF41 1px, transparent 1px),
+    linear-gradient(90deg, #00FF41 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Custom developer terminal scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #050505;
+}
+::-webkit-scrollbar-thumb {
+  background: #152216;
+  border: 1px solid rgba(0, 255, 65, 0.2);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #00FF41;
+}
+
+/* Text stroke utility for display headlines */
+.text-stroke-matrix {
+  -webkit-text-stroke: 1px #00FF41;
+}
+
+/* Subtle glow effects */
+.glow-matrix-sm {
+  box-shadow: 0 0 15px rgba(0, 255, 65, 0.15);
+}
+
+.glow-matrix-md {
+  box-shadow: 0 0 30px rgba(0, 255, 65, 0.25);
+}
+
+.glow-text-matrix {
+  text-shadow: 0 0 10px rgba(0, 255, 65, 0.4);
+}
+
+/* 1. Subtle Animated Film Grain Noise Layer */
+@keyframes grain-shift {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-3%, -2%); }
+  20% { transform: translate(2%, 3%); }
+  30% { transform: translate(-2%, 4%); }
+  40% { transform: translate(3%, -1%); }
+  50% { transform: translate(-4%, 2%); }
+  60% { transform: translate(1%, -3%); }
+  70% { transform: translate(-2%, 1%); }
+  80% { transform: translate(3%, 3%); }
+  90% { transform: translate(-1%, -4%); }
+}
+
+.bg-film-grain {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.035'/%3E%3C/svg%3E");
+}
+
+.animate-film-grain {
+  animation: grain-shift 0.8s steps(6) infinite;
+}
+
+/* 2. CRT Scanline Overlay using pseudo-element with repeating-linear-gradient */
+.crt-scanlines {
+  position: relative;
+}
+
+.crt-scanlines::after {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15),
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.65;
+}
+
+/* 3. Blinking Terminal Cursor */
+@keyframes terminal-cursor-blink {
+  0%, 49% {
+    opacity: 1;
+  }
+  50%, 100% {
+    opacity: 0;
+  }
+}
+
+.animate-terminal-cursor {
+  animation: terminal-cursor-blink 1s steps(1) infinite;
+}
+

@@ -37,10 +37,21 @@ Traefik routes app.127.0.0.1.nip.io -> the container the node agent just started
   and deploy it, no separate CI config. See "Real git push deploys" below.
 - **blockchain/** — Solana devnet integration for node-operator credits.
   Optional, feature-flagged, fully documented in [blockchain/README.md](blockchain/README.md).
-- **web/** — The landing page / project overview. Not served by a
-  standalone container — it's shipped through the mesh itself
-  (`cd web && dhost ship opengit-site --port 80`), the same as any other
-  app. This project hosts its own site.
+- **web/** — The original single-page landing page. Still shippable through
+  the mesh (`cd web && dhost ship opengit-site --port 80`) as a live
+  example of self-hosting, but no longer the canonical public site.
+- **marketing-site/** — The real public site: a React/Vite/TypeScript SEO
+  content site (docs, guides, architecture explainer, honest competitor
+  comparisons with evidence sources, an interactive deployment simulator).
+  Meant for **www.decentralized.host** via Vercel — a legitimate static-hosting
+  use case, distinct from the mesh itself. `npm install && npm run dev`
+  inside the directory; `npm run build` for a static `dist/`. Every
+  `claimStatus`/`codeSource` field in its content data cites real files in
+  this repo. It shipped with fabricated testimonials, fake case studies,
+  and several fictional CLI commands/config formats (`dhost login`,
+  `dhost.yml`, `--repo`/`--node` flags, an `install.sh`) — all removed or
+  corrected to match what's actually built; see the commit history for
+  specifics if you're curious what changed.
 - **dashboard/** — **OpenGit Console**: a single-page web dashboard (vanilla
   JS, no build step) at http://localhost:4001. Dashboard, Deployments (with
   live logs and teardown), **Git Manager** (real release history — every

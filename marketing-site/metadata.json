@@ -1,0 +1,6 @@
+{
+  "name": "Decentralized.Host - Open-Source Decentralized Hosting & Compute",
+  "description": "Deploy applications from Git or CLI across independently operated compute nodes. Open-source self-hosted PaaS and distributed compute mesh.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
