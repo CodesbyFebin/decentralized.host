@@ -2,7 +2,7 @@ export interface DocSection {
   id: string;
   title: string;
   slug: string;
-  category: 'getting-started' | 'cli-reference' | 'self-hosting' | 'node-agent' | 'rest-api' | 'configuration';
+  category: 'getting-started' | 'cli-reference' | 'self-hosting' | 'node-agent' | 'rest-api' | 'configuration' | 'git-server' | 'console' | 'blockchain' | 'ai-assistant';
   description: string;
   content: string;
   codeBlocks?: { label: string; language: string; code: string }[];
@@ -63,180 +63,341 @@ dhost update "fix"`
     title: 'CLI Command Reference',
     slug: 'cli-reference',
     category: 'cli-reference',
-    description: 'Full reference manual for all subcommands and flags in the dhost developer CLI.',
-    content: `The \`dhost\` CLI provides complete control over deployments, applications, logs, and compute nodes directly from your local terminal.
+    description: 'Every real subcommand in the dhost CLI, matched against cli/dhost/main.py -- no aliases or flags that don\'t exist.',
+    content: `The \`dhost\` CLI talks to whatever control plane you point it at via two environment variables (or the \`.dhost/config.yml\` that \`dhost ship\`/\`init\` write automatically):
 
-### Global Options
-- \`--url <endpoint>\`: Target control plane API URL (default: \`$DHOST_API_URL\` or \`http://localhost:8000\`)
-- \`--token <api_key>\`: Control plane authentication token (default: \`$DHOST_API_KEY\`)
-- \`--json\`: Output raw JSON response for scripting and CI/CD pipelines
-- \`--help\`: Display command options
+\`\`\`bash
+export DHOST_API_URL=http://localhost:8000      # default if unset
+export DHOST_DEPLOY_KEY=dev-deploy-key           # default if unset
+\`\`\`
 
-### Deployment Commands
-- \`dhost ship [path]\`: Archive current directory, schedule to an optimal node, and execute build.
-- \`dhost deploy [path]\`: Alias for \`dhost ship\`.
-- \`dhost list\`: List all deployed applications, active status, memory usage, and assigned nodes.
-- \`dhost logs <app-name> [--tail 100] [--follow]\`: Stream real-time stdout and stderr logs from the running container.
-- \`dhost restart <app-name>\`: Trigger zero-downtime container restart on the assigned node.
-- \`dhost stop <app-name>\`: Gracefully stop a running application container.
-- \`dhost destroy <app-name>\`: Terminate container, remove Traefik router, and delete deployment record.
+There is no global \`--url\`/\`--token\`/\`--json\` flag set -- auth is env-var or config-file based, not per-invocation flags.
 
-### Versioning & Rollbacks
-- \`dhost history <app-name>\`: Inspect release history, git commits, build timestamps, and image tags.
-- \`dhost rollback <app-name> --version <tag>\`: Instantly repoint router traffic to a prior healthy release tag.
+### The Git-free path (recommended)
+- \`dhost ship [name] [--port 8080] [--message/-m "ship"] [--domain <bare-domain>]\`: Detects your stack, snapshots the project into \`.dhost/ledger/\` (SHA-256 content-addressed, no Git), uploads it, and the control plane builds + runs it server-side. No Dockerfile needed in your repo. \`--domain\` binds a bare apex domain instead of \`<name>.<BASE_DOMAIN>\` (used for this project's own landing page, for example).
+- \`dhost update "<message>"\`: Snapshots current changes and redeploys, reusing the name/port/domain from the last \`dhost ship\` in this directory.
+- \`dhost history\`: Lists local snapshots for the current project (id, message, timestamp, file count) -- reads \`.dhost/ledger/\` on this machine only.
+- \`dhost rollback <snapshot-id>\`: Restores a local snapshot to a temp sandbox and reships it.
 
-### Compute Node Management
-- \`dhost nodes list\`: View all connected compute nodes, CPU load, available RAM, and heartbeat health.
-- \`dhost nodes inspect <node-id>\`: Detailed telemetry inspection for a specific node agent.`,
+### The older, local-build path
+- \`dhost init\`: Writes a real \`Dockerfile\` to the project root (only if one doesn't exist) and creates \`.dhost/config.yml\`.
+- \`dhost deploy [name] [--port 8080] [--registry localhost:5000]\`: Runs \`docker build\`/\`docker push\` on **your own machine** (needs local Docker), then schedules it -- distinct from \`dhost ship\`, not an alias.
+
+### Status & logs
+- \`dhost status <name>\`: Prints a deployment's status, image, node id, URL, and error (if any).
+- \`dhost logs <name>\`: Prints the last ~200 lines of container logs.
+
+### Mesh nodes
+- \`dhost node join [--node-name <name>] [--control-plane-url <url>]\`: Builds and runs another node-agent container on this same Docker daemon -- for a genuinely separate machine, see the Self-Hosting / multi-node guide instead.
+- \`dhost node list\`: Table of all nodes -- name, status, region, CPU%, RAM used, wallet.
+
+### Git server & keys
+- \`dhost keys add <label> <path-to-pubkey>\`: Registers an SSH public key allowed to \`git push\` to this mesh.
+- \`dhost keys list\`: Lists registered keys with fingerprints.
+- \`dhost clone-url <name> [--ssh-host localhost] [--ssh-port 2222]\`: Prints the git remote URL and setup commands for a repo.
+
+### Node-operator credits (Solana devnet)
+- \`dhost wallet <node_id> <solana_pubkey>\`: Links a devnet wallet to a node so it can receive credits.
+- \`dhost credits <node_id>\`: Shows a node's credit balance and mint history.
+
+There is no \`dhost list\` (all-deployments), \`dhost restart\`, \`dhost stop\`, or \`dhost destroy\` command -- tear down a deployment via the console's Delete button or \`DELETE /deployments/{name}\`.`,
     codeBlocks: [
       {
         label: 'CLI Examples',
         language: 'bash',
-        code: `# Inspect active applications
-dhost list
+        code: `# Ship the current directory
+dhost ship my-app --port 8080
 
-# Stream logs in real-time
-dhost logs my-fastapi-app --tail 50 -f
+# Tail logs
+dhost logs my-app
 
-# Inspect connected compute nodes
-dhost nodes list`
+# See what's on the mesh
+dhost node list`
       }
     ]
   },
   {
     id: 'doc-self-hosting',
-    title: 'Self-Hosting the Control Plane',
+    title: 'Self-Hosting: Local Dev vs. Real Production',
     slug: 'self-hosting',
     category: 'self-hosting',
-    description: 'Step-by-step instructions to run your own private Decentralized.Host cluster using Docker Compose.',
-    content: `You can run a complete, self-contained Decentralized.Host cluster on a single Linux VPS (Ubuntu 22.04 / Debian 12 / AlmaLinux) in under 3 minutes.
+    description: 'Two real paths: docker compose up for local dev in minutes, or the full DEPLOY.md walkthrough for a real domain with real Let\'s Encrypt TLS.',
+    content: `There are two genuinely different setups here -- don't mix their env vars.
 
-### System Requirements
-- OS: Linux (x86_64 or ARM64)
-- Hardware: 1 vCPU, 1 GB RAM minimum (2 vCPU, 4 GB RAM recommended)
-- Software: Docker Engine 24.0+ and Docker Compose v2+ installed
-- DNS: Wildcard or subdomain A record pointing to your server IP (e.g. \`*.dhost.example.com\`)
-
-### 1. Clone the Repository
+### Local development (no real domain needed)
 \`\`\`bash
 git clone https://github.com/CodesbyFebin/decentralized.host.git
 cd decentralized.host
+docker compose up -d --build
+pip install -e ./cli
 \`\`\`
+This brings up Postgres, the registry, Traefik, the control plane, one node agent, the console, and the git server, all using \`.env.example\`'s dev defaults (\`BASE_DOMAIN=127.0.0.1.nip.io\` -- a free wildcard DNS service that resolves any \`*.127.0.0.1.nip.io\` to localhost, so you get real DNS + real Traefik routing with zero setup, just no real TLS).
 
-### 2. Configure Environment Variables
-Copy the template configuration:
+### Real production (a real domain, real Let's Encrypt certs)
+This needs a real server and real DNS -- see [DEPLOY.md](https://github.com/CodesbyFebin/decentralized.host/blob/main/DEPLOY.md) in the repo for the full walkthrough. Short version:
+
 \`\`\`bash
+# On a real VPS with Docker installed, DNS already pointed at it:
+git clone https://github.com/CodesbyFebin/decentralized.host.git
+cd decentralized.host
 cp .env.example .env
+# edit .env: real BASE_DOMAIN, real random SECRET_KEY/NODE_JOIN_SECRET/DEPLOY_API_KEY, real ACME_EMAIL
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 \`\`\`
-Edit \`.env\` and set your primary domain, secret API key, and ACME Let’s Encrypt email:
-\`\`\`env
-DOMAIN=dhost.example.com
-API_SECRET_KEY=change_this_to_a_secure_random_string
-LETSENCRYPT_EMAIL=admin@example.com
-\`\`\`
+Note both compose files are required together -- the prod one is an overlay, not a replacement. This gets you \`api.<domain>\` (control plane) and \`app.<domain>\` (console) with real per-hostname Let's Encrypt certs (HTTP-01, no DNS-provider API key needed -- just a wildcard \`*.<domain>\` A record), and every future \`dhost ship\` also gets a real cert automatically.
 
-### 3. Launch the Cluster
-Run Docker Compose in detached mode:
-\`\`\`bash
-docker compose -f docker-compose.prod.yml up -d
-\`\`\`
-
-This launches:
-1. **Traefik Edge Proxy** (ports 80, 443 with automated SSL)
-2. **FastAPI Control Plane** (port 8000)
-3. **Git SSH Server** (port 2222)
-4. **Local Node Agent** (connected to local Docker engine)
-5. **PostgreSQL Database** (persisting state and deployment metadata)`,
+### What's running either way
+1. **Traefik** -- edge proxy, routes by hostname, TLS in production
+2. **FastAPI control plane** -- scheduling, auth, the REST API
+3. **Node agent** -- builds and runs containers on the Docker daemon it has access to
+4. **git-server** -- the SSH git daemon (see the Git Server guide)
+5. **Postgres** -- all state (nodes, deployments, releases, SSH keys)
+6. **Console (dashboard)** -- the web UI, static nginx serving vanilla JS/HTML`,
     codeBlocks: [
       {
-        label: 'Docker Compose Start',
+        label: 'Local dev',
         language: 'bash',
         code: `git clone https://github.com/CodesbyFebin/decentralized.host.git
 cd decentralized.host
-cp .env.example .env
-docker compose -f docker-compose.prod.yml up -d`
+docker compose up -d --build
+pip install -e ./cli
+dhost node list`
       }
     ]
   },
   {
     id: 'doc-node-agent',
-    title: 'Connecting Independent Node Agents',
+    title: 'Node Agent Reference',
     slug: 'node-agent-setup',
     category: 'node-agent',
-    description: 'Add external VPS or bare-metal servers to your compute mesh to distribute workloads across multiple machines.',
-    content: `Decentralized.Host allows you to connect any number of secondary compute nodes across disparate cloud providers (Hetzner, OVH, DigitalOcean, AWS, or home lab servers) to form a unified compute mesh.
+    description: 'What the node agent actually does and every real environment variable it reads (node-agent/agent.py).',
+    content: `The node agent is a single Python process: it registers with the control plane, sends heartbeats every 10s, polls for pending deployments, and builds/runs containers via the Docker socket it has access to. There's no published Docker Hub image -- build it from the repo's node-agent/Dockerfile.
 
-### How Worker Nodes Work
-The Node Agent is a lightweight daemon that connects outbound to your Control Plane API. It does not require any inbound public ports open, as it registers itself and polls for assignments over encrypted HTTP/WebSocket.
+### Real environment variables
+- \`CONTROL_PLANE_URL\` (default \`http://control-plane:8000\`): where to register and send heartbeats
+- \`NODE_JOIN_SECRET\` (default \`dev-join-secret\`): must match the control plane's -- this is the actual variable name, not \`NODE_SECRET_KEY\`
+- \`NODE_NAME\` (default: the container's hostname): shown in \`dhost node list\`
+- \`NODE_REGION\` (default \`local\`): free-text label, not used for scheduling logic today
+- \`ADVERTISE_ADDRESS\` (default \`node-agent:<LOG_API_PORT>\`): **the one that matters for a real remote node** -- must be reachable from the control plane specifically, e.g. \`203.0.113.5:8100\`
+- \`REGISTRY_HOST\` (default \`registry:5000\`): where built images get pushed
+- \`PUBLIC_SCHEME\` (default \`http\`): set to \`https\` in production so generated Traefik routes and sitemap.xml/robots.txt use the right scheme
+- \`HEARTBEAT_INTERVAL\` / \`POLL_INTERVAL\` (default \`10\`/\`3\` seconds)
 
-### Launching an Agent on a Worker Machine
-On your remote worker server with Docker installed, run:
-
+### Building and running it on a remote machine
 \`\`\`bash
-docker run -d \\
-  --name dhost-node-agent \\
-  --restart always \\
+git clone https://github.com/CodesbyFebin/decentralized.host.git
+cd decentralized.host
+docker build -t dhost/node-agent -f node-agent/Dockerfile .
+docker run -d --name dhost-node-agent \\
   -v /var/run/docker.sock:/var/run/docker.sock \\
-  -e CONTROL_PLANE_URL=https://api.dhost.example.com \\
-  -e NODE_SECRET_KEY=your_shared_cluster_secret \\
-  -e NODE_NAME=hetzner-fsn1-worker01 \\
-  -e NODE_REGION=eu-central \\
-  codesbyfebin/dhost-node-agent:latest
+  -e CONTROL_PLANE_URL=https://api.your-domain.com \\
+  -e NODE_JOIN_SECRET=<real secret from the control plane's .env> \\
+  -e NODE_NAME=worker-2 \\
+  -e ADVERTISE_ADDRESS=<this machine's IP>:8100 \\
+  -p 8100:8100 \\
+  dhost/node-agent
 \`\`\`
 
-### Verifying Connection
-On your admin machine, run:
+### Verifying it joined
 \`\`\`bash
-dhost nodes list
+dhost node list
 \`\`\`
-You will immediately see \`hetzner-fsn1-worker01\` report healthy with live CPU, RAM, and Disk capacity. New deployments will automatically be scheduled onto this node when appropriate.`,
+Look for the node's status as \`healthy\` (a node with no heartbeat in the last 30s shows \`stale\`). New deployments schedule onto whichever healthy node has the lowest combined CPU+RAM load.`,
     codeBlocks: [
       {
-        label: 'Worker Node Docker Command',
+        label: 'Real node-agent env vars',
         language: 'bash',
-        code: `docker run -d \\
-  --name dhost-node-agent \\
-  --restart always \\
-  -v /var/run/docker.sock:/var/run/docker.sock \\
-  -e CONTROL_PLANE_URL=https://api.dhost.example.com \\
-  -e NODE_SECRET_KEY=your_shared_cluster_secret \\
-  codesbyfebin/dhost-node-agent:latest`
+        code: `CONTROL_PLANE_URL=https://api.your-domain.com
+NODE_JOIN_SECRET=<match the control plane>
+NODE_NAME=worker-2
+ADVERTISE_ADDRESS=203.0.113.5:8100
+PUBLIC_SCHEME=https`
       }
     ]
   },
   {
     id: 'doc-rest-api',
-    title: 'REST API & OpenAPI Specification',
+    title: 'REST API Reference',
     slug: 'rest-api',
     category: 'rest-api',
-    description: 'Programmatic interface for integrating Decentralized.Host into CI/CD pipelines, GitHub Actions, and custom dashboards.',
-    content: `The Decentralized.Host control plane provides a complete, modern REST API built with FastAPI, compliant with OpenAPI 3.1.
-
-### Base URL
-\`https://<your-control-plane-domain>/api/v1\`
+    description: 'The actual FastAPI routes (control-plane/app/routers/), matched one-to-one against the source. No /api/v1 prefix -- paths are at the root.',
+    content: `### Base URL
+\`http://localhost:8000\` locally, or \`https://api.<your-domain>\` in production. **No \`/api/v1\` prefix** -- every path below is relative to the base URL directly.
 
 ### Authentication
-All requests must include the API key in the HTTP header:
-\`Authorization: Bearer <YOUR_API_KEY>\`
+Most endpoints take \`Authorization: Bearer <DEPLOY_API_KEY>\`. Node-to-control-plane endpoints (heartbeat, pending-deployments) instead take a short-lived JWT issued at \`/auth/node-join\` -- that's a separate trust boundary from the deploy key.
 
-### Core Endpoints
-- \`POST /deployments\`: Create a new deployment from an uploaded archive or git payload.
-- \`GET /deployments\`: List all deployments with filtering by app name and status.
-- \`GET /deployments/{id}\`: Get real-time status, assigned node, and container ID.
-- \`GET /deployments/{id}/logs\`: Retrieve stdout/stderr build and execution logs.
-- \`DELETE /deployments/{id}\`: Stop and remove an active deployment.
-- \`GET /nodes\`: List all registered nodes and their live capacity telemetry.
-- \`POST /nodes/heartbeat\`: Node agent telemetry ingest endpoint.
-- \`GET /auth/keys\`: Manage developer SSH keys for Git deployment.
-- \`GET /blockchain/balance\`: (Experimental) Query Solana SPL token compute credit balance.`,
+### Deployments (deploy-key auth)
+- \`POST /deployments\` -- old flow: create from an already-built image reference
+- \`POST /deployments/detect\` -- upload files, get back detected stack + generated Dockerfile + a reusable upload_id
+- \`POST /deployments/ship\` -- upload (or reference an upload_id) + a Dockerfile, build and deploy
+- \`POST /deployments/push\` -- single-call detect+build+deploy from one tarball; what the git server's post-receive hook calls
+- \`GET /deployments\` -- list all
+- \`GET /deployments/{name}\` -- one deployment's status
+- \`GET /deployments/{name}/logs\` -- last ~200 lines
+- \`GET /deployments/{name}/releases\` -- release/deploy history
+- \`DELETE /deployments/{name}\` -- tear down the container and delete the record
+
+### Nodes
+- \`GET /nodes\` -- list (deploy-key auth)
+- \`POST /auth/node-join\` -- a node registers with \`join_secret\`, gets back a JWT (node auth, not deploy-key)
+- \`POST /nodes/heartbeat\`, \`GET /nodes/{id}/pending-deployments\`, \`POST /nodes/{id}/deployment-status/{deployment_id}\` -- all node-JWT auth, called by the node agent itself, not something you'd call directly
+
+### Git server keys
+- \`POST /git/keys\`, \`GET /git/keys\`, \`DELETE /git/keys/{id}\` -- manage SSH keys (deploy-key auth)
+- \`GET /git/keys/authorized_keys\` -- plain-text authorized_keys format, polled by the git-server container itself
+
+### Blockchain (node-operator credits)
+- \`GET /blockchain/status\` -- whether credits are enabled, mint address, reward config
+- \`POST /blockchain/nodes/{node_id}/wallet\` -- link a devnet wallet to a node
+- \`GET /blockchain/credits/{node_id}\` -- balance + mint ledger for a node
+
+### AI Assistant
+- \`GET /assistant/status\` -- whether GOOGLE_API_KEY is configured
+- \`POST /assistant/chat\` -- \`{message, history}\` in, \`{reply, tool_calls}\` out; read-only, cannot deploy or delete anything`,
     codeBlocks: [
       {
-        label: 'cURL API Example',
+        label: 'cURL example',
         language: 'bash',
-        code: `# List active deployments via curl
-curl -X GET "https://api.dhost.example.com/api/v1/deployments" \\
-  -H "Authorization: Bearer dhost_sec_89f3a1..." \\
-  -H "Content-Type: application/json"`
+        code: `curl "http://localhost:8000/deployments" \\
+  -H "Authorization: Bearer dev-deploy-key"`
+      }
+    ]
+  },
+  {
+    id: 'doc-git-server',
+    title: 'Git Server Deep Dive',
+    slug: 'git-server-internals',
+    category: 'git-server',
+    description: 'How the SSH daemon, the restricted shell, and the post-receive hook actually work -- for when you want to know exactly what you\'re trusting.',
+    content: `### The restricted login shell
+The \`git\` user's login shell is not \`/bin/bash\` or plain \`git-shell\` -- it's a small wrapper (git-server/opengit-shell.sh) that:
+1. Reads the requested command (via \`-c\` argument when invoked as a login shell, or \`$SSH_ORIGINAL_COMMAND\` for a ForceCommand-style setup -- it handles both)
+2. Pattern-matches it against exactly three allowed forms: \`git-upload-pack\`, \`git-receive-pack\`, \`git-upload-archive\`. Anything else is rejected before any real shell runs.
+3. Extracts the repo name via \`basename()\` (so \`../../etc/passwd\` becomes just \`passwd\` -- no path traversal possible)
+4. On \`git-receive-pack\` to a repo that doesn't exist yet, runs \`git init --bare\` and installs the post-receive hook, then execs the real \`git-shell -c\`
+
+### The post-receive hook
+Copied from git-server/post-receive.template into every repo's \`hooks/\` at creation time, with \`CONTROL_PLANE_URL\`/\`DEPLOY_API_KEY\` substituted in at container startup:
+1. Reads which ref was just pushed and points the bare repo's \`HEAD\` at it (deploys whatever you last pushed -- there's no fixed "main branch" assumption, which also means a fresh repo has no ambiguity about what "the default branch" is)
+2. \`git archive HEAD\` into a tarball (already respects \`.gitignore\`/export-ignore, so no separate ignore-list logic needed)
+3. Reads an optional \`.opengit.yml\` at the repo root for \`port:\`/\`domain:\` overrides
+4. POSTs the tarball to \`/deployments/push\` and prints the result back to your \`git push\` output
+
+### SSH key sync
+Registered keys live in Postgres (the \`SSHKey\` model), not directly in the container. The git-server container fetches \`GET /git/keys/authorized_keys\` once at startup and then every 30s in a background loop, so a newly-added key becomes usable within half a minute without a restart.
+
+### What this does NOT have
+No per-user accounts, no per-repo access control (any registered key can push to any repo), no branch protection, no PR/code-review workflow, no webhooks besides the deploy trigger itself.`,
+    codeBlocks: [
+      {
+        label: 'Optional .opengit.yml',
+        language: 'yaml',
+        code: `port: 3000
+domain: custom.example.com`
+      }
+    ]
+  },
+  {
+    id: 'doc-console',
+    title: 'OpenGit Console Reference',
+    slug: 'console-reference',
+    category: 'console',
+    description: 'What each tab in the web console actually does -- it\'s a thin client over the same REST API, nothing it shows is exclusive to the UI.',
+    content: `The console (dashboard/index.html) is a single static HTML file with vanilla JS -- no build step, no framework. It stores your API URL and deploy key in this browser's localStorage and polls the REST API every 5 seconds.
+
+### Dashboard
+Live counts (nodes healthy, deployments running, releases shipped), blockchain status, and a recent-deployments list.
+
+### Launchpad
+Drag a project folder in; it uploads to \`/deployments/detect\`, shows the detected stack and an editable generated Dockerfile (plus a real Gemini note if \`GOOGLE_API_KEY\` is set on the control plane, otherwise it says so honestly), then Ship calls \`/deployments/ship\`. Exactly the same pipeline as \`dhost ship\` and \`git push\`.
+
+### Deployments
+Table of everything on the mesh; click one for status, the assigned node, and its last ~200 log lines, plus a real Delete button (\`DELETE /deployments/{name}\`).
+
+### Git Manager
+Real release history per deployment (message, snapshot id if it came from \`dhost ship\`, status, timestamp) via \`GET /deployments/{name}/releases\` -- plus a quick-command reference for the actual CLI/git-push workflows. This does not let you roll back from the browser; that still needs the local snapshot on whichever machine shipped it.
+
+### Mesh Nodes
+Live table from \`GET /nodes\` -- status, region, CPU%, RAM used, linked wallet.
+
+### Credits
+Per-node Solana devnet credit ledger, and an honest "off (ENABLE_BLOCKCHAIN=false)" state when it isn't configured.
+
+### Assistant
+The AI chat tab -- see the AI Assistant doc.
+
+### Settings
+Just two fields: the control plane API URL and the deploy key, stored in this browser only. No user accounts exist in this version.`,
+    codeBlocks: []
+  },
+  {
+    id: 'doc-blockchain-credits',
+    title: 'Node-Operator Credits (Solana Devnet)',
+    slug: 'node-operator-credits',
+    category: 'blockchain',
+    description: 'A real SPL token minted on Solana devnet -- not mainnet, and that\'s deliberate. See blockchain/README.md for the full reasoning.',
+    content: `Off by default (\`ENABLE_BLOCKCHAIN=false\`). When enabled, the control plane mints a real SPL token ("DHOST Credits") to a node operator's linked devnet wallet every \`HEARTBEATS_PER_REWARD\` (default 6) healthy heartbeats.
+
+### Why devnet, not mainnet
+Devnet SOL and tokens have no monetary value -- funded by a free public faucet, not a purchase. That keeps this a genuine on-chain demonstration (real transactions, a real token mint, a real Explorer link) without touching real money or requiring anyone to buy anything. A mainnet path is an explicit future decision, not something this version does quietly.
+
+### Setting it up
+\`\`\`bash
+pip install -r blockchain/requirements.txt
+python blockchain/scripts/setup_devnet.py
+\`\`\`
+This generates a payer keypair, requests a free devnet airdrop (the public faucet is often rate-limited -- the script tells you if it fails and how to retry or fund manually), and creates the token mint. Copy the printed mint address into \`.env\`:
+\`\`\`env
+ENABLE_BLOCKCHAIN=true
+SOLANA_MINT_ADDRESS=<printed mint address>
+\`\`\`
+Restart the control plane, then link a node's wallet:
+\`\`\`bash
+dhost wallet <node_id> <your-devnet-wallet-pubkey>
+dhost credits <node_id>
+\`\`\`
+
+### What actually happens on-chain
+Real \`solana-py\`/\`solders\` calls: associated-token-account creation if needed, then a real \`mint_to\` instruction. Every mint is recorded with its transaction signature and a working \`explorer.solana.com/...?cluster=devnet\` link, visible in the console's Credits tab or \`GET /blockchain/credits/{node_id}\`.`,
+    codeBlocks: [
+      {
+        label: 'Enable it',
+        language: 'bash',
+        code: `python blockchain/scripts/setup_devnet.py
+# .env: ENABLE_BLOCKCHAIN=true, SOLANA_MINT_ADDRESS=<printed>
+docker compose restart control-plane`
+      }
+    ]
+  },
+  {
+    id: 'doc-ai-assistant',
+    title: 'AI Assistant Reference',
+    slug: 'ai-assistant',
+    category: 'ai-assistant',
+    description: 'One model, four read-only tools, no write access. Not a "God Router" across 100 providers.',
+    content: `The console's Assistant tab is backed by a single Gemini model (\`gemini-1.5-flash\`), using the same \`GOOGLE_API_KEY\` as the Launchpad's stack notes. Off by default -- both \`GET /assistant/status\` and the console show an honest "not configured" state rather than a fake response when no key is set.
+
+### The four tools it actually has (all read-only)
+- \`list_deployments()\` -- name, status, URL, error for every deployment
+- \`get_deployment_logs(name)\` -- last ~200 lines for one deployment
+- \`list_nodes()\` -- name, status, CPU%, RAM for every node
+- \`get_release_history(name)\` -- last 10 releases for one deployment
+
+It has no tool to deploy, delete, or modify anything. Its system instruction explicitly tells it to decline requests to change state and point at the right CLI command or console button instead.
+
+### Enabling it
+\`\`\`env
+GOOGLE_API_KEY=your-real-key
+\`\`\`
+\`docker compose restart control-plane\`, then the Assistant tab's input unlocks automatically once \`/assistant/status\` reports \`enabled: true\`.`,
+    codeBlocks: [
+      {
+        label: 'Enable it',
+        language: 'bash',
+        code: `# .env
+GOOGLE_API_KEY=your-real-key
+docker compose restart control-plane`
       }
     ]
   }
