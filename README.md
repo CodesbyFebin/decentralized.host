@@ -1,5 +1,8 @@
 # decentralized.host
 
+[![CI](https://github.com/CodesbyFebin/decentralized.host/actions/workflows/ci.yml/badge.svg)](https://github.com/CodesbyFebin/decentralized.host/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 A working local MVP of an open-source, decentralized hosting mesh: a
 FastAPI control plane, a Docker-based node agent, a Traefik edge proxy, a
 local container registry, a `dhost` CLI, and an optional Solana-devnet

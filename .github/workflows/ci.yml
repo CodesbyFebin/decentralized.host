@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  marketing-site:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: marketing-site
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm ci
+      - run: npm run lint
+      - run: npx vite build
+
+  python-syntax:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        component: [control-plane, node-agent, cli, blockchain]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install ${{ matrix.component }} dependencies
+        run: |
+          if [ -f ${{ matrix.component }}/requirements.txt ]; then
+            pip install -r ${{ matrix.component }}/requirements.txt
+          elif [ -f ${{ matrix.component }}/pyproject.toml ]; then
+            pip install -e ./${{ matrix.component }}
+          fi
+      - name: Compile-check ${{ matrix.component }}
+        run: python -m compileall -q ${{ matrix.component }}
