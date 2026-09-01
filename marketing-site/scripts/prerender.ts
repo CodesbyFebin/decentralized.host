@@ -57,11 +57,23 @@ async function prerender(): Promise<void> {
   const routes = Object.values(CONTENT_REGISTRY).map((page) => page.slug);
   const startedAt = Date.now();
 
-  const browser = await launchBrowser();
-  // A single reused page was tried and made things worse in an actual Vercel
-  // build (most routes hit a hard 20s networkidle0 timeout instead of just
-  // being slow) -- reverted to a fresh page per route, which reliably
-  // prerenders the first several routes before the time budget below kicks in.
+  // A single reused page across all routes was tried and made things worse
+  // in an actual Vercel build (most routes hit a hard 20s networkidle0
+  // timeout instead of just being slow) -- reverted to a fresh page per
+  // route.
+  //
+  // A fresh page per route (one shared browser) was itself then found to
+  // have a real, measured problem, from an actual Vercel build's per-route
+  // timings: the *first* page in a freshly-launched browser rendered in
+  // 982ms, and every subsequent page.newPage() in that same browser
+  // instance then took 145-175s -- flat, regardless of which route or how
+  // much content it had. That's not content-driven slowness; it's
+  // @sparticuz/chromium's forced --single-process mode degrading badly
+  // for the second and later pages opened in one browser instance. A
+  // fresh *browser* per route (not just a fresh page) is the untested fix
+  // for that -- more per-route launch overhead, but if the hypothesis is
+  // right every route should behave like that first 982ms one did.
+  let browser = await launchBrowser();
 
   let ok = 0;
   let failed = 0;
@@ -101,6 +113,12 @@ async function prerender(): Promise<void> {
       failed++;
     } finally {
       await page.close();
+      // Relaunch rather than reuse -- see the note above launchBrowser() call
+      // above the loop. Yes, this pays a fresh browser-launch cost every
+      // route; that's the trade being tested against the 145-175s/route
+      // degradation a shared browser instance showed in production.
+      await browser.close();
+      browser = await launchBrowser();
     }
   }
 

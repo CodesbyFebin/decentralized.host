@@ -1,6 +1,6 @@
 # decentralized.host -- Complete Technical Reference for LLM Retrieval
 # Generated at build time from the real site data (registry.ts, docs.ts, guides.ts)
-# Generated: 2026-09-01T22:42:08.357Z
+# Generated: 2026-09-01T23:00:29.433Z
 
 ## Pages
 
@@ -62,7 +62,7 @@ AEO answer: Decentralized.Host guides offer end-to-end recipes covering Git push
 URL: https://decentralized.host/alternatives/
 H1: Decentralized.Host vs Self-Hosted & Managed PaaS Platforms
 Type: comparison
-Summary: Evidence-based comparisons between Decentralized.Host and Coolify, Dokploy, CapRover, Dokku, Heroku, Vercel, and AWS with verified capability dates.
+Summary: Evidence-based comparisons between Decentralized.Host and Coolify, Dokploy, CapRover, Dokku, Heroku, Vercel, AWS, and UpCloud with verified capability dates.
 Claim status: IMPLEMENTED
 AEO answer: Unlike single-server PaaS tools like Dokku or single-orchestrator tools like Coolify and Dokploy, Decentralized.Host is designed around a lightweight decoupled node agent mesh architecture with built-in remote execution and multi-node scheduling.
 
