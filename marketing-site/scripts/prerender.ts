@@ -6,7 +6,6 @@
  * for each page; Vercel serves those static files directly (falling back to the
  * existing SPA rewrite for anything not in this list).
  */
-import puppeteer from 'puppeteer';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -16,13 +15,34 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DIST_DIR = path.join(__dirname, '..', 'dist');
 const BASE_URL = process.env.PRERENDER_BASE_URL || 'http://localhost:4173';
 
-async function prerender(): Promise<void> {
-  const routes = Object.values(CONTENT_REGISTRY).map((page) => page.slug);
-
-  const browser = await puppeteer.launch({
+/**
+ * Vercel's build container is missing the shared libs (libnspr4.so etc.) that
+ * regular puppeteer's bundled Chromium needs -- confirmed by an actual failed
+ * production build. @sparticuz/chromium ships a self-contained Linux build made
+ * for exactly this (Lambda/Vercel-style) environment, so we use it there and
+ * fall back to regular puppeteer's own Chromium for local dev (macOS/Windows).
+ */
+async function launchBrowser() {
+  if (process.env.VERCEL) {
+    const puppeteerCore = (await import('puppeteer-core')).default;
+    const chromium = (await import('@sparticuz/chromium')).default;
+    return puppeteerCore.launch({
+      headless: true,
+      args: chromium.args,
+      executablePath: await chromium.executablePath()
+    });
+  }
+  const puppeteer = (await import('puppeteer')).default;
+  return puppeteer.launch({
     headless: true,
     args: ['--no-sandbox', '--disable-setuid-sandbox']
   });
+}
+
+async function prerender(): Promise<void> {
+  const routes = Object.values(CONTENT_REGISTRY).map((page) => page.slug);
+
+  const browser = await launchBrowser();
 
   let ok = 0;
   let failed = 0;
