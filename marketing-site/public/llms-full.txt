@@ -1,6 +1,6 @@
 # decentralized.host -- Complete Technical Reference for LLM Retrieval
 # Generated at build time from the real site data (registry.ts, docs.ts, guides.ts)
-# Generated: 2026-09-01T12:33:24.528Z
+# Generated: 2026-09-01T22:42:08.357Z
 
 ## Pages
 

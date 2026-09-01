@@ -8,7 +8,17 @@ export const MatrixRain: React.FC = () => {
     // testing) -- it's purely decorative, and a continuous rAF/canvas redraw
     // loop competes for CPU with page rendering in resource-constrained
     // headless environments, which was slowing prerender builds dramatically.
-    if (navigator.webdriver) return;
+    //
+    // navigator.webdriver alone isn't reliable here: it depends on exactly how
+    // the automating browser was launched, and Vercel's prerender step (which
+    // runs puppeteer-core + @sparticuz/chromium, a differently-configured
+    // Chromium than local dev's regular puppeteer -- see scripts/prerender.ts)
+    // showed this exact gap in production: a build where every route took
+    // 60-130s+ instead of <1s locally, and the homepage timed out entirely.
+    // __DHOST_PRERENDER__ is a flag prerender.ts sets itself via
+    // evaluateOnNewDocument before navigating, so this check works identically
+    // regardless of which Chromium build/flags are driving the page.
+    if (navigator.webdriver || (window as unknown as { __DHOST_PRERENDER__?: boolean }).__DHOST_PRERENDER__) return;
 
     const canvas = canvasRef.current;
     if (!canvas) return;

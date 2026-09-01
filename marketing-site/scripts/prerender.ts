@@ -20,7 +20,14 @@ const BASE_URL = process.env.PRERENDER_BASE_URL || 'http://localhost:4173';
 // the CPU in headless Chrome); this is a second safety net in case some other
 // slowdown shows up later. Routes not reached in time just fall back to the
 // existing SPA rewrite in vercel.json -- a safe degraded state, not a failure.
-const DEADLINE_MS = 6 * 60 * 1000;
+//
+// Bumped from 6 to 10 minutes after a real production build (2026-09-02)
+// showed @sparticuz/chromium running 60-130s/route on Vercel's build machine
+// even with the rAF fix applied (--single-process + forced software
+// rendering in its launch args are inherently slower than local dev's
+// regular puppeteer, confirmed via that build's real logs) -- 6 minutes only
+// fit 4/15 routes. Still comfortably inside Vercel's build time limits.
+const DEADLINE_MS = 10 * 60 * 1000;
 
 /**
  * Vercel's build container is missing the shared libs (libnspr4.so etc.) that
@@ -70,6 +77,12 @@ async function prerender(): Promise<void> {
     const routeStartedAt = Date.now();
     const page = await browser.newPage();
     try {
+      // Set before navigation so it's present the instant the page's own
+      // scripts run -- see MatrixRain.tsx for why this, not navigator.webdriver
+      // alone, is what actually disables the expensive animation loop here.
+      await page.evaluateOnNewDocument(() => {
+        (window as unknown as { __DHOST_PRERENDER__?: boolean }).__DHOST_PRERENDER__ = true;
+      });
       const url = `${BASE_URL}${route}`;
       await page.goto(url, { waitUntil: 'networkidle0', timeout: 20000 });
       // Let the App.tsx effect (title/canonical sync) and any client render settle.
