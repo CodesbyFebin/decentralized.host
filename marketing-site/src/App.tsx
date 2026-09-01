@@ -41,6 +41,32 @@ export default function App() {
   const [searchOpen, setSearchOpen] = useState<boolean>(false);
   const [auditOpen, setAuditOpen] = useState<boolean>(false);
 
+  // Keep <title> and <link rel="canonical"> in sync with the real page data --
+  // avoids every route showing the homepage's static index.html title/canonical.
+  useEffect(() => {
+    const p = currentPath.split('#')[0];
+    const page = CONTENT_REGISTRY[p] || CONTENT_REGISTRY[p.replace(/\/$/, '')] || CONTENT_REGISTRY['/'];
+    if (!page) return;
+
+    document.title = page.title;
+
+    let link = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+    if (!link) {
+      link = document.createElement('link');
+      link.rel = 'canonical';
+      document.head.appendChild(link);
+    }
+    link.href = page.canonical;
+
+    let ogUrl = document.querySelector<HTMLMetaElement>('meta[property="og:url"]');
+    if (!ogUrl) {
+      ogUrl = document.createElement('meta');
+      ogUrl.setAttribute('property', 'og:url');
+      document.head.appendChild(ogUrl);
+    }
+    ogUrl.content = page.canonical;
+  }, [currentPath]);
+
   // Sync with browser navigation & hash
   useEffect(() => {
     const handlePopState = () => {
