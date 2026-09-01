@@ -1,0 +1,38 @@
+# decentralized.host
+
+> Open-source self-hosted deployment platform and distributed compute mesh. Deploy applications from Git or CLI across independently operated compute nodes.
+
+## Core technologies
+- Python (control plane, node agent, CLI)
+- FastAPI
+- PostgreSQL
+- Docker
+- Traefik
+- Solana (optional, devnet-only node-operator credits)
+
+## Repository layout
+- control-plane/ -- FastAPI control plane, scheduler, REST API
+- node-agent/ -- runs on each mesh node, builds/runs containers via Docker
+- cli/ -- the `dhost` command-line tool
+- git-server/ -- real SSH git server, deploys on `git push`
+- blockchain/ -- Solana devnet credit system (optional, off by default)
+- marketing-site/ -- the public site at decentralized.host
+- dashboard/ -- the web console at app.$BASE_DOMAIN
+- web/ -- original single-page landing page, still shippable through the mesh as a self-hosting example
+
+## Primary capabilities
+- CLI deployment (`dhost ship`) with no local Docker or Git required
+- Git-push deployment via a real SSH server
+- Multi-node scheduling by live CPU/RAM load
+- Deployment snapshots, history, and rollback (SHA-256 content-addressed, no Git)
+- Automatic Traefik routing with real Let's Encrypt TLS in production
+- Optional Solana devnet credits for node operators
+
+## Documentation
+- README.md -- architecture, quick start, full command reference
+- DEPLOY.md -- production deployment (real domain, real TLS)
+- blockchain/README.md -- Solana devnet credit system
+- SECURITY.md -- reporting a vulnerability
+- CONTRIBUTING.md -- local setup and how to submit a change
+- https://decentralized.host/docs/ -- full CLI/API reference
+- https://decentralized.host/roadmap/ -- live project roadmap

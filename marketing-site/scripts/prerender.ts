@@ -15,6 +15,13 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DIST_DIR = path.join(__dirname, '..', 'dist');
 const BASE_URL = process.env.PRERENDER_BASE_URL || 'http://localhost:4173';
 
+// Hard time budget for the whole run. A production build once took 20+ minutes
+// per page here before we found the real cause (MatrixRain's rAF loop starving
+// the CPU in headless Chrome); this is a second safety net in case some other
+// slowdown shows up later. Routes not reached in time just fall back to the
+// existing SPA rewrite in vercel.json -- a safe degraded state, not a failure.
+const DEADLINE_MS = 6 * 60 * 1000;
+
 /**
  * Vercel's build container is missing the shared libs (libnspr4.so etc.) that
  * regular puppeteer's bundled Chromium needs -- confirmed by an actual failed
@@ -41,19 +48,27 @@ async function launchBrowser() {
 
 async function prerender(): Promise<void> {
   const routes = Object.values(CONTENT_REGISTRY).map((page) => page.slug);
+  const startedAt = Date.now();
 
   const browser = await launchBrowser();
 
   let ok = 0;
   let failed = 0;
+  let skipped = 0;
 
   for (const route of routes) {
+    if (Date.now() - startedAt > DEADLINE_MS) {
+      console.warn(`⏭ ${route} skipped -- time budget exceeded`);
+      skipped++;
+      continue;
+    }
+
     const page = await browser.newPage();
     try {
       const url = `${BASE_URL}${route}`;
-      await page.goto(url, { waitUntil: 'networkidle0', timeout: 30000 });
+      await page.goto(url, { waitUntil: 'networkidle0', timeout: 20000 });
       // Let the App.tsx effect (title/canonical sync) and any client render settle.
-      await page.waitForSelector('main', { timeout: 5000 });
+      await page.waitForSelector('main', { timeout: 10000 });
 
       const html = await page.content();
       const outDir = path.join(DIST_DIR, route === '/' ? '' : route);
@@ -72,9 +87,11 @@ async function prerender(): Promise<void> {
   }
 
   await browser.close();
-  console.log(`\nPrerendered ${ok}/${routes.length} routes${failed ? ` (${failed} failed)` : ''}.`);
+  console.log(`\nPrerendered ${ok}/${routes.length} routes (${failed} failed, ${skipped} skipped) in ${Math.round((Date.now() - startedAt) / 1000)}s.`);
 
-  if (failed > 0) {
+  // Only a hard failure (0 routes ever succeeded) fails the step -- a partial
+  // result still leaves every route servable via the CSR fallback.
+  if (ok === 0 && routes.length > 0) {
     process.exitCode = 1;
   }
 }

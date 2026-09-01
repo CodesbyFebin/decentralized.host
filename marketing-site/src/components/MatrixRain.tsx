@@ -4,6 +4,12 @@ export const MatrixRain: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
+    // Skip the animation loop entirely under automation (prerendering, headless
+    // testing) -- it's purely decorative, and a continuous rAF/canvas redraw
+    // loop competes for CPU with page rendering in resource-constrained
+    // headless environments, which was slowing prerender builds dramatically.
+    if (navigator.webdriver) return;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');

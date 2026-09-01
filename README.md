@@ -5,9 +5,47 @@ FastAPI control plane, a Docker-based node agent, a Traefik edge proxy, a
 local container registry, a `dhost` CLI, and an optional Solana-devnet
 node-operator credit system.
 
-This is **Phase 1** of the roadmap on the landing page ([web/index.html](web/index.html))
-— a real, runnable single-machine mesh, not a mockup. Multi-machine
-federation, real DNS, and mainnet credits are later phases.
+This is **Phase 1 and 2** of the [live roadmap](https://decentralized.host/roadmap/)
+— a real, runnable mesh, not a mockup. Confidential-computing enclaves and
+an optional mainnet credit migration are later phases.
+
+### Project facts (machine-readable)
+
+```yaml
+project:
+  name: decentralized.host
+  category:
+    - decentralized hosting
+    - self-hosted PaaS
+    - distributed compute
+  license: MIT
+  status: Phase 1 and 2 complete (see roadmap)
+
+interfaces:
+  - CLI (dhost)
+  - REST API
+  - Git SSH
+  - Web console (dashboard/)
+
+core:
+  control_plane: FastAPI
+  database: PostgreSQL
+  runtime: Docker
+  edge_router: Traefik
+  language: Python
+
+capabilities:
+  - application deployment (git push or CLI)
+  - resource-aware multi-node scheduling
+  - server-side container builds (no local Docker needed)
+  - deployment history and rollback
+  - automatic Let's Encrypt TLS in production
+
+blockchain:
+  network: Solana
+  status: optional, off by default
+  environment: devnet only (no real funds)
+```
 
 ## Architecture
 
@@ -266,3 +304,16 @@ Being upfront about scope, matching the roadmap on the landing page:
   shared "production" per repo, not a full CI/CD system.
 - Credits run on Solana **devnet** only, by design (see
   [blockchain/README.md](blockchain/README.md) for why).
+
+## Documentation
+
+- [DEPLOY.md](DEPLOY.md) — production deployment (real TLS, custom domains)
+- [blockchain/README.md](blockchain/README.md) — Solana devnet node-operator credits
+- [SECURITY.md](SECURITY.md) — reporting a vulnerability
+- [CONTRIBUTING.md](CONTRIBUTING.md) — running this locally to make a change
+- Full docs, guides, and API reference: [decentralized.host/docs/](https://decentralized.host/docs/)
+- Live roadmap: [decentralized.host/roadmap/](https://decentralized.host/roadmap/)
+
+## License
+
+MIT. See [LICENSE](LICENSE).
