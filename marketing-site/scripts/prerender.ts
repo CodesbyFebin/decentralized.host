@@ -44,12 +44,27 @@ async function launchBrowser() {
     // page rendering itself is fast (~900ms, matching local) once each route
     // gets its own fresh browser, but the browser *launch* itself then took
     // 110-150s each time. --single-process forces Chromium's browser and
-    // renderer into one OS process -- a known, still-open problem in
+    // renderer into one OS process, and is a known, still-open problem in
     // @sparticuz/chromium itself (see Sparticuz/chromium PR #509, "remove
-    // --single-process from the default args", opened by a maintainer).
-    // Stripping just this one flag to isolate its effect; keeping every
-    // other sparticuz-tuned flag (software rendering etc.) that's actually
-    // needed for this sandboxed environment.
+    // --single-process from the default args", opened by a maintainer) --
+    // a reasonable hypothesis for the launch-time cost.
+    //
+    // Tested against real production data (dpl_ERZTrA8zuTSBKVSx2h42TZ1SdRTy):
+    // it wasn't the cause. Removing it did NOT reduce the per-route launch
+    // gap (still ~105-150s/route, same magnitude, same 5/15-routes-in-budget
+    // outcome) and did not regress anything either (no crash, same routes
+    // still succeed). Left removed since it's neutral and matches upstream's
+    // own direction, but the real bottleneck is still unidentified beyond
+    // ruling this out and ruling out @sparticuz/chromium re-extracting its
+    // binary (executablePath() correctly short-circuits via
+    // existsSync(/tmp/chromium) after the first call -- confirmed by reading
+    // its actual source, not assumed). Further flag-guessing here (e.g.
+    // touching the swiftshader/software-rendering flags) is riskier than
+    // it's worth: those are likely load-bearing for a build machine with no
+    // real GPU, and two real hypotheses are already spent. The 10/15 routes
+    // that don't make the 10-minute budget fall back to client-side
+    // rendering, which works fine for real users -- an accepted, safe
+    // degradation, not a broken build.
     const args = chromium.args.filter((a) => a !== '--single-process');
     return puppeteerCore.launch({
       headless: true,
