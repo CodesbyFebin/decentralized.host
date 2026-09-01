@@ -77,7 +77,11 @@ export default function App() {
     }
     setCurrentPath(normalized);
     if (typeof window !== 'undefined') {
-      window.location.hash = normalized;
+      // Real History API navigation -- the address bar shows the clean canonical
+      // path (matching registry.ts / sitemap.xml), not a #-fragment. vercel.json
+      // already rewrites any path to index.html, so a direct hit or a shared link
+      // to e.g. /docs/ works without JS having to run first.
+      window.history.pushState(null, '', normalized.split('#')[0]);
       window.scrollTo(0, 0);
     }
   };
