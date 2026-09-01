@@ -51,6 +51,13 @@ async function prerender(): Promise<void> {
   const startedAt = Date.now();
 
   const browser = await launchBrowser();
+  // Reuse a single page across every route instead of newPage()/close() per
+  // route. @sparticuz/chromium has a documented issue where browser/page
+  // close() can hang in serverless-style environments (Sparticuz/chromium#85)
+  // -- an actual production build showed ~2.5min between routes after the
+  // first, which lines up with exactly this. Closing once at the end avoids
+  // the repeated close cycle entirely.
+  const page = await browser.newPage();
 
   let ok = 0;
   let failed = 0;
@@ -63,7 +70,7 @@ async function prerender(): Promise<void> {
       continue;
     }
 
-    const page = await browser.newPage();
+    const routeStartedAt = Date.now();
     try {
       const url = `${BASE_URL}${route}`;
       await page.goto(url, { waitUntil: 'networkidle0', timeout: 20000 });
@@ -76,16 +83,15 @@ async function prerender(): Promise<void> {
       fs.mkdirSync(outDir, { recursive: true });
       fs.writeFileSync(outFile, html, 'utf-8');
 
-      console.log(`✔ ${route} -> ${path.relative(DIST_DIR, outFile)}`);
+      console.log(`✔ ${route} -> ${path.relative(DIST_DIR, outFile)} (${Date.now() - routeStartedAt}ms)`);
       ok++;
     } catch (err) {
-      console.error(`✘ ${route} failed:`, (err as Error).message);
+      console.error(`✘ ${route} failed after ${Date.now() - routeStartedAt}ms:`, (err as Error).message);
       failed++;
-    } finally {
-      await page.close();
     }
   }
 
+  await page.close();
   await browser.close();
   console.log(`\nPrerendered ${ok}/${routes.length} routes (${failed} failed, ${skipped} skipped) in ${Math.round((Date.now() - startedAt) / 1000)}s.`);
 
