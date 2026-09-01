@@ -46,7 +46,7 @@ export const HomeView: React.FC<Props> = ({ onNavigate, onOpenAudit }) => {
         {/* Top claim pill */}
         <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs font-mono">
           <span className="px-2 py-0.5 bg-[#00FF41]/10 text-[#00FF41] text-[9px] font-mono rounded-full border border-[#00FF41]/30 uppercase">
-            v1.0.4-stable
+            MIT Licensed
           </span>
           <span className="text-[10px] font-mono text-white/40 uppercase tracking-widest">
             Open Source Infrastructure
