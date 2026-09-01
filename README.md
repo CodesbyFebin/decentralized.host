@@ -1,4 +1,6 @@
-# decentralized.host
+# decentralized.hosting
+<img width="864" height="1821" alt="image" src="https://github.com/user-attachments/assets/cbc2254d-426f-4b20-b1e7-9a8a47de1e74" />
+
 
 [![CI](https://github.com/CodesbyFebin/decentralized.hosting/actions/workflows/ci.yml/badge.svg)](https://github.com/CodesbyFebin/decentralized.hosting/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
