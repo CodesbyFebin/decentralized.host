@@ -198,18 +198,18 @@ export const Footer: React.FC<Props> = ({ onNavigate, onOpenAudit }) => {
           <div>
             © 2025 Decentralized.Host. MIT Open Source License. Canonical Repository:{' '}
             <a
-              href="https://github.com/CodesbyFebin/decentralized.host"
+              href="https://github.com/CodesbyFebin/decentralized.hosting"
               target="_blank"
               rel="noreferrer"
               className="text-[#00FF41] hover:underline"
             >
-              CodesbyFebin/decentralized.host
+              CodesbyFebin/decentralized.hosting
             </a>
           </div>
 
           <div className="flex items-center gap-4">
             <a
-              href="https://github.com/CodesbyFebin/decentralized.host"
+              href="https://github.com/CodesbyFebin/decentralized.hosting"
               target="_blank"
               rel="noreferrer"
               className="hover:text-white flex items-center gap-1"

@@ -4,7 +4,7 @@ decentralized.host is a self-hosted platform: you run your own control plane, no
 
 ## Reporting a vulnerability
 
-Please report security issues privately via [GitHub Security Advisories](https://github.com/CodesbyFebin/decentralized.host/security/advisories/new) rather than opening a public issue. Include:
+Please report security issues privately via [GitHub Security Advisories](https://github.com/CodesbyFebin/decentralized.hosting/security/advisories/new) rather than opening a public issue. Include:
 
 - The affected component (`control-plane`, `node-agent`, `cli`, `git-server`, or `blockchain`)
 - Steps to reproduce

@@ -1,6 +1,6 @@
 # Decentralized.Host (dhost) — Machine-Readable LLM Specification
 # Standard: https://llmstxt.org/
-# Canonical Repository: https://github.com/CodesbyFebin/decentralized.host
+# Canonical Repository: https://github.com/CodesbyFebin/decentralized.hosting
 # License: MIT Open Source
 
 > Decentralized.Host is an open-source self-hosted deployment platform and distributed compute mesh for running containerized web applications across independently operated compute nodes.
@@ -31,8 +31,8 @@
 ## Developer Quick Start
 ```bash
 # 1. Clone and install the CLI (not on PyPI yet)
-git clone https://github.com/CodesbyFebin/decentralized.host.git
-cd decentralized.host && pip install -e ./cli
+git clone https://github.com/CodesbyFebin/decentralized.hosting.git
+cd decentralized.hosting && pip install -e ./cli
 
 # 2. Point at your control plane
 export DHOST_API_URL=http://localhost:8000

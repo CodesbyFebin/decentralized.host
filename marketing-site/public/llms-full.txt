@@ -1,6 +1,6 @@
 # decentralized.host -- Complete Technical Reference for LLM Retrieval
 # Generated at build time from the real site data (registry.ts, docs.ts, guides.ts)
-# Generated: 2026-09-01T06:44:49.425Z
+# Generated: 2026-09-01T12:33:24.528Z
 
 ## Pages
 
@@ -152,8 +152,8 @@ Decentralized.Host deploys any web application, API, or background container wit
 The CLI isn't published to PyPI yet -- install it in editable mode from the repo:
 
 ```bash
-git clone https://github.com/CodesbyFebin/decentralized.host.git
-cd decentralized.host
+git clone https://github.com/CodesbyFebin/decentralized.hosting.git
+cd decentralized.hosting
 pip install -e ./cli
 ```
 
@@ -234,20 +234,20 @@ There are two genuinely different setups here -- don't mix their env vars.
 
 ### Local development (no real domain needed)
 ```bash
-git clone https://github.com/CodesbyFebin/decentralized.host.git
-cd decentralized.host
+git clone https://github.com/CodesbyFebin/decentralized.hosting.git
+cd decentralized.hosting
 docker compose up -d --build
 pip install -e ./cli
 ```
 This brings up Postgres, the registry, Traefik, the control plane, one node agent, the console, and the git server, all using `.env.example`'s dev defaults (`BASE_DOMAIN=127.0.0.1.nip.io` -- a free wildcard DNS service that resolves any `*.127.0.0.1.nip.io` to localhost, so you get real DNS + real Traefik routing with zero setup, just no real TLS).
 
 ### Real production (a real domain, real Let's Encrypt certs)
-This needs a real server and real DNS -- see [DEPLOY.md](https://github.com/CodesbyFebin/decentralized.host/blob/main/DEPLOY.md) in the repo for the full walkthrough. Short version:
+This needs a real server and real DNS -- see [DEPLOY.md](https://github.com/CodesbyFebin/decentralized.hosting/blob/main/DEPLOY.md) in the repo for the full walkthrough. Short version:
 
 ```bash
 # On a real VPS with Docker installed, DNS already pointed at it:
-git clone https://github.com/CodesbyFebin/decentralized.host.git
-cd decentralized.host
+git clone https://github.com/CodesbyFebin/decentralized.hosting.git
+cd decentralized.hosting
 cp .env.example .env
 # edit .env: real BASE_DOMAIN, real random SECRET_KEY/NODE_JOIN_SECRET/DEPLOY_API_KEY, real ACME_EMAIL
 docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
@@ -282,8 +282,8 @@ The node agent is a single Python process: it registers with the control plane, 
 
 ### Building and running it on a remote machine
 ```bash
-git clone https://github.com/CodesbyFebin/decentralized.host.git
-cd decentralized.host
+git clone https://github.com/CodesbyFebin/decentralized.hosting.git
+cd decentralized.hosting
 docker build -t dhost/node-agent -f node-agent/Dockerfile .
 docker run -d --name dhost-node-agent \
   -v /var/run/docker.sock:/var/run/docker.sock \
@@ -524,8 +524,8 @@ Steps:
 1. Step 1: Get the join secret -- On the control plane host, read the real secret from .env (not a placeholder -- the join will fail otherwise).
    $ grep NODE_JOIN_SECRET .env
 2. Step 2: Build and run the node agent on the new machine -- There is no published Docker Hub image -- clone the repo (or just copy node-agent/ and blockchain/) and build locally. ADVERTISE_ADDRESS must be reachable FROM the control plane, not from you.
-   $ git clone https://github.com/CodesbyFebin/decentralized.host.git
-cd decentralized.host
+   $ git clone https://github.com/CodesbyFebin/decentralized.hosting.git
+cd decentralized.hosting
 docker build -t dhost/node-agent -f node-agent/Dockerfile .
 docker run -d --name dhost-node-agent \
   -v /var/run/docker.sock:/var/run/docker.sock \

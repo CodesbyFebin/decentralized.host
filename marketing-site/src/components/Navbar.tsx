@@ -161,7 +161,7 @@ export const Navbar: React.FC<Props> = ({ currentPath, onNavigate, onOpenSearch,
 
           {/* Get Started / GitHub Repo Link */}
           <a
-            href="https://github.com/CodesbyFebin/decentralized.host"
+            href="https://github.com/CodesbyFebin/decentralized.hosting"
             target="_blank"
             rel="noreferrer"
             className="flex items-center gap-1.5 px-3.5 py-1.5 rounded bg-white/5 border border-white/10 text-white text-[11px] font-mono uppercase tracking-wider hover:bg-[#00FF41] hover:text-black hover:border-[#00FF41] transition-all"
@@ -230,7 +230,7 @@ export const Navbar: React.FC<Props> = ({ currentPath, onNavigate, onOpenSearch,
               Inspect Quality Gates
             </button>
             <a
-              href="https://github.com/CodesbyFebin/decentralized.host"
+              href="https://github.com/CodesbyFebin/decentralized.hosting"
               target="_blank"
               rel="noreferrer"
               className="p-2 rounded bg-white/5 text-white border border-white/10 flex items-center justify-center gap-1"

@@ -82,8 +82,8 @@ To ssh://localhost:2222/repos/my-service.git
       {
         title: 'Step 2: Build and run the node agent on the new machine',
         description: 'There is no published Docker Hub image -- clone the repo (or just copy node-agent/ and blockchain/) and build locally. ADVERTISE_ADDRESS must be reachable FROM the control plane, not from you.',
-        command: `git clone https://github.com/CodesbyFebin/decentralized.host.git
-cd decentralized.host
+        command: `git clone https://github.com/CodesbyFebin/decentralized.hosting.git
+cd decentralized.hosting
 docker build -t dhost/node-agent -f node-agent/Dockerfile .
 docker run -d --name dhost-node-agent \\
   -v /var/run/docker.sock:/var/run/docker.sock \\

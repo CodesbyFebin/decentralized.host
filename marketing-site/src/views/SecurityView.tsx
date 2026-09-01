@@ -13,12 +13,12 @@ interface Props {
 export const SecurityView: React.FC<Props> = ({ onNavigate }) => {
   const frontmatter = CONTENT_REGISTRY['/security/'];
 
-  const securityTxtContent = `Contact: https://github.com/CodesbyFebin/decentralized.host/security/advisories/new
+  const securityTxtContent = `Contact: https://github.com/CodesbyFebin/decentralized.hosting/security/advisories/new
 Expires: 2027-09-01T00:00:00.000Z
 Preferred-Languages: en
 Canonical: https://decentralized.host/.well-known/security.txt
-Policy: https://github.com/CodesbyFebin/decentralized.host/blob/main/SECURITY.md
-Acknowledgments: https://github.com/CodesbyFebin/decentralized.host/graphs/contributors`;
+Policy: https://github.com/CodesbyFebin/decentralized.hosting/blob/main/SECURITY.md
+Acknowledgments: https://github.com/CodesbyFebin/decentralized.hosting/graphs/contributors`;
 
   const threatMatrix = [
     {

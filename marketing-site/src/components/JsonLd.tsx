@@ -20,7 +20,7 @@ export const JsonLd: React.FC<Props> = ({ frontmatter, faqEntries }) => {
       'softwareRequirements': 'Docker 24.0+, Python 3.11+',
       'programmingLanguage': 'Python',
       'license': 'https://opensource.org/licenses/MIT',
-      'codeRepository': 'https://github.com/CodesbyFebin/decentralized.host',
+      'codeRepository': 'https://github.com/CodesbyFebin/decentralized.hosting',
       'description': frontmatter.description,
       'offers': {
         '@type': 'Offer',
@@ -39,7 +39,7 @@ export const JsonLd: React.FC<Props> = ({ frontmatter, faqEntries }) => {
       'url': 'https://decentralized.host',
       'logo': 'https://decentralized.host/assets/logo.svg',
       'sameAs': [
-        'https://github.com/CodesbyFebin/decentralized.host'
+        'https://github.com/CodesbyFebin/decentralized.hosting'
       ]
     });
   }

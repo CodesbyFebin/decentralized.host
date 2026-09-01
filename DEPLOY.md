@@ -43,8 +43,8 @@ provider/TTL. Don't proceed to cert issuance until `dig decentralized.host`
 On the server:
 
 ```bash
-git clone https://github.com/CodesbyFebin/decentralized.host.git
-cd decentralized.host
+git clone https://github.com/CodesbyFebin/decentralized.hosting.git
+cd decentralized.hosting
 cp .env.example .env
 ```
 

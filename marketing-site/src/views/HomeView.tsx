@@ -106,7 +106,7 @@ export const HomeView: React.FC<Props> = ({ onNavigate, onOpenAudit }) => {
           </button>
 
           <a
-            href="https://github.com/CodesbyFebin/decentralized.host"
+            href="https://github.com/CodesbyFebin/decentralized.hosting"
             target="_blank"
             rel="noreferrer"
             className="px-6 py-3 rounded bg-white/5 hover:bg-white/10 text-white border border-white/10 hover:border-[#00FF41]/40 font-mono text-xs uppercase tracking-wider transition-all flex items-center gap-2"
@@ -315,7 +315,7 @@ export const HomeView: React.FC<Props> = ({ onNavigate, onOpenAudit }) => {
 
         <div className="inline-flex items-center gap-2 p-2 px-4 rounded bg-white/5 border border-white/10 font-mono text-xs sm:text-sm text-[#00FF41]">
           <Terminal className="w-4 h-4 text-[#00FF41]" />
-          <span>git clone https://github.com/CodesbyFebin/decentralized.host && pip install -e ./cli</span>
+          <span>git clone https://github.com/CodesbyFebin/decentralized.hosting && pip install -e ./cli</span>
         </div>
 
         <div className="flex items-center justify-center gap-4 pt-2 flex-wrap">
@@ -326,7 +326,7 @@ export const HomeView: React.FC<Props> = ({ onNavigate, onOpenAudit }) => {
             Read Documentation
           </button>
           <a
-            href="https://github.com/CodesbyFebin/decentralized.host"
+            href="https://github.com/CodesbyFebin/decentralized.hosting"
             target="_blank"
             rel="noreferrer"
             className="px-6 py-3 rounded bg-white/5 hover:bg-white/10 text-white border border-white/10 font-mono text-xs uppercase tracking-wider transition-all flex items-center gap-2"

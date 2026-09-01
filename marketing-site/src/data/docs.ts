@@ -21,8 +21,8 @@ export const DOCS_DATA: DocSection[] = [
 The CLI isn't published to PyPI yet -- install it in editable mode from the repo:
 
 \`\`\`bash
-git clone https://github.com/CodesbyFebin/decentralized.host.git
-cd decentralized.host
+git clone https://github.com/CodesbyFebin/decentralized.hosting.git
+cd decentralized.hosting
 pip install -e ./cli
 \`\`\`
 
@@ -126,20 +126,20 @@ dhost node list`
 
 ### Local development (no real domain needed)
 \`\`\`bash
-git clone https://github.com/CodesbyFebin/decentralized.host.git
-cd decentralized.host
+git clone https://github.com/CodesbyFebin/decentralized.hosting.git
+cd decentralized.hosting
 docker compose up -d --build
 pip install -e ./cli
 \`\`\`
 This brings up Postgres, the registry, Traefik, the control plane, one node agent, the console, and the git server, all using \`.env.example\`'s dev defaults (\`BASE_DOMAIN=127.0.0.1.nip.io\` -- a free wildcard DNS service that resolves any \`*.127.0.0.1.nip.io\` to localhost, so you get real DNS + real Traefik routing with zero setup, just no real TLS).
 
 ### Real production (a real domain, real Let's Encrypt certs)
-This needs a real server and real DNS -- see [DEPLOY.md](https://github.com/CodesbyFebin/decentralized.host/blob/main/DEPLOY.md) in the repo for the full walkthrough. Short version:
+This needs a real server and real DNS -- see [DEPLOY.md](https://github.com/CodesbyFebin/decentralized.hosting/blob/main/DEPLOY.md) in the repo for the full walkthrough. Short version:
 
 \`\`\`bash
 # On a real VPS with Docker installed, DNS already pointed at it:
-git clone https://github.com/CodesbyFebin/decentralized.host.git
-cd decentralized.host
+git clone https://github.com/CodesbyFebin/decentralized.hosting.git
+cd decentralized.hosting
 cp .env.example .env
 # edit .env: real BASE_DOMAIN, real random SECRET_KEY/NODE_JOIN_SECRET/DEPLOY_API_KEY, real ACME_EMAIL
 docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
@@ -157,8 +157,8 @@ Note both compose files are required together -- the prod one is an overlay, not
       {
         label: 'Local dev',
         language: 'bash',
-        code: `git clone https://github.com/CodesbyFebin/decentralized.host.git
-cd decentralized.host
+        code: `git clone https://github.com/CodesbyFebin/decentralized.hosting.git
+cd decentralized.hosting
 docker compose up -d --build
 pip install -e ./cli
 dhost node list`
@@ -185,8 +185,8 @@ dhost node list`
 
 ### Building and running it on a remote machine
 \`\`\`bash
-git clone https://github.com/CodesbyFebin/decentralized.host.git
-cd decentralized.host
+git clone https://github.com/CodesbyFebin/decentralized.hosting.git
+cd decentralized.hosting
 docker build -t dhost/node-agent -f node-agent/Dockerfile .
 docker run -d --name dhost-node-agent \\
   -v /var/run/docker.sock:/var/run/docker.sock \\

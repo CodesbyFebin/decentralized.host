@@ -1,10 +1,10 @@
 # decentralized.host
 
-[![CI](https://github.com/CodesbyFebin/decentralized.host/actions/workflows/ci.yml/badge.svg)](https://github.com/CodesbyFebin/decentralized.host/actions/workflows/ci.yml)
+[![CI](https://github.com/CodesbyFebin/decentralized.hosting/actions/workflows/ci.yml/badge.svg)](https://github.com/CodesbyFebin/decentralized.hosting/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Dependabot](https://img.shields.io/badge/Dependabot-enabled-025E8C?logo=dependabot)](https://github.com/CodesbyFebin/decentralized.host/network/updates)
-[![Contributors](https://img.shields.io/github/contributors/CodesbyFebin/decentralized.host)](https://github.com/CodesbyFebin/decentralized.host/graphs/contributors)
-[![Stars](https://img.shields.io/github/stars/CodesbyFebin/decentralized.host)](https://github.com/CodesbyFebin/decentralized.host/stargazers)
+[![Dependabot](https://img.shields.io/badge/Dependabot-enabled-025E8C?logo=dependabot)](https://github.com/CodesbyFebin/decentralized.hosting/network/updates)
+[![Contributors](https://img.shields.io/github/contributors/CodesbyFebin/decentralized.hosting)](https://github.com/CodesbyFebin/decentralized.hosting/graphs/contributors)
+[![Stars](https://img.shields.io/github/stars/CodesbyFebin/decentralized.hosting)](https://github.com/CodesbyFebin/decentralized.hosting/stargazers)
 
 A working local MVP of an open-source, decentralized hosting mesh: a
 FastAPI control plane, a Docker-based node agent, a Traefik edge proxy, a

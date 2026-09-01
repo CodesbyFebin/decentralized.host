@@ -34,7 +34,7 @@ export const OpenSourceView: React.FC<Props> = ({ onNavigate }) => {
       {/* AEO Block */}
       <AeoAnswerBlock
         question="Is Decentralized.Host open source?"
-        answer="Yes. Decentralized.Host is 100% open source under the MIT License. The entire source code—including the FastAPI control plane, Python node agent daemon, Git SSH server, and CLI tool—is available on GitHub at CodesbyFebin/decentralized.host."
+        answer="Yes. Decentralized.Host is 100% open source under the MIT License. The entire source code—including the FastAPI control plane, Python node agent daemon, Git SSH server, and CLI tool—is available on GitHub at CodesbyFebin/decentralized.hosting."
         sourceContext="Repository License and GitHub Source Verification"
       />
 
@@ -46,13 +46,13 @@ export const OpenSourceView: React.FC<Props> = ({ onNavigate }) => {
               <Github className="w-6 h-6" />
             </div>
             <div>
-              <div className="font-bold text-white font-display text-lg">CodesbyFebin/decentralized.host</div>
+              <div className="font-bold text-white font-display text-lg">CodesbyFebin/decentralized.hosting</div>
               <div className="text-xs font-mono text-emerald-400">Target Repository • MIT License</div>
             </div>
           </div>
 
           <a
-            href="https://github.com/CodesbyFebin/decentralized.host"
+            href="https://github.com/CodesbyFebin/decentralized.hosting"
             target="_blank"
             rel="noreferrer"
             className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-mono font-bold text-xs flex items-center gap-2 transition-colors"
@@ -75,9 +75,9 @@ export const OpenSourceView: React.FC<Props> = ({ onNavigate }) => {
           <div className="space-y-3 font-mono text-xs">
             <div className="p-4 rounded-xl bg-black border border-slate-800 text-slate-300 space-y-2">
               <div className="text-slate-500"># 1. Clone the repository</div>
-              <div className="text-emerald-300">git clone https://github.com/CodesbyFebin/decentralized.host.git</div>
+              <div className="text-emerald-300">git clone https://github.com/CodesbyFebin/decentralized.hosting.git</div>
               <div className="text-slate-500 pt-1"># 2. Set up virtual environment and control plane</div>
-              <div className="text-emerald-300">cd decentralized.host && python3 -m venv venv && source venv/bin/activate</div>
+              <div className="text-emerald-300">cd decentralized.hosting && python3 -m venv venv && source venv/bin/activate</div>
               <div className="text-slate-500 pt-1"># 3. Run development tests</div>
               <div className="text-emerald-300">pytest tests/</div>
             </div>

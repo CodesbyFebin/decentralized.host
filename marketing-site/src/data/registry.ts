@@ -14,7 +14,7 @@ export const CONTENT_REGISTRY: Record<string, PageFrontmatter> = {
     audience: 'developers',
     claimStatus: 'IMPLEMENTED',
     sources: [
-      'https://github.com/CodesbyFebin/decentralized.host',
+      'https://github.com/CodesbyFebin/decentralized.hosting',
       'control-plane/app/main.py',
       'node-agent/agent.py',
       'cli/dhost/main.py'
@@ -292,7 +292,7 @@ export const CONTENT_REGISTRY: Record<string, PageFrontmatter> = {
     contentType: 'about',
     audience: 'developers',
     claimStatus: 'IMPLEMENTED',
-    sources: ['https://github.com/CodesbyFebin/decentralized.host', 'README.md'],
+    sources: ['https://github.com/CodesbyFebin/decentralized.hosting', 'README.md'],
     relatedPages: ['/docs/', '/about/', '/features/'],
     canonical: 'https://decentralized.host/open-source/',
     schemaTypes: ['TechArticle', 'BreadcrumbList'],
