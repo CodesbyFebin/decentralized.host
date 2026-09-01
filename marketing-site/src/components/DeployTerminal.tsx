@@ -97,7 +97,7 @@ export const DeployTerminal: React.FC = () => {
   const [isCompleted, setIsCompleted] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [logs, setLogs] = useState<string[]>([
-    '[*] Decentralized.Host Interactive Deployment Engine v1.0.4',
+    '[*] Decentralized.Host Interactive Deployment Engine',
     '[*] Select a framework recipe and compute node, then press [DEPLOY NOW].'
   ]);
   const [copiedCli, setCopiedCli] = useState(false);
@@ -147,7 +147,7 @@ export const DeployTerminal: React.FC = () => {
       {
         stepNum: 3,
         message: `[03/06] [BUILD] Building standard OCI container image layer-by-layer...`,
-        log: `[03/06] [OCI] Created container image tag: dhost.mesh/apps/${selectedFramework.id}:v1.0.4 [sha256:7c9e0d1f4b]`
+        log: `[03/06] [OCI] Created container image tag: registry:5000/${selectedFramework.id}:latest`
       },
       {
         stepNum: 4,

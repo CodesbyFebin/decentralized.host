@@ -6,8 +6,9 @@
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
     "generate-sitemap": "tsx scripts/generate-sitemap.ts",
+    "generate-machine-files": "tsx scripts/generate-machine-files.ts",
     "prerender": "start-server-and-test 'vite preview --port 4173' http://localhost:4173 'tsx scripts/prerender.ts'",
-    "build": "npm run generate-sitemap && vite build && (npm run prerender || echo 'Prerender failed -- falling back to client-side rendering for this deploy')",
+    "build": "npm run generate-sitemap && npm run generate-machine-files && vite build && (npm run prerender || echo 'Prerender failed -- falling back to client-side rendering for this deploy')",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit"

@@ -1,0 +1,654 @@
+# decentralized.host -- Complete Technical Reference for LLM Retrieval
+# Generated at build time from the real site data (registry.ts, docs.ts, guides.ts)
+# Generated: 2026-09-01T06:44:49.425Z
+
+## Pages
+
+================================================================================
+URL: https://decentralized.host/
+H1: Decentralized Hosting & Distributed Compute
+Type: homepage
+Summary: Deploy applications from Git or CLI across independently operated compute nodes. Open-source self-hosted PaaS and distributed compute mesh.
+Claim status: IMPLEMENTED
+AEO answer: Decentralized.Host is an open-source self-hosted deployment platform and distributed compute mesh for deploying containerized applications from Git or CLI across independently operated compute nodes.
+
+
+================================================================================
+URL: https://decentralized.host/features/
+H1: Decentralized.Host Capabilities & Verified Feature Matrix
+Type: feature
+Summary: Explore the complete verified capabilities of Decentralized.Host. Factual classification across implemented, experimental, and planned capabilities.
+Claim status: IMPLEMENTED
+AEO answer: Decentralized.Host capabilities include CLI and Git push deployment, intelligent multi-node scheduling, Docker container execution, automated Traefik reverse proxy routing with SSL, real-time log streaming, and resource monitoring.
+
+
+================================================================================
+URL: https://decentralized.host/architecture/
+H1: Decentralized.Host System Architecture
+Type: architecture
+Summary: Technical architecture specification of the Decentralized.Host control plane, node agents, scheduler, Git SSH hook, and Traefik edge routing.
+Claim status: IMPLEMENTED
+AEO answer: Decentralized.Host architecture splits deployment into three decoupled layers: a FastAPI control plane managing state and scheduling, independent node agents orchestrating local Docker runtimes, and a Traefik edge layer managing dynamic SSL routing.
+
+
+================================================================================
+URL: https://decentralized.host/security/
+H1: Security Architecture & Threat Model
+Type: security
+Summary: Security architecture, container isolation boundaries, node authentication protocols, threat model, and vulnerability disclosure policy for Decentralized.Host.
+Claim status: IMPLEMENTED
+AEO answer: Decentralized.Host enforces security through bearer API key authentication on the control plane, SSH public key verification for Git workflows, process and network namespace isolation in Docker containers, and scoped communication between node agents and the coordinator.
+
+
+================================================================================
+URL: https://decentralized.host/docs/
+H1: Decentralized.Host Developer Documentation
+Type: documentation
+Summary: Comprehensive guides and reference manuals for dhost CLI, self-hosting the control plane, deploying node agents, and the REST API.
+Claim status: IMPLEMENTED
+AEO answer: The Decentralized.Host documentation provides step-by-step instructions for installing the dhost CLI, configuring self-hosted control planes, connecting worker nodes, and automating app deployments.
+
+
+================================================================================
+URL: https://decentralized.host/guides/
+H1: Production Deployment & Operations Guides
+Type: guide
+Summary: Practical developer tutorials for Git push deployment, Docker containers, multi-node setups, rollback management, and Traefik HTTPS configuration.
+Claim status: IMPLEMENTED
+AEO answer: Decentralized.Host guides offer end-to-end recipes covering Git push workflows, multi-server clustering, automated Let’s Encrypt TLS setup, and single-command rollbacks.
+
+
+================================================================================
+URL: https://decentralized.host/alternatives/
+H1: Decentralized.Host vs Self-Hosted & Managed PaaS Platforms
+Type: comparison
+Summary: Evidence-based comparisons between Decentralized.Host and Coolify, Dokploy, CapRover, Dokku, Heroku, Vercel, and AWS with verified capability dates.
+Claim status: IMPLEMENTED
+AEO answer: Unlike single-server PaaS tools like Dokku or single-orchestrator tools like Coolify and Dokploy, Decentralized.Host is designed around a lightweight decoupled node agent mesh architecture with built-in remote execution and multi-node scheduling.
+
+
+================================================================================
+URL: https://decentralized.host/deploy/
+H1: Framework & Stack Deployment Recipes
+Type: deploy-recipe
+Summary: One-command deployment configurations and Dockerfiles for FastAPI, Express, Next.js, Django, Flask, React, Astro, Static HTML, PostgreSQL, and Redis.
+Claim status: IMPLEMENTED
+AEO answer: Decentralized.Host automatically detects project frameworks including Python FastAPI/Flask/Django, Node.js/Next.js/Express, Dockerfiles, and Static Web apps, generating optimal container builds automatically.
+
+
+================================================================================
+URL: https://decentralized.host/decentralized-hosting/
+H1: Decentralized Hosting: Architecture, Tradeoffs & Implementation
+Type: pillar
+Summary: The canonical guide to decentralized hosting, distributed compute architectures, independent node execution, comparison with centralized cloud, and open-source operations.
+Claim status: IMPLEMENTED
+AEO answer: Decentralized hosting distributes application workloads across independently operated compute nodes rather than relying exclusively on a single hyperscaler provider, ensuring infrastructure sovereignty and fault tolerance.
+
+
+================================================================================
+URL: https://decentralized.host/self-hosted-paas/
+H1: Self-Hosted PaaS: Architecture, Comparison & Production Guide
+Type: pillar
+Summary: How to build, operate, and scale a self-hosted Platform-as-a-Service on your own VPS or bare-metal servers with Git push and Docker automation.
+Claim status: IMPLEMENTED
+AEO answer: A self-hosted PaaS provides a developer experience similar to Heroku or Render on privately managed servers, giving engineers automated Git/CLI deployments, reverse proxy management, and zero recurring cloud management surcharges.
+
+
+================================================================================
+URL: https://decentralized.host/depin/
+H1: DePIN Compute: Physical Nodes, Useful Workloads & Economic Alignment
+Type: depin
+Summary: How Decentralized.Host bridges physical compute hardware with useful application workloads, verifiable service receipts, and optional network incentives.
+Claim status: EXPERIMENTAL
+AEO answer: In Decentralized.Host, DePIN is treated as real physical compute executing verifiable containerized workloads. The optional Solana blockchain integration provides credit ledger tracking and node compensation without compromising base compute execution.
+
+
+================================================================================
+URL: https://decentralized.host/roadmap/
+H1: Decentralized.Host Engineering Roadmap
+Type: roadmap
+Summary: Public roadmap and delivery milestones for Decentralized.Host across core control plane, node agent mesh, storage replication, and security hardening.
+Claim status: IMPLEMENTED
+AEO answer: The Decentralized.Host engineering roadmap covers a single-node control plane and CLI (Phase 1), a distributed multi-node mesh with real Git-push deploys, production TLS, and Solana devnet node-operator credits (Phase 2, both complete), confidential-computing enclaves (Phase 3, planned), and an optional Solana mainnet migration with automated node failover (Phase 4, planned).
+
+
+================================================================================
+URL: https://decentralized.host/about/
+H1: Own Your Infrastructure. Democratize Compute.
+Type: about
+Summary: The mission, design principles, and open-source vision behind Decentralized.Host: empowering developers to deploy anywhere and own their infrastructure.
+Claim status: IMPLEMENTED
+AEO answer: Decentralized.Host was created to restore developer sovereignty over application deployment, eliminating artificial cloud margins and vendor lock-in through modular, open-source distributed software.
+
+
+================================================================================
+URL: https://decentralized.host/open-source/
+H1: 100% Open Source & Community Driven
+Type: about
+Summary: Decentralized.Host is 100% open-source software under the MIT license. Learn how to contribute to the CLI, control plane, node agent, or documentation.
+Claim status: IMPLEMENTED
+AEO answer: Decentralized.Host is licensed under MIT, welcoming community contributions to its Python/FastAPI control plane, Python node agent, Bash git server hooks, and Python dhost CLI.
+
+
+================================================================================
+URL: https://decentralized.host/faq/
+H1: Frequently Asked Questions
+Type: faq
+Summary: Honest answers about what Decentralized.Host actually is and isn't: no IPFS/Arweave/Filecoin, no smart contracts, no per-user accounts, and what the optional Solana devnet credit system does and doesn't do.
+Claim status: IMPLEMENTED
+AEO answer: Decentralized.Host is a self-hosted Docker deployment mesh (FastAPI control plane + node agents + Traefik), not a blockchain storage network -- it does not use IPFS, Arweave, or Filecoin, and its only blockchain component is an optional Solana devnet credit system for node operators.
+
+
+## Documentation
+
+================================================================================
+DOC: Quick Start: Deploy in 60 Seconds
+URL: https://decentralized.host/docs/#quickstart
+Category: getting-started
+
+Decentralized.Host deploys any web application, API, or background container with one command, from your own machine or from a self-hosted control plane. Follow this guide to ship your first project against a mesh you're running (see the self-hosting guide to stand one up).
+
+### 1. Install the CLI
+The CLI isn't published to PyPI yet -- install it in editable mode from the repo:
+
+```bash
+git clone https://github.com/CodesbyFebin/decentralized.host.git
+cd decentralized.host
+pip install -e ./cli
+```
+
+### 2. Point it at your control plane
+Set the URL and deploy key for the mesh you're targeting (defaults match a local `docker compose up` mesh):
+
+```bash
+export DHOST_API_URL=http://localhost:8000
+export DHOST_DEPLOY_KEY=your_deploy_api_key
+```
+
+### 3. Ship your application
+Navigate to your application directory (FastAPI, Next.js, Express, static, or anything with a custom Dockerfile) and run:
+
+```bash
+cd my-app
+dhost ship my-app
+```
+The CLI detects your stack, snapshots the project locally (a real SHA-256 content-addressed ledger under `.dhost/` -- no Git required), uploads the snapshot, and the control plane builds and runs it on the mesh -- no Dockerfile needed in your repo, no local Docker required either. It prints your live URL when done.
+
+### 4. Update it
+```bash
+dhost update "what changed"
+```
+Snapshots your current changes and redeploys. `dhost history` lists past snapshots; `dhost rollback <snapshot-id>` restores and redeploys an earlier one.
+
+
+================================================================================
+DOC: CLI Command Reference
+URL: https://decentralized.host/docs/#cli-reference
+Category: cli-reference
+
+The `dhost` CLI talks to whatever control plane you point it at via two environment variables (or the `.dhost/config.yml` that `dhost ship`/`init` write automatically):
+
+```bash
+export DHOST_API_URL=http://localhost:8000      # default if unset
+export DHOST_DEPLOY_KEY=dev-deploy-key           # default if unset
+```
+
+There is no global `--url`/`--token`/`--json` flag set -- auth is env-var or config-file based, not per-invocation flags.
+
+### The Git-free path (recommended)
+- `dhost ship [name] [--port 8080] [--message/-m "ship"] [--domain <bare-domain>]`: Detects your stack, snapshots the project into `.dhost/ledger/` (SHA-256 content-addressed, no Git), uploads it, and the control plane builds + runs it server-side. No Dockerfile needed in your repo. `--domain` binds a bare apex domain instead of `<name>.<BASE_DOMAIN>` (used for this project's own landing page, for example).
+- `dhost update "<message>"`: Snapshots current changes and redeploys, reusing the name/port/domain from the last `dhost ship` in this directory.
+- `dhost history`: Lists local snapshots for the current project (id, message, timestamp, file count) -- reads `.dhost/ledger/` on this machine only.
+- `dhost rollback <snapshot-id>`: Restores a local snapshot to a temp sandbox and reships it.
+
+### The older, local-build path
+- `dhost init`: Writes a real `Dockerfile` to the project root (only if one doesn't exist) and creates `.dhost/config.yml`.
+- `dhost deploy [name] [--port 8080] [--registry localhost:5000]`: Runs `docker build`/`docker push` on **your own machine** (needs local Docker), then schedules it -- distinct from `dhost ship`, not an alias.
+
+### Status & logs
+- `dhost status <name>`: Prints a deployment's status, image, node id, URL, and error (if any).
+- `dhost logs <name>`: Prints the last ~200 lines of container logs.
+
+### Mesh nodes
+- `dhost node join [--node-name <name>] [--control-plane-url <url>]`: Builds and runs another node-agent container on this same Docker daemon -- for a genuinely separate machine, see the Self-Hosting / multi-node guide instead.
+- `dhost node list`: Table of all nodes -- name, status, region, CPU%, RAM used, wallet.
+
+### Git server & keys
+- `dhost keys add <label> <path-to-pubkey>`: Registers an SSH public key allowed to `git push` to this mesh.
+- `dhost keys list`: Lists registered keys with fingerprints.
+- `dhost clone-url <name> [--ssh-host localhost] [--ssh-port 2222]`: Prints the git remote URL and setup commands for a repo.
+
+### Node-operator credits (Solana devnet)
+- `dhost wallet <node_id> <solana_pubkey>`: Links a devnet wallet to a node so it can receive credits.
+- `dhost credits <node_id>`: Shows a node's credit balance and mint history.
+
+There is no `dhost list` (all-deployments), `dhost restart`, `dhost stop`, or `dhost destroy` command -- tear down a deployment via the console's Delete button or `DELETE /deployments/{name}`.
+
+
+================================================================================
+DOC: Self-Hosting: Local Dev vs. Real Production
+URL: https://decentralized.host/docs/#self-hosting
+Category: self-hosting
+
+There are two genuinely different setups here -- don't mix their env vars.
+
+### Local development (no real domain needed)
+```bash
+git clone https://github.com/CodesbyFebin/decentralized.host.git
+cd decentralized.host
+docker compose up -d --build
+pip install -e ./cli
+```
+This brings up Postgres, the registry, Traefik, the control plane, one node agent, the console, and the git server, all using `.env.example`'s dev defaults (`BASE_DOMAIN=127.0.0.1.nip.io` -- a free wildcard DNS service that resolves any `*.127.0.0.1.nip.io` to localhost, so you get real DNS + real Traefik routing with zero setup, just no real TLS).
+
+### Real production (a real domain, real Let's Encrypt certs)
+This needs a real server and real DNS -- see [DEPLOY.md](https://github.com/CodesbyFebin/decentralized.host/blob/main/DEPLOY.md) in the repo for the full walkthrough. Short version:
+
+```bash
+# On a real VPS with Docker installed, DNS already pointed at it:
+git clone https://github.com/CodesbyFebin/decentralized.host.git
+cd decentralized.host
+cp .env.example .env
+# edit .env: real BASE_DOMAIN, real random SECRET_KEY/NODE_JOIN_SECRET/DEPLOY_API_KEY, real ACME_EMAIL
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+```
+Note both compose files are required together -- the prod one is an overlay, not a replacement. This gets you `api.<domain>` (control plane) and `app.<domain>` (console) with real per-hostname Let's Encrypt certs (HTTP-01, no DNS-provider API key needed -- just a wildcard `*.<domain>` A record), and every future `dhost ship` also gets a real cert automatically.
+
+### What's running either way
+1. **Traefik** -- edge proxy, routes by hostname, TLS in production
+2. **FastAPI control plane** -- scheduling, auth, the REST API
+3. **Node agent** -- builds and runs containers on the Docker daemon it has access to
+4. **git-server** -- the SSH git daemon (see the Git Server guide)
+5. **Postgres** -- all state (nodes, deployments, releases, SSH keys)
+6. **Console (dashboard)** -- the web UI, static nginx serving vanilla JS/HTML
+
+
+================================================================================
+DOC: Node Agent Reference
+URL: https://decentralized.host/docs/#node-agent-setup
+Category: node-agent
+
+The node agent is a single Python process: it registers with the control plane, sends heartbeats every 10s, polls for pending deployments, and builds/runs containers via the Docker socket it has access to. There's no published Docker Hub image -- build it from the repo's node-agent/Dockerfile.
+
+### Real environment variables
+- `CONTROL_PLANE_URL` (default `http://control-plane:8000`): where to register and send heartbeats
+- `NODE_JOIN_SECRET` (default `dev-join-secret`): must match the control plane's -- this is the actual variable name, not `NODE_SECRET_KEY`
+- `NODE_NAME` (default: the container's hostname): shown in `dhost node list`
+- `NODE_REGION` (default `local`): free-text label, not used for scheduling logic today
+- `ADVERTISE_ADDRESS` (default `node-agent:<LOG_API_PORT>`): **the one that matters for a real remote node** -- must be reachable from the control plane specifically, e.g. `203.0.113.5:8100`
+- `REGISTRY_HOST` (default `registry:5000`): where built images get pushed
+- `PUBLIC_SCHEME` (default `http`): set to `https` in production so generated Traefik routes and sitemap.xml/robots.txt use the right scheme
+- `HEARTBEAT_INTERVAL` / `POLL_INTERVAL` (default `10`/`3` seconds)
+
+### Building and running it on a remote machine
+```bash
+git clone https://github.com/CodesbyFebin/decentralized.host.git
+cd decentralized.host
+docker build -t dhost/node-agent -f node-agent/Dockerfile .
+docker run -d --name dhost-node-agent \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -e CONTROL_PLANE_URL=https://api.your-domain.com \
+  -e NODE_JOIN_SECRET=<real secret from the control plane's .env> \
+  -e NODE_NAME=worker-2 \
+  -e ADVERTISE_ADDRESS=<this machine's IP>:8100 \
+  -p 8100:8100 \
+  dhost/node-agent
+```
+
+### Verifying it joined
+```bash
+dhost node list
+```
+Look for the node's status as `healthy` (a node with no heartbeat in the last 30s shows `stale`). New deployments schedule onto whichever healthy node has the lowest combined CPU+RAM load.
+
+
+================================================================================
+DOC: REST API Reference
+URL: https://decentralized.host/docs/#rest-api
+Category: rest-api
+
+### Base URL
+`http://localhost:8000` locally, or `https://api.<your-domain>` in production. **No `/api/v1` prefix** -- every path below is relative to the base URL directly.
+
+### Authentication
+Most endpoints take `Authorization: Bearer <DEPLOY_API_KEY>`. Node-to-control-plane endpoints (heartbeat, pending-deployments) instead take a short-lived JWT issued at `/auth/node-join` -- that's a separate trust boundary from the deploy key.
+
+### Deployments (deploy-key auth)
+- `POST /deployments` -- old flow: create from an already-built image reference
+- `POST /deployments/detect` -- upload files, get back detected stack + generated Dockerfile + a reusable upload_id
+- `POST /deployments/ship` -- upload (or reference an upload_id) + a Dockerfile, build and deploy
+- `POST /deployments/push` -- single-call detect+build+deploy from one tarball; what the git server's post-receive hook calls
+- `GET /deployments` -- list all
+- `GET /deployments/{name}` -- one deployment's status
+- `GET /deployments/{name}/logs` -- last ~200 lines
+- `GET /deployments/{name}/releases` -- release/deploy history
+- `DELETE /deployments/{name}` -- tear down the container and delete the record
+
+### Nodes
+- `GET /nodes` -- list (deploy-key auth)
+- `POST /auth/node-join` -- a node registers with `join_secret`, gets back a JWT (node auth, not deploy-key)
+- `POST /nodes/heartbeat`, `GET /nodes/{id}/pending-deployments`, `POST /nodes/{id}/deployment-status/{deployment_id}` -- all node-JWT auth, called by the node agent itself, not something you'd call directly
+
+### Git server keys
+- `POST /git/keys`, `GET /git/keys`, `DELETE /git/keys/{id}` -- manage SSH keys (deploy-key auth)
+- `GET /git/keys/authorized_keys` -- plain-text authorized_keys format, polled by the git-server container itself
+
+### Blockchain (node-operator credits)
+- `GET /blockchain/status` -- whether credits are enabled, mint address, reward config
+- `POST /blockchain/nodes/{node_id}/wallet` -- link a devnet wallet to a node
+- `GET /blockchain/credits/{node_id}` -- balance + mint ledger for a node
+
+### AI Assistant
+- `GET /assistant/status` -- whether GOOGLE_API_KEY is configured
+- `POST /assistant/chat` -- `{message, history}` in, `{reply, tool_calls}` out; read-only, cannot deploy or delete anything
+
+
+================================================================================
+DOC: Git Server Deep Dive
+URL: https://decentralized.host/docs/#git-server-internals
+Category: git-server
+
+### The restricted login shell
+The `git` user's login shell is not `/bin/bash` or plain `git-shell` -- it's a small wrapper (git-server/opengit-shell.sh) that:
+1. Reads the requested command (via `-c` argument when invoked as a login shell, or `$SSH_ORIGINAL_COMMAND` for a ForceCommand-style setup -- it handles both)
+2. Pattern-matches it against exactly three allowed forms: `git-upload-pack`, `git-receive-pack`, `git-upload-archive`. Anything else is rejected before any real shell runs.
+3. Extracts the repo name via `basename()` (so `../../etc/passwd` becomes just `passwd` -- no path traversal possible)
+4. On `git-receive-pack` to a repo that doesn't exist yet, runs `git init --bare` and installs the post-receive hook, then execs the real `git-shell -c`
+
+### The post-receive hook
+Copied from git-server/post-receive.template into every repo's `hooks/` at creation time, with `CONTROL_PLANE_URL`/`DEPLOY_API_KEY` substituted in at container startup:
+1. Reads which ref was just pushed and points the bare repo's `HEAD` at it (deploys whatever you last pushed -- there's no fixed "main branch" assumption, which also means a fresh repo has no ambiguity about what "the default branch" is)
+2. `git archive HEAD` into a tarball (already respects `.gitignore`/export-ignore, so no separate ignore-list logic needed)
+3. Reads an optional `.opengit.yml` at the repo root for `port:`/`domain:` overrides
+4. POSTs the tarball to `/deployments/push` and prints the result back to your `git push` output
+
+### SSH key sync
+Registered keys live in Postgres (the `SSHKey` model), not directly in the container. The git-server container fetches `GET /git/keys/authorized_keys` once at startup and then every 30s in a background loop, so a newly-added key becomes usable within half a minute without a restart.
+
+### What this does NOT have
+No per-user accounts, no per-repo access control (any registered key can push to any repo), no branch protection, no PR/code-review workflow, no webhooks besides the deploy trigger itself.
+
+
+================================================================================
+DOC: OpenGit Console Reference
+URL: https://decentralized.host/docs/#console-reference
+Category: console
+
+The console (dashboard/index.html) is a single static HTML file with vanilla JS -- no build step, no framework. It stores your API URL and deploy key in this browser's localStorage and polls the REST API every 5 seconds.
+
+### Dashboard
+Live counts (nodes healthy, deployments running, releases shipped), blockchain status, and a recent-deployments list.
+
+### Launchpad
+Drag a project folder in; it uploads to `/deployments/detect`, shows the detected stack and an editable generated Dockerfile (plus a real Gemini note if `GOOGLE_API_KEY` is set on the control plane, otherwise it says so honestly), then Ship calls `/deployments/ship`. Exactly the same pipeline as `dhost ship` and `git push`.
+
+### Deployments
+Table of everything on the mesh; click one for status, the assigned node, and its last ~200 log lines, plus a real Delete button (`DELETE /deployments/{name}`).
+
+### Git Manager
+Real release history per deployment (message, snapshot id if it came from `dhost ship`, status, timestamp) via `GET /deployments/{name}/releases` -- plus a quick-command reference for the actual CLI/git-push workflows. This does not let you roll back from the browser; that still needs the local snapshot on whichever machine shipped it.
+
+### Mesh Nodes
+Live table from `GET /nodes` -- status, region, CPU%, RAM used, linked wallet.
+
+### Credits
+Per-node Solana devnet credit ledger, and an honest "off (ENABLE_BLOCKCHAIN=false)" state when it isn't configured.
+
+### Assistant
+The AI chat tab -- see the AI Assistant doc.
+
+### Settings
+Just two fields: the control plane API URL and the deploy key, stored in this browser only. No user accounts exist in this version.
+
+
+================================================================================
+DOC: Node-Operator Credits (Solana Devnet)
+URL: https://decentralized.host/docs/#node-operator-credits
+Category: blockchain
+
+Off by default (`ENABLE_BLOCKCHAIN=false`). When enabled, the control plane mints a real SPL token ("DHOST Credits") to a node operator's linked devnet wallet every `HEARTBEATS_PER_REWARD` (default 6) healthy heartbeats.
+
+### Why devnet, not mainnet
+Devnet SOL and tokens have no monetary value -- funded by a free public faucet, not a purchase. That keeps this a genuine on-chain demonstration (real transactions, a real token mint, a real Explorer link) without touching real money or requiring anyone to buy anything. A mainnet path is an explicit future decision, not something this version does quietly.
+
+### Setting it up
+```bash
+pip install -r blockchain/requirements.txt
+python blockchain/scripts/setup_devnet.py
+```
+This generates a payer keypair, requests a free devnet airdrop (the public faucet is often rate-limited -- the script tells you if it fails and how to retry or fund manually), and creates the token mint. Copy the printed mint address into `.env`:
+```env
+ENABLE_BLOCKCHAIN=true
+SOLANA_MINT_ADDRESS=<printed mint address>
+```
+Restart the control plane, then link a node's wallet:
+```bash
+dhost wallet <node_id> <your-devnet-wallet-pubkey>
+dhost credits <node_id>
+```
+
+### What actually happens on-chain
+Real `solana-py`/`solders` calls: associated-token-account creation if needed, then a real `mint_to` instruction. Every mint is recorded with its transaction signature and a working `explorer.solana.com/...?cluster=devnet` link, visible in the console's Credits tab or `GET /blockchain/credits/{node_id}`.
+
+
+================================================================================
+DOC: AI Assistant Reference
+URL: https://decentralized.host/docs/#ai-assistant
+Category: ai-assistant
+
+The console's Assistant tab is backed by a single Gemini model (`gemini-1.5-flash`), using the same `GOOGLE_API_KEY` as the Launchpad's stack notes. Off by default -- both `GET /assistant/status` and the console show an honest "not configured" state rather than a fake response when no key is set.
+
+### The four tools it actually has (all read-only)
+- `list_deployments()` -- name, status, URL, error for every deployment
+- `get_deployment_logs(name)` -- last ~200 lines for one deployment
+- `list_nodes()` -- name, status, CPU%, RAM for every node
+- `get_release_history(name)` -- last 10 releases for one deployment
+
+It has no tool to deploy, delete, or modify anything. Its system instruction explicitly tells it to decline requests to change state and point at the right CLI command or console button instead.
+
+### Enabling it
+```env
+GOOGLE_API_KEY=your-real-key
+```
+`docker compose restart control-plane`, then the Assistant tab's input unlocks automatically once `/assistant/status` reports `enabled: true`.
+
+
+================================================================================
+DOC: Database & State Management
+URL: https://decentralized.host/docs/#database
+Category: database
+
+The control plane has exactly one stateful dependency: PostgreSQL, via SQLAlchemy. No Redis, no message queue, no separate cache layer.
+
+### The real schema (control-plane/app/models.py)
+Five tables, nothing more:
+- **Node** -- name, status, region, live CPU/RAM telemetry, and `advertise_address` (the reachable host:port the control plane uses to talk back to this specific node -- critical once you have more than one)
+- **Deployment** -- name, image reference, assigned node, status, custom domain, container port
+- **Release** -- one row per `ship`/`update`/git-push, message, snapshot id, status, timestamp -- this is what the console's Git Manager tab and `GET /deployments/{name}/releases` read
+- **CreditLedger** -- one row per Solana devnet mint event, with the real transaction signature
+- **SSHKey** -- registered public keys for the git server, label, and the pubkey itself
+
+### Schema changes: no migration framework
+There's no Alembic, no versioned migration files. On startup, `Base.metadata.create_all()` creates any tables that don't exist yet, then a short `STARTUP_MIGRATIONS` list of raw, idempotent `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` statements in `control-plane/app/main.py` applies any additive changes to tables that already exist. It's intentionally minimal -- fine for a single-operator self-hosted mesh where you control both the code and the database, not something that would scale to a team needing rollback-able migrations or a review process on schema changes.
+
+### Startup sequence
+On boot, the control plane retries the database connection for up to 30 attempts (2s apart) before giving up -- this is what lets `docker compose up` bring up Postgres and the control plane in either order without a crash loop. `GET /healthz` returns `{"status": "ok"}` once the app is actually serving, useful for a real load balancer or orchestrator health check in front of it.
+
+
+================================================================================
+DOC: Container Isolation & Resource Limits
+URL: https://decentralized.host/docs/#container-isolation
+Category: security
+
+Isolation between deployments comes from standard Docker container boundaries -- Linux namespaces (PID, network, mount) and cgroups -- the same isolation any Docker container gets, nothing added and nothing removed. There's no seccomp profile customization, no dropped Linux capabilities, and no read-only root filesystem enforcement beyond Docker's own defaults. If your threat model requires stronger isolation than stock Docker (e.g. gVisor, Kata Containers, or gVisor-style sandboxing), that's not present in this version -- see the roadmap's Phase 3 (confidential computing) for where stronger isolation is planned, not yet built.
+
+### The resource limit every container gets, hardcoded
+Every container the node agent starts is capped at:
+- **256MB memory** (`mem_limit="256m"`)
+- **1 vCPU** (`nano_cpus=1_000_000_000`)
+
+This is currently the same fixed limit for every deployment regardless of what the app actually needs -- there's no per-app override yet. A memory-hungry app will get OOM-killed at 256MB just like a tiny one; know this before shipping something that needs more headroom. Restart policy is `unless-stopped`, so a crashed container restarts automatically, but a container that's OOM-killed repeatedly will just keep restarting and dying rather than surfacing a clear "needs more memory" signal today.
+
+### Networking
+Every deployment container joins the same Docker network (the compose-defined mesh network) so Traefik can reach it by container IP; it is not exposed on a host port directly. Only Traefik's own ports (80/443, or the local dev port) are exposed to the outside world.
+
+
+## Guides
+
+================================================================================
+GUIDE: Deploy via Git Push over SSH (No Local Docker or dhost CLI Needed)
+URL: https://decentralized.host/guides/#deploy-with-git
+Difficulty: Beginner (5 min)
+Claim status: IMPLEMENTED
+
+The git-server container runs a hardened SSH daemon whose login shell only permits git-upload-pack/git-receive-pack (see git-server/opengit-shell.sh) -- no interactive shell access. Pushing to a repo name that does not exist yet auto-creates it. A post-receive hook archives the pushed tree with `git archive` (already .gitignore-clean) and POSTs it directly to the control plane's /deployments/push endpoint, which detects the stack, builds, and runs it -- the exact same pipeline `dhost ship` and the console's Launchpad use.
+
+Steps:
+1. Step 1: Register your SSH public key -- Any registered key can push to any repo on this mesh -- there are no per-user accounts or per-repo permissions in this version, the same single-shared-secret trust model as the rest of the mesh.
+   $ dhost keys add "laptop-macbook" ~/.ssh/id_ed25519.pub
+2. Step 2: Add the git remote -- Repos live under /repos/<name>.git on the git-server container. For local dev the SSH port is published as 2222.
+   $ git remote add opengit ssh://git@localhost:2222/repos/my-service.git
+3. Step 3: Push to deploy -- Pushing deploys whichever branch you just pushed (single-branch-is-live, like a classic Heroku remote -- no multi-branch preview environments in this version). First push auto-creates the repo.
+   $ git push opengit main
+
+
+================================================================================
+GUIDE: Adding a Second, Genuinely Remote Node
+URL: https://decentralized.host/guides/#multi-node-app-deployment
+Difficulty: Intermediate (10 min)
+Claim status: IMPLEMENTED
+
+Each node reports its own reachable address (advertise_address) when it registers, and the control plane always talks to the specific node a deployment actually landed on -- not a single hardcoded address. This is what makes a genuinely separate machine work correctly: earlier versions of this project had one global node-agent URL, which would have silently misrouted builds/logs/teardown the moment a second real node joined.
+
+Steps:
+1. Step 1: Get the join secret -- On the control plane host, read the real secret from .env (not a placeholder -- the join will fail otherwise).
+   $ grep NODE_JOIN_SECRET .env
+2. Step 2: Build and run the node agent on the new machine -- There is no published Docker Hub image -- clone the repo (or just copy node-agent/ and blockchain/) and build locally. ADVERTISE_ADDRESS must be reachable FROM the control plane, not from you.
+   $ git clone https://github.com/CodesbyFebin/decentralized.host.git
+cd decentralized.host
+docker build -t dhost/node-agent -f node-agent/Dockerfile .
+docker run -d --name dhost-node-agent \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -e CONTROL_PLANE_URL=https://api.your-domain.com \
+  -e NODE_JOIN_SECRET=<the real secret from step 1> \
+  -e NODE_NAME=worker-2 \
+  -e ADVERTISE_ADDRESS=<this machine's public IP>:8100 \
+  -p 8100:8100 \
+  dhost/node-agent
+3. Step 3: Verify it joined -- From any machine with the CLI installed and pointed at the same control plane.
+   $ dhost node list
+
+
+================================================================================
+GUIDE: Rolling Back a Deployment (Local Snapshot, Not a Server-Side Version Store)
+URL: https://decentralized.host/guides/#deployment-rollbacks
+Difficulty: Beginner (3 min)
+Claim status: IMPLEMENTED
+
+This is important to understand correctly: rollback is local-ledger-based, not a centralized "roll back app X to version Y from anywhere" API. Every `dhost ship`/`dhost update` snapshots the project into a SHA-256 content-addressed blob store under .dhost/ledger/ on whichever machine ran it (see cli/dhost/ledger.py) -- that is the real "no Git" replacement this project is built around. `dhost rollback` restores one of those local snapshots to a temp directory and reships it. The control plane separately keeps a read-only Release history (message, snapshot id, status, timestamp) per deployment, visible in the console's Git Manager tab or via GET /deployments/{name}/releases -- useful for seeing what happened, but it does not itself let you roll back; the actual snapshot files have to exist locally.
+
+Steps:
+1. Step 1: List local snapshots -- Run from inside the project directory whose history you want -- this reads .dhost/ledger/ on this machine, not a server-side store.
+   $ dhost history
+2. Step 2: Restore and redeploy a snapshot -- Takes a snapshot id (not a version number or app name) -- restores it to a temp build sandbox, rebuilds, and reships it.
+   $ dhost rollback 7c0d3c9
+
+
+================================================================================
+GUIDE: Binding a Custom Domain to a Deployment
+URL: https://decentralized.host/guides/#custom-domain
+Difficulty: Beginner (5 min)
+Claim status: IMPLEMENTED
+
+The `--domain` flag on `dhost ship`/`dhost update` (and the equivalent `domain:` key in an .opengit.yml for git-push deploys) is stored on the deployment and passed straight through to the node agent's `write_traefik_config()`, which adds a second Traefik router for that exact host alongside the default `<name>.<BASE_DOMAIN>` one -- both stay live at once. In production mode (PUBLIC_SCHEME=https) that router gets its own Let's Encrypt HTTP-01 certificate the same way the default subdomain does.
+
+Steps:
+1. Step 1: Point DNS at your server -- A plain A record to your control-plane host's public IP. No CNAME/ALIAS tricks needed since Traefik terminates on standard ports 80/443.
+   $ # In your DNS provider: A record
+# app.yourdomain.com -> <your server's public IP>
+2. Step 2: Ship with --domain -- Works on first ship or any later update -- the domain binding updates in place.
+   $ dhost ship my-service --domain app.yourdomain.com
+
+
+================================================================================
+GUIDE: Going to Production: Real Domain, Real Let's Encrypt TLS
+URL: https://decentralized.host/guides/#production-deployment
+Difficulty: Intermediate (20 min)
+Claim status: IMPLEMENTED
+
+Local dev uses nip.io + plain HTTP -- fine for testing, not for the internet. Production uses a second compose file (docker-compose.prod.yml, layered on top of the base one) that sets PUBLIC_SCHEME=https and a real BASE_DOMAIN, which flips the node agent's `write_traefik_config()` over to requesting real Let's Encrypt certificates via Traefik's HTTP-01 challenge for every router it creates -- the control plane, the dashboard, and every app deployed after that, automatically, with no DNS-provider API key required. See DEPLOY.md in the repo for the complete checklist this guide summarizes.
+
+Steps:
+1. Step 1: Point DNS at the server -- A wildcard record is the least friction, since every deployment gets its own subdomain.
+   $ # A records:
+# yourdomain.com          -> <server IP>
+# *.yourdomain.com        -> <server IP>
+2. Step 2: Set real secrets in .env -- Rotate every default -- these ship with dev-friendly placeholders that are not safe on a public server.
+   $ BASE_DOMAIN=yourdomain.com
+PUBLIC_SCHEME=https
+SECRET_KEY=<generate a real random secret>
+NODE_JOIN_SECRET=<generate a real random secret>
+DEPLOY_API_KEY=<generate a real random secret>
+LETSENCRYPT_EMAIL=you@yourdomain.com
+3. Step 3: Bring up the production stack -- Layers docker-compose.prod.yml over the base compose file -- this is what actually switches Traefik to request real certificates instead of running on plain HTTP.
+   $ docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+4. Step 4: Verify -- Confirm the control plane itself is served over real HTTPS before shipping anything to it.
+   $ curl -I https://api.yourdomain.com/health
+
+
+================================================================================
+GUIDE: Automatic sitemap.xml and robots.txt for Static Sites
+URL: https://decentralized.host/guides/#auto-seo-files
+Difficulty: Beginner (2 min)
+Claim status: IMPLEMENTED
+
+On every build, the node agent runs `_maybe_generate_seo_files()` (node-agent/agent.py) after detecting a static-site stack. It walks the uploaded source for every real .html file it finds, builds a sitemap.xml with actual URLs for that deployment's real domain (respecting PUBLIC_SCHEME so it emits https:// in production), and writes a robots.txt pointing at it -- but only if the project doesn't already ship its own sitemap.xml/robots.txt, which take priority untouched. This deliberately only applies to static sites: a Python/Node backend's real routes can't be known without introspecting the app, so nothing is fabricated or guessed for those.
+
+Steps:
+1. Step 1: Ship a static site normally -- No extra flag needed -- generation is automatic once the static stack is detected.
+   $ cd my-static-site && dhost ship my-site
+2. Step 2: Check the generated files -- Both are served at the deployment's real domain, generated fresh from what was actually found in the upload.
+   $ curl http://my-site.127.0.0.1.nip.io/sitemap.xml
+
+
+================================================================================
+GUIDE: Setting Up Solana Devnet Node-Operator Credits
+URL: https://decentralized.host/guides/#solana-devnet-credits
+Difficulty: Intermediate (10 min)
+Claim status: IMPLEMENTED
+
+This is entirely opt-in and off by default (ENABLE_BLOCKCHAIN=false). When enabled, the control plane mints a real SPL token ("DHOST Credits") on Solana's public devnet cluster to a node operator's linked wallet every HEARTBEATS_PER_REWARD healthy heartbeats. Devnet SOL and tokens have no monetary value -- funded by a free public faucet -- so this is a genuine on-chain demonstration (real transactions, a real mint, a real Explorer link) without touching real money. See control-plane/app/blockchain_client.py and blockchain/creditor.py for the actual mint logic.
+
+Steps:
+1. Step 1: Generate the payer keypair and mint -- Run once, on the control-plane host. This creates a payer keypair, requests a free devnet SOL airdrop for transaction fees, and creates the DHOST Credits token mint.
+   $ pip install -r blockchain/requirements.txt
+python blockchain/scripts/setup_devnet.py
+2. Step 2: Enable it and restart -- Copy the printed mint address into .env, then restart just the control plane -- no need to rebuild node agents.
+   $ # .env
+ENABLE_BLOCKCHAIN=true
+SOLANA_MINT_ADDRESS=<printed mint address>
+
+docker compose restart control-plane
+3. Step 3: Link a node's wallet -- Any devnet-compatible wallet public key works -- this just tells the control plane where to mint that node's earned credits.
+   $ dhost wallet <node_id> <your-devnet-wallet-pubkey>
+4. Step 4: Watch credits accrue -- Every HEARTBEATS_PER_REWARD (default 6) healthy heartbeats from that node mints CREDITS_PER_REWARD (default 10) tokens, with a real transaction signature.
+   $ dhost credits <node_id>
+
+
+================================================================================
+GUIDE: Debugging a Failed Deployment with the AI Assistant
+URL: https://decentralized.host/guides/#ai-assistant-debugging
+Difficulty: Beginner (5 min)
+Claim status: IMPLEMENTED
+
+The Assistant tab is a single Gemini model with exactly four read-only tools -- list_deployments, get_deployment_logs, list_nodes, get_release_history (control-plane/app/routers/assistant.py). It cannot deploy, delete, restart, or change anything; its system instruction explicitly tells it to decline and point you at the right CLI command or console button instead. That makes it genuinely safe to ask broad, exploratory questions about a broken deployment without worrying it will "fix" something on its own.
+
+Steps:
+1. Step 1: Open the Assistant tab -- In the console, with a failed or misbehaving deployment already showing in the Deployments tab.
+   $ # console -> Assistant tab
+2. Step 2: Ask a direct question -- The model calls get_deployment_logs and/or get_release_history itself -- you don't need to paste logs in manually.
+   $ "Why is my-service failing to start? Check its logs and recent releases."
+3. Step 3: Read the tool-backed answer -- A real answer references what the tools actually returned, not a generic guess -- e.g. quoting the specific error line from the last ~200 log lines, or noting the last release's status.
+4. Step 4: Act on it yourself -- The assistant never runs the fix -- you redeploy, roll back, or restart via the CLI or console as normal.
+   $ dhost ship my-service
+

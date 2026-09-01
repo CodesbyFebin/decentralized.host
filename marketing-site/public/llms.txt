@@ -18,7 +18,8 @@
 - /security/: Threat matrix, authentication model, and RFC 9116 security.txt
 - /docs/: Developer CLI manual, quickstart guide, and self-hosting runbook
 - /guides/: Step-by-step technical guides (Git push, multi-node mesh, rollbacks)
-- /alternatives/: Evidence-backed comparisons with Coolify, Dokploy, CapRover, Dokku, Heroku
+- /alternatives/: Evidence-backed comparisons with Coolify, Dokploy, CapRover, Dokku, Heroku, Vercel, AWS
+- /faq/: Direct answers to common scope questions (no blockchain storage, devnet-only Solana, not a hosted SaaS)
 - /deploy/: Framework auto-detection recipes (FastAPI, Next.js, Django, Express, Docker)
 - /decentralized-hosting/: Comprehensive category authority guide on decentralized hosting
 - /self-hosted-paas/: Comprehensive category authority guide on self-hosted PaaS architecture

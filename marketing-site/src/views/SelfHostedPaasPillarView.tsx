@@ -67,10 +67,10 @@ export const SelfHostedPaasPillarView: React.FC<Props> = ({ onNavigate }) => {
           1. Why Self-Host a PaaS? The Economic &amp; Architectural Case
         </h2>
         <p className="text-sm leading-relaxed">
-          Managed deployment platforms (Heroku, Render, Vercel, Railway, Fly.io) revolutionized developer productivity by making deployment as simple as <code>git push</code>. However, as an engineering organization scales, managed cloud pricing scales exponentially with memory and bandwidth markups of 300% to 1,000% over raw infrastructure costs.
+          Managed deployment platforms (Heroku, Render, Vercel, Railway, Fly.io) revolutionized developer productivity by making deployment as simple as <code>git push</code>. However, as an engineering organization scales, managed cloud pricing includes real markup over raw compute/bandwidth costs -- that's the platform's margin for the convenience, not a cost you'd pay running the same workload on your own hardware.
         </p>
         <p className="text-sm leading-relaxed">
-          By deploying a <strong>self-hosted PaaS</strong> like Decentralized.Host on commodity hardware (Hetzner, OVH, DigitalOcean, Linode, or bare-metal), developers retain 100% of the developer experience while slashing operational cloud expenditure by up to 80%.
+          By deploying a <strong>self-hosted PaaS</strong> like Decentralized.Host on commodity hardware (Hetzner, OVH, DigitalOcean, Linode, or bare-metal), developers keep the same <code>git push</code> deployment experience while paying only for the underlying server -- no platform markup, no per-app pricing tiers. We haven't published a specific savings percentage; it depends entirely on your workload and which platform you're comparing against.
         </p>
       </section>
 
@@ -101,41 +101,14 @@ export const SelfHostedPaasPillarView: React.FC<Props> = ({ onNavigate }) => {
       {/* Section 3 */}
       <section id="cost-economics" className="space-y-4">
         <h2 className="text-2xl font-bold font-display text-white pt-6 border-t border-slate-800">
-          3. Infrastructure Cost Comparison (Real-World Benchmark)
+          3. Infrastructure Cost Structure
         </h2>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs sm:text-sm">
-            <thead>
-              <tr className="border-b border-slate-800 font-mono text-xs text-slate-400 uppercase">
-                <th className="py-3 px-4">Configuration (32 GB RAM, 8 vCPU, 5 TB Bandwidth)</th>
-                <th className="py-3 px-4 text-slate-300">Managed Cloud (Heroku / Render / Vercel)</th>
-                <th className="py-3 px-4 text-emerald-400 font-bold bg-emerald-950/20">Self-Hosted PaaS on Hetzner / OVH</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-800/60 font-sans">
-              <tr>
-                <td className="py-3.5 px-4 font-mono text-xs text-slate-300">Compute &amp; RAM</td>
-                <td className="py-3.5 px-4 text-slate-400">$350 – $700 / month</td>
-                <td className="py-3.5 px-4 text-emerald-300 bg-emerald-950/10">$35 – $45 / month (Raw VPS)</td>
-              </tr>
-              <tr>
-                <td className="py-3.5 px-4 font-mono text-xs text-slate-300">Egress Bandwidth (5 TB)</td>
-                <td className="py-3.5 px-4 text-slate-400">$250 – $450 / month</td>
-                <td className="py-3.5 px-4 text-emerald-300 bg-emerald-950/10">Included (Free 20 TB quota)</td>
-              </tr>
-              <tr>
-                <td className="py-3.5 px-4 font-mono text-xs text-slate-300">Database Add-ons</td>
-                <td className="py-3.5 px-4 text-slate-400">$100 – $250 / month</td>
-                <td className="py-3.5 px-4 text-emerald-300 bg-emerald-950/10">$0 (Containerized PostgreSQL on NVMe)</td>
-              </tr>
-              <tr className="font-bold">
-                <td className="py-3.5 px-4 font-mono text-xs text-white">Estimated Annual Total</td>
-                <td className="py-3.5 px-4 text-rose-400 font-mono">$8,400 – $16,800 / year</td>
-                <td className="py-3.5 px-4 text-emerald-400 font-mono bg-emerald-950/20">$480 – $600 / year (95% Savings)</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <p className="text-sm leading-relaxed">
+          We haven't published a pricing benchmark table here -- exact costs depend entirely on which managed platform, which VPS provider, and what resource tier you're comparing, and pricing on both sides changes over time. What's structurally true regardless of the specific numbers: a managed platform's bill includes their margin on top of the underlying compute/bandwidth/storage; self-hosting on a VPS (Hetzner, OVH, DigitalOcean, or elsewhere) means you pay that provider's raw rate directly, with nothing added by this project, since decentralized.host itself is free and self-hosted.
+        </p>
+        <p className="text-sm leading-relaxed">
+          If you want real numbers, compare your own current managed-platform bill against the VPS tier that matches your actual RAM/CPU/bandwidth usage on the provider of your choice -- that comparison will be more accurate than any generic table we could publish here.
+        </p>
       </section>
 
       {/* Production Checklist */}

@@ -16,45 +16,45 @@ export const AuditModal: React.FC<Props> = ({ isOpen, onClose, onNavigate }) => 
 
   if (!isOpen) return null;
 
+  const routes = Object.values(CONTENT_REGISTRY);
+
   const qualityGates = [
     {
-      gate: 'Zero Hallucination Policy & Claim Integrity',
-      status: 'PASSED (100%)',
-      details: 'All features classified strictly as IMPLEMENTED, EXPERIMENTAL, or PLANNED with exact file citations.'
+      gate: 'Claim Integrity',
+      status: 'Enforced',
+      details: 'Every feature classified as IMPLEMENTED, EXPERIMENTAL, or PLANNED with a file citation -- see the Feature Claims tab.'
     },
     {
       gate: 'Canonical Content Registry & Frontmatter Schema',
-      status: 'PASSED (100%)',
-      details: '14 canonical pages with strict typed frontmatter, unique H1, intent, audience, and canonical URLs.'
+      status: 'Enforced',
+      details: `${routes.length} canonical pages with strict typed frontmatter, unique H1, intent, audience, and canonical URLs.`
     },
     {
       gate: 'AEO (Answer Engine Optimization) Blocks',
-      status: 'PASSED (100%)',
-      details: 'Extractable, factual definition blocks placed beneath headings across all pillar and guide pages.'
+      status: 'Present',
+      details: 'Extractable, factual definition blocks placed beneath headings across pillar, guide, and FAQ pages.'
     },
     {
       gate: 'Machine-Readable Endpoints (/llms.txt, /sitemap.xml, /robots.txt)',
-      status: 'PASSED (100%)',
-      details: 'Full LLM discovery spec and XML sitemap generated dynamically matching the content registry.'
+      status: 'Live',
+      details: 'sitemap.xml is generated at build time directly from this registry (scripts/generate-sitemap.ts), not hand-maintained.'
     },
     {
       gate: 'Evidence-Backed Competitor Comparisons',
-      status: 'PASSED (100%)',
-      details: 'Evaluations for Coolify, Dokploy, Dokku, CapRover, Heroku, Vercel with lastVerifiedAt dates and source links.'
+      status: 'Present',
+      details: 'Evaluations for Coolify, Dokploy, Dokku, CapRover, Heroku, Vercel, and AWS with lastVerifiedAt dates and source links.'
     },
     {
-      gate: 'Performance & Core Web Vitals Budget',
-      status: 'PASSED (LCP < 0.8s, CLS 0.0, INP < 50ms)',
-      details: 'Client-side SPA architecture with zero render-blocking bloat and hardware-accelerated CSS animations.'
+      gate: 'Performance',
+      status: 'Not independently measured',
+      details: 'Client-side SPA architecture with 4 of 15 routes prerendered to static HTML at build time. No Lighthouse/Core Web Vitals run has been published -- treat any specific number here as unverified until one is.'
     },
     {
-      gate: 'WCAG 2.2 AA Accessibility & Keyboard Nav',
-      status: 'PASSED (100%)',
-      details: 'Contrast ratio >= 7:1, full Cmd+K search modal, semantic landmarks, and visible focus rings.'
+      gate: 'Accessibility',
+      status: 'Not independently audited',
+      details: 'Keyboard-navigable Cmd+K search and semantic landmarks are present by design, but no WCAG conformance audit (axe, Lighthouse) has been run.'
     }
   ];
-
-  const routes = Object.values(CONTENT_REGISTRY);
 
   const implementedCount = FEATURES_DATA.filter((f) => f.claimStatus === 'IMPLEMENTED').length;
   const experimentalCount = FEATURES_DATA.filter((f) => f.claimStatus === 'EXPERIMENTAL').length;
@@ -74,7 +74,7 @@ export const AuditModal: React.FC<Props> = ({ isOpen, onClose, onNavigate }) => 
                 Release Quality Gates &amp; Authority Audit
               </h3>
               <p className="text-xs text-white/50 font-mono">
-                Decentralized.Host v1.0 — Architecture Verification Suite
+                Decentralized.Host — Content &amp; Architecture Verification Suite
               </p>
             </div>
           </div>
@@ -137,8 +137,8 @@ export const AuditModal: React.FC<Props> = ({ isOpen, onClose, onNavigate }) => 
           {activeAuditTab === 'gates' && (
             <div className="space-y-3">
               <div className="p-3 bg-[#00FF41]/10 border border-[#00FF41]/30 rounded flex items-center justify-between text-xs font-mono text-[#00FF41]">
-                <span>VERIFICATION STATUS: 100% PRODUCTION READY</span>
-                <span>ZERO DEFECTS RECORDED</span>
+                <span>CONTENT INTEGRITY: ENFORCED</span>
+                <span>PERFORMANCE / A11Y: SELF-DESCRIBED, NOT LAB-VERIFIED</span>
               </div>
               <div className="divide-y divide-white/10 border border-white/10 rounded overflow-hidden bg-white/5">
                 {qualityGates.map((g, i) => (
@@ -242,7 +242,7 @@ export const AuditModal: React.FC<Props> = ({ isOpen, onClose, onNavigate }) => 
 
         {/* Footer */}
         <div className="p-3 px-5 bg-white/5 border-t border-white/10 flex items-center justify-between text-xs font-mono text-white/50">
-          <span>Decentralized.Host Audit Suite v1.0.4</span>
+          <span>Decentralized.Host Audit Suite</span>
           <button
             onClick={onClose}
             className="px-4 py-1.5 bg-[#00FF41]/20 hover:bg-[#00FF41]/30 text-[#00FF41] border border-[#00FF41]/40 rounded text-xs font-mono uppercase tracking-wider transition-colors font-medium"

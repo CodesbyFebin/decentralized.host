@@ -183,7 +183,7 @@ export const FEATURE_COMPARISON_MATRIX: import('../types').FeatureComparisonRow[
       detail: 'Single-server standalone or Docker Swarm master/worker cluster overlay'
     },
     lastVerifiedAt: '2026-08-25',
-    evidenceSource: 'Official Architecture Docs (Decentralized.Host v1.0, Coolify v4.0, Dokploy v0.9)'
+    evidenceSource: 'Repository source (this repo, main branch), Coolify GitHub repo (v4.0), Dokploy GitHub repo (v0.9)'
   },
   {
     featureName: 'Runtime Support',
@@ -308,11 +308,11 @@ export const FEATURE_COMPARISON_MATRIX: import('../types').FeatureComparisonRow[
   {
     featureName: 'DePIN / Tokenized Compute',
     category: 'Decentralized Economy',
-    description: 'Cryptographic compute receipts and decentralized peer worker accounting.',
+    description: 'Node-operator incentives for contributing compute capacity to the mesh.',
     decentralizedHost: {
-      status: 'Limited',
-      detail: 'Phase 3 experimental node gossiping; Phase 4 Solana on-chain verifiable compute receipts',
-      claimStatus: 'EXPERIMENTAL'
+      status: 'Supported',
+      detail: 'Solana devnet SPL token credits minted per healthy heartbeat interval (off by default). Devnet only, no real monetary value -- see blockchain/README.md.',
+      claimStatus: 'IMPLEMENTED'
     },
     coolify: {
       status: 'Not Supported',
@@ -322,8 +322,8 @@ export const FEATURE_COMPARISON_MATRIX: import('../types').FeatureComparisonRow[
       status: 'Not Supported',
       detail: 'Standard self-hosted architecture without cryptographic compute verification'
     },
-    lastVerifiedAt: '2026-08-25',
-    evidenceSource: 'DePIN Architecture Whitepaper & Phase 4 Roadmap'
+    lastVerifiedAt: '2026-09-01',
+    evidenceSource: 'blockchain/README.md, blockchain/creditor.py'
   },
   {
     featureName: 'License & Sovereignty',
