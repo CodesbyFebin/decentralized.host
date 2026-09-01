@@ -12,12 +12,12 @@ interface Props {
 export const SecurityView: React.FC<Props> = ({ onNavigate }) => {
   const frontmatter = CONTENT_REGISTRY['/security/'];
 
-  const securityTxtContent = `Contact: mailto:security@decentralized.host
-Expires: 2026-12-31T23:59:59.000Z
+  const securityTxtContent = `Contact: https://github.com/CodesbyFebin/decentralized.host/security/advisories/new
+Expires: 2027-09-01T00:00:00.000Z
 Preferred-Languages: en
 Canonical: https://decentralized.host/.well-known/security.txt
-Policy: https://decentralized.host/security/
-Encryption: https://decentralized.host/pgp-key.txt`;
+Policy: https://github.com/CodesbyFebin/decentralized.host/blob/main/SECURITY.md
+Acknowledgments: https://github.com/CodesbyFebin/decentralized.host/graphs/contributors`;
 
   const threatMatrix = [
     {
@@ -27,7 +27,7 @@ Encryption: https://decentralized.host/pgp-key.txt`;
     },
     {
       threat: 'Malicious application escaping container cgroups to host',
-      mitigation: 'Containers execute in rootless or unprivileged Docker namespaces with standard Linux cgroup memory/CPU limits and no host volume mounts by default.',
+      mitigation: 'Containers execute in standard Docker namespaces with hardcoded cgroup memory (256MB) and CPU (1 vCPU) limits and no host volume mounts by default. This is stock Docker isolation, not rootless or additionally hardened -- stronger sandboxing (gVisor/Kata-style, confidential VMs) is Phase 3 roadmap, not built yet.',
       status: 'MITIGATED'
     },
     {
