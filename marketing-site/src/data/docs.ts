@@ -2,7 +2,7 @@ export interface DocSection {
   id: string;
   title: string;
   slug: string;
-  category: 'getting-started' | 'cli-reference' | 'self-hosting' | 'node-agent' | 'rest-api' | 'configuration' | 'git-server' | 'console' | 'blockchain' | 'ai-assistant';
+  category: 'getting-started' | 'cli-reference' | 'self-hosting' | 'node-agent' | 'rest-api' | 'configuration' | 'git-server' | 'console' | 'blockchain' | 'ai-assistant' | 'database' | 'security';
   description: string;
   content: string;
   codeBlocks?: { label: string; language: string; code: string }[];
@@ -398,6 +398,70 @@ GOOGLE_API_KEY=your-real-key
         code: `# .env
 GOOGLE_API_KEY=your-real-key
 docker compose restart control-plane`
+      }
+    ]
+  },
+  {
+    id: 'doc-database',
+    title: 'Database & State Management',
+    slug: 'database',
+    category: 'database',
+    description: 'What the control plane actually stores, and how schema changes are applied -- there is no Alembic here, on purpose, for now.',
+    content: `The control plane has exactly one stateful dependency: PostgreSQL, via SQLAlchemy. No Redis, no message queue, no separate cache layer.
+
+### The real schema (control-plane/app/models.py)
+Five tables, nothing more:
+- **Node** -- name, status, region, live CPU/RAM telemetry, and \`advertise_address\` (the reachable host:port the control plane uses to talk back to this specific node -- critical once you have more than one)
+- **Deployment** -- name, image reference, assigned node, status, custom domain, container port
+- **Release** -- one row per \`ship\`/\`update\`/git-push, message, snapshot id, status, timestamp -- this is what the console's Git Manager tab and \`GET /deployments/{name}/releases\` read
+- **CreditLedger** -- one row per Solana devnet mint event, with the real transaction signature
+- **SSHKey** -- registered public keys for the git server, label, and the pubkey itself
+
+### Schema changes: no migration framework
+There's no Alembic, no versioned migration files. On startup, \`Base.metadata.create_all()\` creates any tables that don't exist yet, then a short \`STARTUP_MIGRATIONS\` list of raw, idempotent \`ALTER TABLE ... ADD COLUMN IF NOT EXISTS\` statements in \`control-plane/app/main.py\` applies any additive changes to tables that already exist. It's intentionally minimal -- fine for a single-operator self-hosted mesh where you control both the code and the database, not something that would scale to a team needing rollback-able migrations or a review process on schema changes.
+
+### Startup sequence
+On boot, the control plane retries the database connection for up to 30 attempts (2s apart) before giving up -- this is what lets \`docker compose up\` bring up Postgres and the control plane in either order without a crash loop. \`GET /healthz\` returns \`{"status": "ok"}\` once the app is actually serving, useful for a real load balancer or orchestrator health check in front of it.`,
+    codeBlocks: [
+      {
+        label: 'The full STARTUP_MIGRATIONS list (as of this writing)',
+        language: 'python',
+        code: `STARTUP_MIGRATIONS = [
+    "ALTER TABLE nodes ADD COLUMN IF NOT EXISTS advertise_address VARCHAR",
+]`
+      }
+    ]
+  },
+  {
+    id: 'doc-container-isolation',
+    title: 'Container Isolation & Resource Limits',
+    slug: 'container-isolation',
+    category: 'security',
+    description: 'What actually isolates one deployment from another -- standard Docker boundaries, plus one hardcoded resource cap you should know about.',
+    content: `Isolation between deployments comes from standard Docker container boundaries -- Linux namespaces (PID, network, mount) and cgroups -- the same isolation any Docker container gets, nothing added and nothing removed. There's no seccomp profile customization, no dropped Linux capabilities, and no read-only root filesystem enforcement beyond Docker's own defaults. If your threat model requires stronger isolation than stock Docker (e.g. gVisor, Kata Containers, or gVisor-style sandboxing), that's not present in this version -- see the roadmap's Phase 3 (confidential computing) for where stronger isolation is planned, not yet built.
+
+### The resource limit every container gets, hardcoded
+Every container the node agent starts is capped at:
+- **256MB memory** (\`mem_limit="256m"\`)
+- **1 vCPU** (\`nano_cpus=1_000_000_000\`)
+
+This is currently the same fixed limit for every deployment regardless of what the app actually needs -- there's no per-app override yet. A memory-hungry app will get OOM-killed at 256MB just like a tiny one; know this before shipping something that needs more headroom. Restart policy is \`unless-stopped\`, so a crashed container restarts automatically, but a container that's OOM-killed repeatedly will just keep restarting and dying rather than surfacing a clear "needs more memory" signal today.
+
+### Networking
+Every deployment container joins the same Docker network (the compose-defined mesh network) so Traefik can reach it by container IP; it is not exposed on a host port directly. Only Traefik's own ports (80/443, or the local dev port) are exposed to the outside world.`,
+    codeBlocks: [
+      {
+        label: 'The actual container creation call (node-agent/agent.py)',
+        language: 'python',
+        code: `container = docker_client.containers.run(
+    image,
+    name=container_name,
+    detach=True,
+    network=MESH_NETWORK,
+    restart_policy={"Name": "unless-stopped"},
+    mem_limit="256m",
+    nano_cpus=1_000_000_000,  # 1 vCPU cap
+)`
       }
     ]
   }
