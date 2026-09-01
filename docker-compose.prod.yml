@@ -6,7 +6,7 @@
 #     as it appears -- no wildcard cert needed, so no DNS provider API key
 #     is required, just a wildcard A record; see DEPLOY.md).
 #   - control-plane and dashboard are reached through Traefik on
-#     api.$BASE_DOMAIN / console.$BASE_DOMAIN instead of raw published
+#     api.$BASE_DOMAIN / app.$BASE_DOMAIN instead of raw published
 #     ports, so they get real TLS too.
 #   - The registry is no longer published to the internet -- only the
 #     node agent needs it, and the real deploy path (`dhost ship`) never
@@ -57,7 +57,7 @@ services:
     ports: !reset []
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.dashboard.rule=Host(`console.${BASE_DOMAIN}`)"
+      - "traefik.http.routers.dashboard.rule=Host(`app.${BASE_DOMAIN}`)"
       - "traefik.http.routers.dashboard.entrypoints=websecure"
       - "traefik.http.routers.dashboard.tls.certresolver=letsencrypt"
       - "traefik.http.services.dashboard.loadbalancer.server.port=80"

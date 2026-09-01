@@ -70,7 +70,7 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 ```
 
 This starts everything with real TLS: `api.decentralized.host` (control
-plane), `console.decentralized.host` (OpenGit Console), and Traefik
+plane), `app.decentralized.host` (OpenGit Console), and Traefik
 issuing a real Let's Encrypt cert for each hostname the first time it's
 requested. The registry is no longer exposed to the internet — only the
 node agent needs it.
