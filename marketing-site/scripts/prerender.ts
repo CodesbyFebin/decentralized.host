@@ -40,9 +40,20 @@ async function launchBrowser() {
   if (process.env.VERCEL) {
     const puppeteerCore = (await import('puppeteer-core')).default;
     const chromium = (await import('@sparticuz/chromium')).default;
+    // Real production build data (dpl_3M3jVuEFKFp9S81TGWz6J2RLL2mR) showed
+    // page rendering itself is fast (~900ms, matching local) once each route
+    // gets its own fresh browser, but the browser *launch* itself then took
+    // 110-150s each time. --single-process forces Chromium's browser and
+    // renderer into one OS process -- a known, still-open problem in
+    // @sparticuz/chromium itself (see Sparticuz/chromium PR #509, "remove
+    // --single-process from the default args", opened by a maintainer).
+    // Stripping just this one flag to isolate its effect; keeping every
+    // other sparticuz-tuned flag (software rendering etc.) that's actually
+    // needed for this sandboxed environment.
+    const args = chromium.args.filter((a) => a !== '--single-process');
     return puppeteerCore.launch({
       headless: true,
-      args: chromium.args,
+      args,
       executablePath: await chromium.executablePath()
     });
   }
