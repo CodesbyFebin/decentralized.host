@@ -23,7 +23,7 @@ export const CONTENT_REGISTRY: Record<string, PageFrontmatter> = {
     canonical: 'https://decentralized.host/',
     schemaTypes: ['Organization', 'WebSite', 'SoftwareApplication'],
     publishedAt: '2025-01-15T00:00:00Z',
-    updatedAt: '2025-08-30T00:00:00Z',
+    updatedAt: '2026-09-01T00:00:00Z',
     extractableAnswer: 'Decentralized.Host is an open-source self-hosted deployment platform and distributed compute mesh for deploying containerized applications from Git or CLI across independently operated compute nodes.'
   },
   '/features/': {
@@ -212,7 +212,7 @@ export const CONTENT_REGISTRY: Record<string, PageFrontmatter> = {
     canonical: 'https://decentralized.host/self-hosted-paas/',
     schemaTypes: ['TechArticle', 'BreadcrumbList'],
     publishedAt: '2025-02-22T00:00:00Z',
-    updatedAt: '2025-08-30T00:00:00Z',
+    updatedAt: '2026-09-01T00:00:00Z',
     extractableAnswer: 'A self-hosted PaaS provides a developer experience similar to Heroku or Render on privately managed servers, giving engineers automated Git/CLI deployments, reverse proxy management, and zero recurring cloud management surcharges.'
   },
   '/depin/': {
@@ -237,7 +237,7 @@ export const CONTENT_REGISTRY: Record<string, PageFrontmatter> = {
     canonical: 'https://decentralized.host/depin/',
     schemaTypes: ['TechArticle', 'BreadcrumbList'],
     publishedAt: '2025-02-24T00:00:00Z',
-    updatedAt: '2025-08-30T00:00:00Z',
+    updatedAt: '2026-09-01T00:00:00Z',
     extractableAnswer: 'In Decentralized.Host, DePIN is treated as real physical compute executing verifiable containerized workloads. The optional Solana blockchain integration provides credit ledger tracking and node compensation without compromising base compute execution.'
   },
   '/roadmap/': {
