@@ -19,6 +19,7 @@ import { AboutView } from './views/AboutView';
 import { OpenSourceView } from './views/OpenSourceView';
 import { FAQView } from './views/FAQView';
 import { MachineReadableViewer } from './views/MachineReadableViewer';
+import { MatrixRain } from './components/MatrixRain';
 import { CONTENT_REGISTRY } from './data/registry';
 
 export default function App() {
@@ -149,10 +150,13 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#050505] text-[#e0e0e0] flex flex-col relative selection:bg-[#00FF41]/30 selection:text-[#00FF41] crt-scanlines overflow-x-hidden">
       {/* Background Matrix Grid Overlay */}
-      <div 
-        className="fixed inset-0 opacity-[0.035] pointer-events-none bg-matrix-grid z-0" 
-        aria-hidden="true" 
+      <div
+        className="fixed inset-0 opacity-[0.035] pointer-events-none bg-matrix-grid z-0"
+        aria-hidden="true"
       />
+
+      {/* Animated Matrix Rain */}
+      <MatrixRain />
 
       {/* Subtle Animated Film Grain Noise Layer */}
       <div
