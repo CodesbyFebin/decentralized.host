@@ -42,7 +42,7 @@ export const AuditModal: React.FC<Props> = ({ isOpen, onClose, onNavigate }) => 
     {
       gate: 'Evidence-Backed Competitor Comparisons',
       status: 'Present',
-      details: 'Evaluations for Coolify, Dokploy, Dokku, CapRover, Heroku, Vercel, and AWS with lastVerifiedAt dates and source links.'
+      details: 'Evaluations for Coolify, Dokploy, Dokku, CapRover, Heroku, Vercel, AWS, and UpCloud with lastVerifiedAt dates and source links.'
     },
     {
       gate: 'Performance',

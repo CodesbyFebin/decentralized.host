@@ -1,0 +1,19 @@
+[project]
+name = "dhost-mcp"
+version = "0.1.0"
+description = "MCP server exposing the decentralized.host control plane's real API as tools -- deployments, logs, nodes, release/engine history, ship, delete."
+requires-python = ">=3.10"
+dependencies = [
+    "mcp[cli]>=2.0",
+    "httpx>=0.27",
+]
+
+[project.scripts]
+dhost-mcp = "dhost_mcp.server:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["dhost_mcp"]

@@ -90,6 +90,10 @@ Traefik routes app.127.0.0.1.nip.io -> the container the node agent just started
   and deploy it, no separate CI config. See "Real git push deploys" below.
 - **blockchain/** — Solana devnet integration for node-operator credits.
   Optional, feature-flagged, fully documented in [blockchain/README.md](blockchain/README.md).
+- **mcp-server/** — An MCP server exposing the control plane's real API as
+  tools (list/inspect deployments, logs, nodes, release/engine history,
+  ship, delete) for Claude or any MCP client. Fully documented in
+  [mcp-server/README.md](mcp-server/README.md).
 - **web/** — The original single-page landing page. Still shippable through
   the mesh (`cd web && dhost ship opengit-site --port 80`) as a live
   example of self-hosting, but no longer the canonical public site.
@@ -117,7 +121,11 @@ Traefik routes app.127.0.0.1.nip.io -> the container the node agent just started
   to your repo, no local Docker or Git involved either way. No Analytics or
   chat-based AI Assistant pages — those would need fabricated data or a
   much bigger feature (a tool-using conversational agent) than "dashboard,"
-  so they were left out rather than faked.
+  so they were left out rather than faked. Protected by HTTP Basic Auth
+  (`dashboard/nginx.conf`) when exposed beyond localhost — generate your own
+  `dashboard/.htpasswd` with `htpasswd -c dashboard/.htpasswd admin`
+  (from the `apache2-utils`/`httpd-tools` package); it's gitignored, not
+  shipped in the repo.
 
 ## Quick start
 

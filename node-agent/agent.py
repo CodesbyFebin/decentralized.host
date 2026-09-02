@@ -92,7 +92,7 @@ def heartbeat_loop() -> None:
         time.sleep(HEARTBEAT_INTERVAL)
 
 
-def write_traefik_config(name: str, subdomain: str, ip: str, port: int) -> None:
+def write_traefik_config(name: str, subdomain: str, target_host: str, port: int) -> None:
     router = {
         "rule": f"Host(`{subdomain}`)",
         "service": name,
@@ -112,7 +112,7 @@ def write_traefik_config(name: str, subdomain: str, ip: str, port: int) -> None:
             "routers": {name: router},
             "services": {
                 name: {
-                    "loadBalancer": {"servers": [{"url": f"http://{ip}:{port}"}]}
+                    "loadBalancer": {"servers": [{"url": f"http://{target_host}:{port}"}]}
                 }
             },
         }
@@ -147,9 +147,15 @@ def _start_container(name: str, image: str, port: int, subdomain: str) -> "docke
         nano_cpus=1_000_000_000,  # 1 vCPU cap
     )
     container.reload()
-    ip = container.attrs["NetworkSettings"]["Networks"][MESH_NETWORK]["IPAddress"]
-    write_traefik_config(name, subdomain, ip, port)
-    logger.info(f"Started {container_name} ({container.id[:12]}) -> {subdomain} ({ip}:{port})")
+    # Use the container's name, not its IP, as Traefik's routing target.
+    # Docker's embedded DNS resolves it to whatever the current IP actually
+    # is on every connection -- a static IP baked in at ship time goes stale
+    # the moment Docker reassigns IPs (e.g. after a host/daemon restart,
+    # even though restart_policy correctly brings the container back up),
+    # which is a real bug this fixes: every shipped app 502'd through
+    # Traefik after a routine restart because of exactly this.
+    write_traefik_config(name, subdomain, container_name, port)
+    logger.info(f"Started {container_name} ({container.id[:12]}) -> {subdomain} ({container_name}:{port})")
     return container
 
 

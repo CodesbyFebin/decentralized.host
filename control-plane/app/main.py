@@ -17,6 +17,7 @@ from .routers import assistant, auth, blockchain, deployments, git_keys, nodes
 # the signal to actually adopt Alembic.
 STARTUP_MIGRATIONS = [
     "ALTER TABLE nodes ADD COLUMN IF NOT EXISTS advertise_address VARCHAR",
+    "ALTER TABLE releases ADD COLUMN IF NOT EXISTS engine_report TEXT",
 ]
 
 logging.basicConfig(level=logging.INFO)

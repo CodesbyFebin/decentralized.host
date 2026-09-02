@@ -1,14 +1,13 @@
 """Local project stack detection + Dockerfile generation.
 
-Rule-based by default (fast, offline, always works). If GOOGLE_API_KEY is
-set in the environment, this module will attempt to ask Gemini to review
-and refine the generated Dockerfile before writing it -- best-effort only;
-any failure silently falls back to the rule-based result.
+Rule-based by default (fast, offline, always works). If an LLM provider
+is configured (see llm.py -- Anthropic, OpenAI, or Google), this module
+will attempt to ask it to review and refine the generated Dockerfile
+before writing it -- best-effort only; any failure silently falls back
+to the rule-based result.
 """
 import json
-import os
 from pathlib import Path
-from typing import Optional
 
 DOCKERFILES = {
     "node": """FROM node:20-slim
@@ -16,7 +15,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci --omit=dev || npm install --omit=dev
 COPY . .
-RUN if [ -f next.config.js ] || [ -f next.config.mjs ]; then npm run build; fi
+RUN if [ -f next.config.js ] || [ -f next.config.mjs ] || [ -f next.config.ts ]; then npm run build; fi
 EXPOSE 8080
 ENV PORT=8080
 CMD ["npm", "start"]
@@ -85,22 +84,15 @@ def detect_stack(project_dir: Path) -> tuple[str, str]:
 
 
 def maybe_refine_with_ai(stack: str, dockerfile: str, project_dir: Path) -> str:
-    api_key = os.getenv("GOOGLE_API_KEY")
-    if not api_key:
-        return dockerfile
-    try:
-        import google.generativeai as genai  # optional dependency
+    from .llm import any_provider_configured, generate_text
 
-        genai.configure(api_key=api_key)
-        model = genai.GenerativeModel("gemini-1.5-flash")
-        prompt = (
-            f"This is a generated multi-stage Dockerfile for a detected '{stack}' "
-            f"project. Improve it if there's an obvious issue (missing build step, "
-            f"wrong entrypoint, etc.), otherwise return it unchanged. "
-            f"Return ONLY the Dockerfile contents, no markdown fences.\n\n{dockerfile}"
-        )
-        response = model.generate_content(prompt)
-        refined = response.text.strip()
-        return refined if refined else dockerfile
-    except Exception:
+    if not any_provider_configured():
         return dockerfile
+    prompt = (
+        f"This is a generated multi-stage Dockerfile for a detected '{stack}' "
+        f"project. Improve it if there's an obvious issue (missing build step, "
+        f"wrong entrypoint, etc.), otherwise return it unchanged. "
+        f"Return ONLY the Dockerfile contents, no markdown fences.\n\n{dockerfile}"
+    )
+    refined, _provider = generate_text(prompt)
+    return refined if refined else dockerfile

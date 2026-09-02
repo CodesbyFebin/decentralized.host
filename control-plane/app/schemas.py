@@ -1,7 +1,8 @@
+import json
 from datetime import datetime
 from typing import Optional, List
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 
 class NodeJoinRequest(BaseModel):
@@ -82,6 +83,13 @@ class DeploymentOut(BaseModel):
         from_attributes = True
 
 
+class EngineAgentResult(BaseModel):
+    agent: str
+    status: str
+    summary: str
+    details: List[str] = []
+
+
 class ReleaseOut(BaseModel):
     id: str
     deployment_name: str
@@ -90,10 +98,23 @@ class ReleaseOut(BaseModel):
     image: str
     status: str
     error: Optional[str] = None
+    engine_report: Optional[List[EngineAgentResult]] = None
     created_at: datetime
 
     class Config:
         from_attributes = True
+
+    @field_validator("engine_report", mode="before")
+    @classmethod
+    def _parse_engine_report(cls, v):
+        # Stored as a JSON-encoded TEXT column (see models.Release), not a
+        # native array -- this project has no migration tool, so adding a
+        # real JSON/array column type later would need one; a TEXT column
+        # with an idempotent ALTER (see main.py's STARTUP_MIGRATIONS) is
+        # the same tradeoff already made for every other column here.
+        if isinstance(v, str):
+            return json.loads(v)
+        return v
 
 
 class DetectResponse(BaseModel):

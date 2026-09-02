@@ -1,4 +1,6 @@
 .env
+.mcp.json
+dashboard/.htpasswd
 __pycache__/
 *.pyc
 .venv/

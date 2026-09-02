@@ -95,6 +95,40 @@ export const RoadmapView: React.FC<Props> = ({ onNavigate }) => {
         />
       </div>
 
+      {/* Exploratory vision note -- deliberately kept OUT of roadmapPhases and
+          the ClaimBadge system below (IMPLEMENTED/EXPERIMENTAL/PLANNED all
+          imply some level of committed engineering work; this is neither).
+          A genuinely different architecture (peer-to-peer content-addressed
+          storage, à la the Hypercore/Dat ecosystem) was raised as an idea for
+          where the project could go long-term. Framed honestly as
+          brainstorming, not a decision -- today's real Decentralized.Host is
+          Docker containers on servers you run or rent, nothing here changes
+          that. */}
+      <div className="max-w-3xl mx-auto p-6 rounded-2xl border border-purple-500/20 bg-purple-500/[0.03] space-y-3">
+        <div className="flex items-center gap-2 text-xs font-mono text-purple-400">
+          <Sparkles className="w-3.5 h-3.5" />
+          <span>EXPLORATORY IDEA — NOT A COMMITTED PHASE</span>
+        </div>
+        <h2 className="text-base font-bold font-display text-white">
+          A longer-term "hosting economy" direction, under consideration
+        </h2>
+        <p className="text-xs text-slate-400 font-sans leading-relaxed">
+          None of this exists in the codebase and it isn't scheduled in any phase above.
+          It's a different architecture from today's Decentralized.Host (which runs your
+          Docker containers on servers you own or rent), floated as a possible long-term
+          direction rather than a decision: instead of one operator's VPS/bare-metal, an
+          app's code and data would be content-addressed and seeded across a swarm of
+          peers who get paid for the storage and bandwidth they contribute — closer to
+          the peer-to-peer model pioneered by the{' '}
+          <a href="https://npmjs.com/package/hypercore" target="_blank" rel="noreferrer" className="text-purple-300 underline decoration-purple-500/40 hover:text-purple-200">
+            Hypercore Protocol
+          </a>{' '}
+          ecosystem (Hypercore, Hyperdrive, and the tools built on them) than to
+          today's container-hosting model. Whether this is worth pursuing, and how it
+          would interoperate with the real mesh described above, is unresolved.
+        </p>
+      </div>
+
       {/* Roadmap Phase Timeline */}
       <div className="space-y-6">
         {roadmapPhases.map((p, idx) => (

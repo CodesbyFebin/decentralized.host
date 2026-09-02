@@ -49,7 +49,7 @@ export const HomeView: React.FC<Props> = ({ onNavigate, onOpenAudit }) => {
             MIT Licensed
           </span>
           <span className="text-[10px] font-mono text-white/40 uppercase tracking-widest">
-            Open Source Infrastructure
+            // Infrastructure Without Permission
           </span>
           <ClaimBadge status="IMPLEMENTED" size="sm" showLabel={false} />
         </div>
@@ -57,14 +57,15 @@ export const HomeView: React.FC<Props> = ({ onNavigate, onOpenAudit }) => {
         {/* Semantic H1 & Hero Headings */}
         <div className="space-y-4 max-w-4xl mx-auto px-4">
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold font-display tracking-tight text-white leading-[0.95] uppercase">
-            DEPLOY ANYWHERE.<br/>
+            HOST ANYWHERE. RUN EVERYWHERE.<br/>
             <span className="text-transparent text-stroke-matrix" style={{ WebkitTextStroke: '1px #00FF41' }}>
-              OWN THE INFRA.
+              OWN THE INFRASTRUCTURE.
             </span>
             <TerminalCursor className="ml-2 inline-block" />
           </h1>
           <p className="text-base sm:text-xl text-white/60 leading-relaxed max-w-2xl mx-auto font-sans">
-            Distributed compute mesh for deploying containerized applications from Git or CLI across independently operated compute nodes.
+            Deploy applications across an open network of independently operated compute and
+            storage nodes — self-host it yourself, or join a mesh someone else is running.
           </p>
 
           {/* Key Architectural Principles Callout */}
@@ -86,6 +87,21 @@ export const HomeView: React.FC<Props> = ({ onNavigate, onOpenAudit }) => {
               </span>
             </div>
           </div>
+
+          {/* Developer -> Host Network flow -- the real flow today is
+              single-operator (you run the control plane, you decide which
+              nodes join it via a shared secret, see /docs/ and /depin/), not
+              a permissionless public marketplace. Framed as the mesh
+              topology, not as "anyone anywhere can join your mesh." */}
+          <div className="flex items-center justify-center gap-2 sm:gap-3 pt-4 font-mono text-[10px] sm:text-xs text-white/50 uppercase tracking-wide flex-wrap">
+            <span className="text-white">Developer</span>
+            <ArrowRight className="w-3 h-3 text-[#00FF41]" />
+            <span className="text-white">Decentralized.Host</span>
+            <ArrowRight className="w-3 h-3 text-[#00FF41]" />
+            <span className="text-white">Node Mesh</span>
+            <ArrowRight className="w-3 h-3 text-[#00FF41]" />
+            <span className="text-white">Independent Peers</span>
+          </div>
         </div>
 
         {/* CTA Buttons */}
@@ -94,15 +110,15 @@ export const HomeView: React.FC<Props> = ({ onNavigate, onOpenAudit }) => {
             onClick={() => onNavigate('/docs/')}
             className="px-6 py-3 rounded bg-[#00FF41] hover:bg-[#00FF41]/90 text-black font-mono font-bold text-xs uppercase tracking-wider transition-all shadow-[0_0_20px_rgba(0,255,65,0.4)] flex items-center gap-2"
           >
-            <span>Deploy First App</span>
+            <span>Deploy to the Network</span>
             <ArrowRight className="w-4 h-4" />
           </button>
 
           <button
-            onClick={() => onNavigate('/features/')}
+            onClick={() => onNavigate('/depin/')}
             className="px-6 py-3 rounded bg-white/5 hover:bg-white/10 text-white border border-white/10 hover:border-[#00FF41]/40 font-mono text-xs uppercase tracking-wider transition-all flex items-center gap-2"
           >
-            <span>View Verified Features</span>
+            <span>Become a Host</span>
           </button>
 
           <a
@@ -120,7 +136,7 @@ export const HomeView: React.FC<Props> = ({ onNavigate, onOpenAudit }) => {
         <div className="max-w-3xl mx-auto px-4 text-left pt-2">
           <AeoAnswerBlock
             question="What is Decentralized.Host?"
-            answer="Decentralized.Host is an open-source self-hosted deployment platform and distributed compute mesh for deploying applications from Git or CLI across independently operated compute nodes. It pairs a FastAPI control plane and smart scheduler with lightweight Docker node agents and Traefik dynamic SSL routing."
+            answer="Decentralized.Host is an open-source self-hosted deployment platform and distributed compute mesh for deploying applications from Git or CLI across independently operated compute nodes. It pairs a FastAPI control plane and smart scheduler with lightweight Docker node agents and Traefik dynamic SSL routing. Today, joining a mesh as a node operator requires that mesh's shared join secret -- it is not yet a public, permissionless marketplace; see /depin/ for the real node-operator flow."
             sourceContext="Repository core architecture (control-plane/app/main.py, node-agent/agent.py)"
           />
         </div>
@@ -128,6 +144,123 @@ export const HomeView: React.FC<Props> = ({ onNavigate, onOpenAudit }) => {
         {/* Interactive Deploy Now Live Terminal */}
         <div className="pt-6 px-2 max-w-5xl mx-auto text-left">
           <DeployTerminal />
+        </div>
+      </section>
+
+      {/* THE NETWORK -- narrative framing is fine (it's the same "open
+          network of independently operated nodes" story as the hero), but
+          the pipeline below is the REAL one (ship -> detect -> build ->
+          schedule -> route -> monitor), not the fictional
+          replication/peer-discovery/verification/settlement one from the
+          mockup this section was adapted from -- none of those exist. */}
+      <section className="space-y-8">
+        <div className="max-w-2xl space-y-3">
+          <span className="text-[10px] sm:text-[11px] font-mono text-[#00FF41] uppercase tracking-[0.2em] flex items-center gap-2">
+            <span className="text-white/30">&gt;</span> The Network
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-bold font-display text-white uppercase">
+            The Internet Should Run <span className="text-[#00FF41]">Everywhere</span>
+          </h2>
+          <p className="text-sm sm:text-base text-white/60 leading-relaxed font-sans">
+            Decentralized Hosting reimagines hosting as a network of independently operated
+            computers instead of one provider's data center. Developers ship once; whichever
+            node in the mesh has capacity picks up the build and serves the traffic.
+          </p>
+        </div>
+
+        <div className="flex flex-wrap items-stretch justify-center gap-2 sm:gap-3">
+          {[
+            'Ship (CLI / Git push)', 'Detect Stack', 'Build Container',
+            'Schedule to Node', 'Route + TLS', 'Heartbeat Monitor',
+          ].map((step, i, arr) => (
+            <React.Fragment key={step}>
+              <div className="px-4 py-2.5 rounded border border-[#00FF41]/20 bg-white/[0.02] text-[10px] sm:text-xs font-mono text-[#00FF41] uppercase tracking-wide">
+                {step}
+              </div>
+              {i < arr.length - 1 && (
+                <span className="self-center text-[#00FF41]/40 font-mono">→</span>
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+        <p className="text-[11px] text-white/30 font-mono text-center">
+          The real pipeline, stage by stage -- see cli/dhost/main.py, control-plane/app/scheduler.py, node-agent/agent.py
+        </p>
+      </section>
+
+      {/* TWO-SIDED NETWORK -- kept the "Airbnb-for-compute" framing since
+          it's genuinely how this works, but the mechanism described is the
+          real one (run node-agent, optionally earn Solana devnet credits
+          for verified uptime -- see /depin/), not a "buy persistent
+          capacity from the network" marketplace, which doesn't exist. */}
+      <section className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+        <div className="p-6 sm:p-8 rounded-2xl bg-[#080b0f] border border-white/10 space-y-3">
+          <span className="text-[10px] font-mono text-[#00FF41] uppercase tracking-[0.2em]">For Hosts</span>
+          <h3 className="text-lg sm:text-xl font-bold font-display text-white flex items-center gap-2">
+            <Server className="w-5 h-5 text-[#00FF41]" />
+            Turn Idle Hardware Into Infrastructure
+          </h3>
+          <p className="text-xs sm:text-sm text-white/60 leading-relaxed font-sans">
+            Run a node-agent on hardware you already own and it joins your mesh's scheduling
+            pool. Node operators can optionally earn Solana devnet credits for verified uptime
+            heartbeats -- devnet only, no real monetary value today (see{' '}
+            <button onClick={() => onNavigate('/depin/')} className="text-[#00FF41] underline decoration-[#00FF41]/40 hover:text-white">/depin/</button>).
+          </p>
+          <p className="text-[11px] font-mono text-white/40 pt-1">PC • Server • VPS • NAS • Homelab</p>
+        </div>
+        <div className="p-6 sm:p-8 rounded-2xl bg-[#080b0f] border border-white/10 space-y-3">
+          <span className="text-[10px] font-mono text-[#00FF41] uppercase tracking-[0.2em]">For Developers</span>
+          <h3 className="text-lg sm:text-xl font-bold font-display text-white flex items-center gap-2">
+            <Code2 className="w-5 h-5 text-[#00FF41]" />
+            Deploy Without Owning Servers
+          </h3>
+          <p className="text-xs sm:text-sm text-white/60 leading-relaxed font-sans">
+            <code className="text-[#00FF41]">dhost ship</code> or a plain <code className="text-[#00FF41]">git push</code> -- no
+            Dockerfile to write, no server to provision by hand. The control plane detects your
+            stack, builds the container, and schedules it onto the best available node in your mesh.
+          </p>
+          <p className="text-[11px] font-mono text-white/40 pt-1">No Dockerfile • No managed-platform lock-in</p>
+        </div>
+      </section>
+
+      {/* SELF-HEALING -- the mockup this was adapted from had an animated
+          "watch a node fail over" demo. That capability (automatic
+          rescheduling of a crashed node's deployments) is Phase 4 on the
+          real roadmap (PLANNED, not built) -- an animated demo of it would
+          be showing a product behavior that doesn't exist yet. Using the
+          same ClaimBadge system the rest of the site uses instead: what's
+          real today (heartbeat-based health tracking) vs. what's planned
+          (automatic failover). */}
+      <section className="p-6 sm:p-8 rounded-2xl bg-[#080b0f] border border-white/10 space-y-5">
+        <div className="space-y-2">
+          <span className="text-[10px] font-mono text-[#00FF41] uppercase tracking-[0.2em] flex items-center gap-2">
+            <RotateCcw className="w-3.5 h-3.5" /> Resilience
+          </span>
+          <h3 className="text-lg sm:text-xl font-bold font-display text-white">
+            Health Monitoring Today, Self-Healing on the Roadmap
+          </h3>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="p-4 rounded-lg bg-white/[0.02] border border-white/10 space-y-2">
+            <div className="flex items-center gap-2">
+              <ClaimBadge status="IMPLEMENTED" size="sm" />
+              <span className="text-xs font-mono text-white uppercase">Heartbeat health tracking</span>
+            </div>
+            <p className="text-xs text-white/50 font-sans leading-relaxed">
+              Every node reports in on an interval; the control plane marks it healthy, stale,
+              or offline based on how recently it last checked in.
+            </p>
+          </div>
+          <div className="p-4 rounded-lg bg-white/[0.02] border border-white/10 space-y-2">
+            <div className="flex items-center gap-2">
+              <ClaimBadge status="PLANNED" size="sm" />
+              <span className="text-xs font-mono text-white uppercase">Automatic failover</span>
+            </div>
+            <p className="text-xs text-white/50 font-sans leading-relaxed">
+              Automatically rescheduling a crashed node's deployments onto a healthy node,
+              without operator intervention -- Phase 4 on the real roadmap, not built yet.
+            </p>
+          </div>
         </div>
       </section>
 

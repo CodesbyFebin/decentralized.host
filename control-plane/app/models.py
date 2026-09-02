@@ -77,6 +77,11 @@ class Release(Base):
     image = Column(String, nullable=False)
     status = Column(String, nullable=False)  # running|failed
     error = Column(Text, nullable=True)
+    # JSON-encoded list of dhost engine AgentResult dicts (security scan,
+    # AI Dockerfile review, release notes, post-deploy health) -- see
+    # app/engine.py. Nullable: releases created before the engine existed,
+    # or ones where the engine hit an unexpected error, just have none.
+    engine_report = Column(Text, nullable=True)
     created_at = Column(DateTime, default=_now)
 
 

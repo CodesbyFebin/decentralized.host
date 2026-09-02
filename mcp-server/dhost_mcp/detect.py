@@ -1,11 +1,9 @@
-"""Rule-based project stack detection, mirroring cli/dhost/detect.py.
-
-Kept as a separate copy (not a shared import) because the CLI and the
-control plane are independently deployable services with their own build
-contexts -- see blockchain/creditor.py for the one case where sharing
-across a Docker build context was worth the coupling. This module is small
-enough (~60 lines) that duplication is cheaper than that coupling.
-"""
+"""Rule-based stack detection, mirroring cli/dhost/detect.py and
+control-plane/app/detect.py -- kept as a third copy for the same reason
+those two are already separate (see control-plane/app/detect.py's
+docstring): this is an independently deployable service with its own
+distribution, and the module is small enough that duplication beats
+coupling across services that ship separately."""
 import json
 from pathlib import Path
 

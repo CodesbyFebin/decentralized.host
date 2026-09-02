@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 import tarfile
@@ -14,6 +15,7 @@ from ..auth import require_deploy_key
 from ..config import settings
 from ..database import get_db
 from ..detect import detect_stack
+from ..engine import AgentResult, run_post_deploy_health_agent, run_pre_deploy_agents
 from ..models import Deployment, Node, Release
 from ..schemas import DeploymentCreate, DeploymentOut, DetectResponse, ReleaseOut
 from ..scheduler import pick_node
@@ -83,15 +85,37 @@ def _deployment_out(d: Deployment) -> DeploymentOut:
     )
 
 
+def _fetch_logs_text(node: Node, container_id: Optional[str]) -> str:
+    if not container_id:
+        return ""
+    try:
+        resp = httpx.get(f"{_node_agent_url(node)}/logs/{container_id}", timeout=10)
+        resp.raise_for_status()
+        return resp.json().get("logs", "")
+    except httpx.HTTPError:
+        return ""
+
+
 def _perform_ship(
     db: Session, name: str, container_port: int, dockerfile: str, archive_bytes: bytes,
     message: str = "", snapshot_id: str = "", custom_domain: str = "",
+    pre_deploy_results: Optional[list[AgentResult]] = None,
 ) -> DeploymentOut:
     """Shared by /ship (CLI, Launchpad) and /push (git server): picks a
     node, upserts the Deployment row, forwards the build to that specific
     node's agent, and records a Release. This is the one place that
     actually talks to a node agent for a build -- every "front door"
-    (dhost ship, Launchpad, git push) funnels through here."""
+    (dhost ship, Launchpad, git push) funnels through here.
+
+    pre_deploy_results comes from the dhost engine's parallel agents (see
+    app/engine.py), run by the caller against the extracted source before
+    this is called. If the security-scan agent came back "blocked" (a
+    likely hardcoded secret), the deploy is refused here -- same spot
+    every other build failure is recorded, so it shows up in release
+    history like any other failed release, not silently."""
+    pre_deploy_results = pre_deploy_results or []
+    blocked = [r for r in pre_deploy_results if r.status == "blocked"]
+
     node = pick_node(db)
     if node is None:
         raise HTTPException(503, "No healthy nodes available in the mesh. Run 'dhost node join'.")
@@ -113,6 +137,18 @@ def _perform_ship(
     db.commit()
     db.refresh(deployment)
 
+    if blocked:
+        deployment.status = "failed"
+        deployment.error = "Blocked by dhost engine: " + "; ".join(r.summary for r in blocked)
+        db.add(Release(
+            deployment_id=deployment.id, deployment_name=deployment.name,
+            snapshot_id=snapshot_id or None, message=message, image=deployment.image,
+            status="failed", error=deployment.error,
+            engine_report=json.dumps([r.to_dict() for r in pre_deploy_results]),
+        ))
+        db.commit()
+        raise HTTPException(400, deployment.error)
+
     try:
         resp = httpx.post(
             f"{_node_agent_url(node)}/build",
@@ -129,6 +165,12 @@ def _perform_ship(
     except httpx.HTTPError as e:
         deployment.status = "failed"
         deployment.error = str(e)
+        db.add(Release(
+            deployment_id=deployment.id, deployment_name=deployment.name,
+            snapshot_id=snapshot_id or None, message=message, image=deployment.image,
+            status="failed", error=deployment.error,
+            engine_report=json.dumps([r.to_dict() for r in pre_deploy_results]),
+        ))
         db.commit()
         raise HTTPException(502, f"Build request to node agent failed: {e}")
 
@@ -141,6 +183,21 @@ def _perform_ship(
         deployment.status = "failed"
         deployment.error = result.get("error", "unknown build error")
 
+    # Post-deploy health agent runs last, after the container is actually
+    # up (or supposed to be) -- it's a real HTTP probe against the live
+    # subdomain, not a guess, so it has to happen after the build result
+    # comes back. Best-effort: never let this agent's own failure mask the
+    # real deploy result.
+    all_results = list(pre_deploy_results)
+    if deployment.status == "running" and deployment.subdomain:
+        try:
+            all_results.append(run_post_deploy_health_agent(
+                f"http://{deployment.subdomain}",
+                logs_fetcher=lambda: _fetch_logs_text(node, deployment.container_id),
+            ))
+        except Exception as e:
+            all_results.append(AgentResult("post-deploy-health", "skipped", f"Agent error: {e}", []))
+
     db.add(Release(
         deployment_id=deployment.id,
         deployment_name=deployment.name,
@@ -149,6 +206,7 @@ def _perform_ship(
         image=deployment.image,
         status=deployment.status,
         error=deployment.error,
+        engine_report=json.dumps([r.to_dict() for r in all_results]) if all_results else None,
     ))
 
     db.commit()
@@ -256,9 +314,27 @@ async def ship_deployment(
     else:
         raise HTTPException(400, "Provide either 'archive' or 'upload_id'")
 
+    # Run the dhost engine's pre-deploy agents against the actual source,
+    # same as the git-push path -- the CLI/Launchpad already detected the
+    # stack client-side (that's what `dockerfile` is), so re-detecting here
+    # is only to label the agents' output, not a second real decision.
+    work_dir = UPLOAD_CACHE_DIR / f"scan-{uuid.uuid4().hex}"
+    work_dir.mkdir(parents=True, exist_ok=True)
+    try:
+        tar_path = work_dir / "src.tar.gz"
+        tar_path.write_bytes(archive_bytes)
+        extract_dir = work_dir / "src"
+        extract_dir.mkdir()
+        _safe_extract_tar(tar_path, extract_dir)
+        stack, _ = detect_stack(extract_dir)
+        pre_deploy_results = run_pre_deploy_agents(extract_dir, name, stack, dockerfile, message)
+    finally:
+        shutil.rmtree(work_dir, ignore_errors=True)
+
     return _perform_ship(
         db, name, container_port, dockerfile, archive_bytes,
         message=message, snapshot_id=snapshot_id, custom_domain=custom_domain,
+        pre_deploy_results=pre_deploy_results,
     )
 
 
@@ -274,7 +350,10 @@ async def push_deployment(
     """The git server's post-receive hook hits this directly: one tarball
     of the pushed tree (from `git archive`, so already .gitignore-clean),
     no separate detect step from the client -- this does detection and
-    build+deploy in a single call, same underlying pipeline as /ship."""
+    build+deploy in a single call, same underlying pipeline as /ship.
+
+    This is the actual "git to hosting" path the dhost engine's agents
+    matter most for: nothing client-side has looked at this source yet."""
     archive_bytes = await archive.read()
     work_dir = UPLOAD_CACHE_DIR / f"push-{uuid.uuid4().hex}"
     work_dir.mkdir(parents=True, exist_ok=True)
@@ -285,12 +364,15 @@ async def push_deployment(
         extract_dir.mkdir()
         _safe_extract_tar(tar_path, extract_dir)
         stack, dockerfile = detect_stack(extract_dir)
+        effective_message = message or f"git push ({stack})"
+        pre_deploy_results = run_pre_deploy_agents(extract_dir, name, stack, dockerfile, effective_message)
     finally:
         shutil.rmtree(work_dir, ignore_errors=True)
 
     return _perform_ship(
         db, name, container_port, dockerfile, archive_bytes,
-        message=message or f"git push ({stack})", custom_domain=custom_domain,
+        message=effective_message, custom_domain=custom_domain,
+        pre_deploy_results=pre_deploy_results,
     )
 
 

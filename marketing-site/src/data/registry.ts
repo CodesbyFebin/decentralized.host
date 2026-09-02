@@ -139,11 +139,11 @@ export const CONTENT_REGISTRY: Record<string, PageFrontmatter> = {
     id: 'page-alternatives',
     slug: '/alternatives/',
     title: 'Open-Source PaaS Alternatives & Comparison — Decentralized.Host',
-    description: 'Evidence-based comparisons between Decentralized.Host and Coolify, Dokploy, CapRover, Dokku, Heroku, Vercel, and AWS with verified capability dates.',
+    description: 'Evidence-based comparisons between Decentralized.Host and Coolify, Dokploy, CapRover, Dokku, Heroku, Vercel, AWS, and UpCloud with verified capability dates.',
     h1: 'Decentralized.Host vs Self-Hosted & Managed PaaS Platforms',
     intent: 'Commercial Comparison & Evaluation',
     primaryEntity: 'PaaS Alternatives',
-    secondaryEntities: ['Coolify', 'Dokploy', 'CapRover', 'Dokku', 'Heroku', 'Vercel', 'AWS'],
+    secondaryEntities: ['Coolify', 'Dokploy', 'CapRover', 'Dokku', 'Heroku', 'Vercel', 'AWS', 'UpCloud'],
     contentType: 'comparison',
     audience: 'engineering-leads',
     claimStatus: 'IMPLEMENTED',
@@ -152,7 +152,7 @@ export const CONTENT_REGISTRY: Record<string, PageFrontmatter> = {
     canonical: 'https://decentralized.host/alternatives/',
     schemaTypes: ['TechArticle', 'BreadcrumbList'],
     publishedAt: '2025-02-15T00:00:00Z',
-    updatedAt: '2026-09-01T00:00:00Z',
+    updatedAt: '2026-09-02T00:00:00Z',
     extractableAnswer: 'Unlike single-server PaaS tools like Dokku or single-orchestrator tools like Coolify and Dokploy, Decentralized.Host is designed around a lightweight decoupled node agent mesh architecture with built-in remote execution and multi-node scheduling.'
   },
   '/deploy/': {

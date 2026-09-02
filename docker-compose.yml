@@ -14,6 +14,7 @@ volumes:
 services:
   postgres:
     image: postgres:16-alpine
+    restart: unless-stopped
     environment:
       POSTGRES_USER: dhost
       POSTGRES_PASSWORD: dhost
@@ -29,6 +30,7 @@ services:
 
   registry:
     image: registry:2
+    restart: unless-stopped
     ports:
       - "5000:5000"
     volumes:
@@ -46,6 +48,7 @@ services:
     # ("client version 1.24 is too old"), a known Traefik/Colima
     # incompatibility unrelated to this project. The file provider sidesteps
     # it entirely and also means Traefik doesn't need docker.sock access.
+    restart: unless-stopped
     command:
       - "--providers.file.directory=/etc/traefik/dynamic"
       - "--providers.file.watch=true"
@@ -63,6 +66,7 @@ services:
     build:
       context: .
       dockerfile: control-plane/Dockerfile
+    restart: unless-stopped
     env_file: .env
     environment:
       DATABASE_URL: postgresql+psycopg2://dhost:dhost@postgres:5432/dhost
@@ -77,6 +81,7 @@ services:
     build:
       context: .
       dockerfile: node-agent/Dockerfile
+    restart: unless-stopped
     env_file: .env
     environment:
       CONTROL_PLANE_URL: http://control-plane:8000
@@ -98,8 +103,11 @@ services:
 
   dashboard:
     image: nginx:alpine
+    restart: unless-stopped
     volumes:
-      - ./dashboard:/usr/share/nginx/html:ro
+      - ./dashboard/public:/usr/share/nginx/html:ro
+      - ./dashboard/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./dashboard/.htpasswd:/etc/nginx/.htpasswd:ro
     ports:
       - "4001:80"
     networks: [dhost-mesh]
@@ -112,6 +120,7 @@ services:
     build:
       context: .
       dockerfile: git-server/Dockerfile
+    restart: unless-stopped
     environment:
       CONTROL_PLANE_URL: http://control-plane:8000
       DEPLOY_API_KEY: ${DEPLOY_API_KEY:-dev-deploy-key}

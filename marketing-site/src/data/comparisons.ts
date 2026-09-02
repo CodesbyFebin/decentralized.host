@@ -161,6 +161,29 @@ export const COMPARISONS_DATA: CompetitorComparison[] = [
     lastVerifiedAt: '2026-08-30',
     evidenceSource: 'https://docs.aws.amazon.com/AmazonECS/, https://docs.aws.amazon.com/elasticbeanstalk/',
     summaryComparison: 'AWS is the deepest, most capable cloud platform that exists, but that depth is also the cost: real infrastructure-as-code, IAM policies, and per-service billing to assemble something as simple as "git push, get a URL." Decentralized.Host does not compete with AWS\'s breadth (no managed databases, no global CDN, no serverless functions) -- it competes with the specific job of running your own containers on your own or rented VPS/bare-metal hardware without needing to learn ECS task definitions or pay per-service markup. Nothing here is a drop-in AWS replacement for teams that need RDS, Lambda, or S3 specifically; it is a much simpler alternative for teams that just need to run Docker containers with Git-push deploys and automatic TLS.'
+  },
+  {
+    id: 'comp-upcloud',
+    name: 'UpCloud',
+    slug: 'upcloud',
+    officialUrl: 'https://upcloud.com',
+    license: 'Proprietary Cloud Service',
+    deploymentModel: 'Managed European IaaS cloud -- you provision Cloud Servers/Kubernetes/databases yourself; there is no app-level "push and deploy" product',
+    runtime: 'KVM-based Cloud Server VMs, or Managed Kubernetes for containers',
+    multiServerSupport: 'Yes, via Managed Kubernetes clusters or manually-networked Cloud Servers -- infrastructure you assemble, not a built-in app scheduler',
+    gitDeployment: 'Not offered -- upctl and the API manage infrastructure (servers, storage, networking), not application source or git pushes',
+    cliTool: '`upctl` -- a real, official CLI, but for provisioning/managing cloud resources, not for shipping an app\'s code',
+    dashboard: 'Web control panel for infrastructure management (servers, storage, networking, billing)',
+    dockerSupport: 'Only indirectly, via Managed Kubernetes or by installing Docker yourself on a Cloud Server -- no built-in Dockerfile build/deploy pipeline',
+    composeSupport: 'Not native (Kubernetes manifests for their Managed Kubernetes product, not docker-compose.yml)',
+    automaticTls: 'Not automatic for arbitrary apps -- TLS is your responsibility to configure on whatever you run on their servers/load balancer',
+    databaseTemplates: 'Managed Databases (PostgreSQL, MySQL, Redis, Valkey, OpenSearch) -- real managed offerings, billed as separate resources',
+    rollbackSupport: 'Not applicable at the app level -- no deployment/release concept exists in the product; you would build that yourself',
+    observability: 'Infrastructure-level metrics (server/network/storage) in the control panel; no application-level log aggregation product',
+    decentralizedOrMesh: 'Centralized, single-vendor commercial cloud (Finland-headquartered, 15 data centers) -- the opposite of a self-hosted node mesh',
+    lastVerifiedAt: '2026-09-02',
+    evidenceSource: 'https://upcloud.com/products, https://upcloud.com/docs/tooling/cli/',
+    summaryComparison: 'UpCloud is a real European cloud IaaS provider -- Cloud Servers, GPU Servers, Managed Kubernetes, Managed Databases, load balancing and networking, backed by a genuine 99.999% uptime SLA across 15 data centers. It is not a competitor on deployment workflow: there is no git-push, no CLI-driven app ship, no automatic per-app TLS, because UpCloud sells the infrastructure layer, not a PaaS on top of it. The honest comparison is the same shape as AWS above: you could run Decentralized.Host\'s own mesh (control plane, node agent, Traefik) on UpCloud Cloud Servers exactly like any other VPS in DEPLOY.md\'s guide -- the two are complementary, not substitutes.'
   }
 ];
 
