@@ -223,21 +223,23 @@ export const HomeView: React.FC<Props> = ({ onNavigate, onOpenAudit }) => {
         </div>
       </section>
 
-      {/* SELF-HEALING -- the mockup this was adapted from had an animated
-          "watch a node fail over" demo. That capability (automatic
-          rescheduling of a crashed node's deployments) is Phase 4 on the
-          real roadmap (PLANNED, not built) -- an animated demo of it would
-          be showing a product behavior that doesn't exist yet. Using the
-          same ClaimBadge system the rest of the site uses instead: what's
-          real today (heartbeat-based health tracking) vs. what's planned
-          (automatic failover). */}
+      {/* SELF-HEALING -- automatic rescheduling of a crashed node's
+          deployments is real now (control-plane/app/failover.py), verified
+          end-to-end: a node's heartbeat going stale past NODE_OFFLINE_SECONDS
+          gets its running deployments rescheduled to a healthy node,
+          pulling the already-built image from the mesh's shared registry.
+          Still no animated "watch it happen" demo here -- that's a
+          real gap (there IS a real gap between the old node going offline
+          and the new container being ready, and in-container state isn't
+          migrated), stated honestly in the copy below instead of hidden
+          behind an animation. */}
       <section className="p-6 sm:p-8 rounded-2xl bg-[#080b0f] border border-white/10 space-y-5">
         <div className="space-y-2">
           <span className="text-[10px] font-mono text-[#00FF41] uppercase tracking-[0.2em] flex items-center gap-2">
             <RotateCcw className="w-3.5 h-3.5" /> Resilience
           </span>
           <h3 className="text-lg sm:text-xl font-bold font-display text-white">
-            Health Monitoring Today, Self-Healing on the Roadmap
+            Health Monitoring and Automated Failover
           </h3>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -253,12 +255,14 @@ export const HomeView: React.FC<Props> = ({ onNavigate, onOpenAudit }) => {
           </div>
           <div className="p-4 rounded-lg bg-white/[0.02] border border-white/10 space-y-2">
             <div className="flex items-center gap-2">
-              <ClaimBadge status="PLANNED" size="sm" />
+              <ClaimBadge status="IMPLEMENTED" size="sm" />
               <span className="text-xs font-mono text-white uppercase">Automatic failover</span>
             </div>
             <p className="text-xs text-white/50 font-sans leading-relaxed">
-              Automatically rescheduling a crashed node's deployments onto a healthy node,
-              without operator intervention -- Phase 4 on the real roadmap, not built yet.
+              A node offline for NODE_OFFLINE_SECONDS (180s default) has its running deployments
+              rescheduled to a healthy node automatically, no rebuild needed. Real limits: a real
+              gap while the new container starts (not zero-downtime), and in-container state isn't
+              migrated -- see the FAQ.
             </p>
           </div>
         </div>

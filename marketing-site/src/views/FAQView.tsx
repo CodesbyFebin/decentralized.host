@@ -113,13 +113,17 @@ const FAQ_ENTRIES: FAQEntry[] = [
   },
   {
     question: 'What happens if one of my nodes goes down?',
-    answerText: "The scheduler places new deployments only on nodes reporting healthy heartbeats, so a down node stops receiving new work. It does not currently migrate an already-running container off a node that goes down mid-flight -- that container stays down until the node recovers or you redeploy it elsewhere manually. There's no automatic failover yet.",
+    answerText: "The scheduler places new deployments only on nodes reporting healthy heartbeats. If a node that already has running deployments misses heartbeats for NODE_OFFLINE_SECONDS (180s by default -- long enough that a Docker runtime restart doesn't trigger it), the control plane automatically reschedules its deployments to another healthy node, pulling the already-built image from the mesh's shared registry with no rebuild needed. Real limitations: there's a gap between the old node going offline and the new container being ready where the app 502s, in-container state (local disk writes, in-memory data) is not migrated, and a single-node mesh has nowhere to reschedule to.",
     answer: (
       <>
-        The scheduler places new deployments only on nodes reporting healthy heartbeats, so a down node stops
-        receiving new work. It does not currently migrate an already-running container off a node that goes down
-        mid-flight -- that container stays down until the node recovers or you redeploy it elsewhere manually. There's
-        no automatic failover yet; that's honestly reflected as a gap, not a hidden limitation.
+        The scheduler places new deployments only on nodes reporting healthy heartbeats. If a node that already has
+        running deployments misses heartbeats for <code>NODE_OFFLINE_SECONDS</code> (180s by default -- long enough
+        that a Docker runtime restart doesn't trigger it), the control plane automatically reschedules its
+        deployments to another healthy node, pulling the already-built image from the mesh's shared registry with no
+        rebuild needed. Real limitations, stated plainly: there's a real gap between the old node going offline and
+        the new container being ready where the app returns 502s -- this is automated recovery, not zero-downtime
+        failover; in-container state (local disk writes, an in-memory cache) is not migrated, only the image is
+        restarted fresh; and a single-node mesh has nowhere to reschedule to.
       </>
     )
   },
@@ -150,13 +154,14 @@ const FAQ_ENTRIES: FAQEntry[] = [
   },
   {
     question: 'What still isn\'t built?',
-    answerText: "Being direct about scope: no automatic failover for a crashed node, no per-user accounts or per-repo access control (one shared deploy key trusts everyone equally), no multi-branch preview environments in the git server, and the node agent still runs Docker internally to build/run containers (developer machines don't need Docker, but the mesh itself does). See the roadmap for what's planned next.",
+    answerText: "Being direct about scope: no confidential computing / workload attestation, no per-user accounts or per-repo access control (one shared deploy key trusts everyone equally), no multi-branch preview environments in the git server, and the node agent still runs Docker internally to build/run containers (developer machines don't need Docker, but the mesh itself does). Automated failover for a crashed node's deployments is now built -- see the roadmap for what's planned next.",
     answer: (
       <>
-        Being direct about scope: no automatic failover for a crashed node, no per-user accounts or per-repo access
-        control (one shared deploy key trusts everyone equally), no multi-branch preview environments in the git
-        server, and the node agent still runs Docker internally to build/run containers (developer machines don't
-        need Docker, but the mesh itself does). See the{' '}
+        Being direct about scope: no confidential computing / workload attestation, no per-user accounts or per-repo
+        access control (one shared deploy key trusts everyone equally), no multi-branch preview environments in the
+        git server, and the node agent still runs Docker internally to build/run containers (developer machines
+        don't need Docker, but the mesh itself does). Automated failover for a crashed node's deployments is now
+        built -- see the{' '}
         <button onClick={() => { window.location.hash = '/roadmap/'; window.scrollTo(0, 0); }} className="text-[#00FF41] hover:underline">
           roadmap
         </button>{' '}

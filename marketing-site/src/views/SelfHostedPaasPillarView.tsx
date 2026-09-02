@@ -122,7 +122,7 @@ export const SelfHostedPaasPillarView: React.FC<Props> = ({ onNavigate }) => {
             { item: 'Set strong API_SECRET_KEY in control plane .env and rotate regularly', status: 'CRITICAL' },
             { item: 'Configure automated PostgreSQL database snapshots to external S3/Wasabi volume', status: 'REQUIRED' },
             { item: 'Monitor node disk space and prune unused Docker build cache layers weekly', status: 'RECOMMENDED' },
-            { item: 'Deploy a secondary worker node to enable instant failover scheduling', status: 'RECOMMENDED' }
+            { item: 'Deploy a secondary worker node -- automated failover has nowhere to reschedule to on a single-node mesh', status: 'RECOMMENDED' }
           ].map((c, i) => (
             <div key={i} className="p-3 rounded-lg bg-[#080b0f] border border-slate-800 flex items-center justify-between gap-3">
               <span className="text-slate-300 font-sans text-xs flex items-center gap-2">

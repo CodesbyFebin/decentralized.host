@@ -23,7 +23,7 @@ export const CONTENT_REGISTRY: Record<string, PageFrontmatter> = {
     canonical: 'https://decentralized.host/',
     schemaTypes: ['Organization', 'WebSite', 'SoftwareApplication'],
     publishedAt: '2025-01-15T00:00:00Z',
-    updatedAt: '2026-09-01T00:00:00Z',
+    updatedAt: '2026-09-02T00:00:00Z',
     extractableAnswer: 'Decentralized.Host is an open-source self-hosted deployment platform and distributed compute mesh for deploying containerized applications from Git or CLI across independently operated compute nodes.'
   },
   '/features/': {
@@ -212,7 +212,7 @@ export const CONTENT_REGISTRY: Record<string, PageFrontmatter> = {
     canonical: 'https://decentralized.host/self-hosted-paas/',
     schemaTypes: ['TechArticle', 'BreadcrumbList'],
     publishedAt: '2025-02-22T00:00:00Z',
-    updatedAt: '2026-09-01T00:00:00Z',
+    updatedAt: '2026-09-02T00:00:00Z',
     extractableAnswer: 'A self-hosted PaaS provides a developer experience similar to Heroku or Render on privately managed servers, giving engineers automated Git/CLI deployments, reverse proxy management, and zero recurring cloud management surcharges.'
   },
   '/depin/': {
@@ -257,8 +257,8 @@ export const CONTENT_REGISTRY: Record<string, PageFrontmatter> = {
     canonical: 'https://decentralized.host/roadmap/',
     schemaTypes: ['TechArticle', 'BreadcrumbList'],
     publishedAt: '2025-02-25T00:00:00Z',
-    updatedAt: '2026-09-01T00:00:00Z',
-    extractableAnswer: 'The Decentralized.Host engineering roadmap covers a single-node control plane and CLI (Phase 1), a distributed multi-node mesh with real Git-push deploys, production TLS, and Solana devnet node-operator credits (Phase 2, both complete), confidential-computing enclaves (Phase 3, planned), and an optional Solana mainnet migration with automated node failover (Phase 4, planned).'
+    updatedAt: '2026-09-02T00:00:00Z',
+    extractableAnswer: 'The Decentralized.Host engineering roadmap covers a single-node control plane and CLI (Phase 1), a distributed multi-node mesh with real Git-push deploys, production TLS, automated node failover, and Solana devnet node-operator credits (Phase 2, both complete), confidential-computing enclaves (Phase 3, planned), and an optional Solana mainnet migration with a public compute marketplace (Phase 4, planned).'
   },
   '/about/': {
     id: 'page-about',
@@ -317,7 +317,7 @@ export const CONTENT_REGISTRY: Record<string, PageFrontmatter> = {
     canonical: 'https://decentralized.host/faq/',
     schemaTypes: ['FAQPage', 'BreadcrumbList'],
     publishedAt: '2026-09-01T00:00:00Z',
-    updatedAt: '2026-09-01T00:00:00Z',
+    updatedAt: '2026-09-02T00:00:00Z',
     extractableAnswer: 'Decentralized.Host is a self-hosted Docker deployment mesh (FastAPI control plane + node agents + Traefik), not a blockchain storage network -- it does not use IPFS, Arweave, or Filecoin, and its only blockchain component is an optional Solana devnet credit system for node operators.'
   }
 };

@@ -31,11 +31,12 @@ export const RoadmapView: React.FC<Props> = ({ onNavigate }) => {
       phase: 'Phase 2: Multi-Node Mesh, Real Git Push & Node-Operator Credits',
       timeline: 'Q3 – Q4 2025',
       status: 'IMPLEMENTED' as const,
-      description: 'Decoupled Python node agent daemon, heartbeats, real-time CPU/RAM telemetry, resource-aware placement scheduler, multi-host container dispatching, a real SSH git server, real production TLS, and an optional Solana devnet credit system for node operators.',
+      description: 'Decoupled Python node agent daemon, heartbeats, real-time CPU/RAM telemetry, resource-aware placement scheduler, multi-host container dispatching, a real SSH git server, real production TLS, automated failover for offline nodes, and an optional Solana devnet credit system for node operators.',
       deliverables: [
         'Standalone node-agent daemon (node-agent/agent.py)',
         'Node registration, health checks, and capacity reporting',
         'Weighted placement scheduler (control-plane/app/scheduler.py)',
+        'Automated failover: a node offline for NODE_OFFLINE_SECONDS has its running deployments rescheduled to a healthy node automatically (control-plane/app/failover.py)',
         'Real SSH git server with auto-create-repo on push (git-server/)',
         'Production Let\'s Encrypt TLS via Traefik HTTP-01 (docker-compose.prod.yml)',
         'Solana devnet SPL token credits for node operators (blockchain/)'
@@ -57,10 +58,9 @@ export const RoadmapView: React.FC<Props> = ({ onNavigate }) => {
       phase: 'Phase 4: Mainnet Settlement & Compute Marketplace',
       timeline: 'Q3 – Q4 2026',
       status: 'PLANNED' as const,
-      description: 'A real-value mainnet migration path for the credit system (currently Solana devnet-only by design), automated failover for crashed nodes, and a public marketplace for community node operators to contribute capacity across meshes they don\'t own.',
+      description: 'A real-value mainnet migration path for the credit system (currently Solana devnet-only by design), and a public marketplace for community node operators to contribute capacity across meshes they don\'t own.',
       deliverables: [
         'Optional Solana mainnet credit migration (opt-in, not default)',
-        'Automated failover / rescheduling for a node that goes down mid-flight',
         'Per-repo access control for the git server (currently any registered key can push to any repo)',
         'Public decentralized node discovery registry'
       ]
@@ -90,7 +90,7 @@ export const RoadmapView: React.FC<Props> = ({ onNavigate }) => {
       <div className="max-w-3xl mx-auto">
         <AeoAnswerBlock
           question="What is the roadmap for Decentralized.Host?"
-          answer="Decentralized.Host has completed Phase 1 (Core PaaS, Git SSH hooks, CLI, Traefik TLS) and Phase 2 (multi-node agent daemon, real SSH git server, production TLS, and Solana devnet node-operator credits). Phase 3 will introduce confidential computing enclaves (AMD SEV), and Phase 4 will introduce an optional Solana mainnet migration and automated node failover."
+          answer="Decentralized.Host has completed Phase 1 (Core PaaS, Git SSH hooks, CLI, Traefik TLS) and Phase 2 (multi-node agent daemon, real SSH git server, production TLS, automated node failover, and Solana devnet node-operator credits). Phase 3 will introduce confidential computing enclaves (AMD SEV), and Phase 4 will introduce an optional Solana mainnet migration and a public compute marketplace."
           sourceContext="Engineering Roadmap Specification (ROADMAP.md)"
         />
       </div>

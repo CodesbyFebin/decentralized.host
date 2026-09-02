@@ -6,19 +6,36 @@ from .config import settings
 from .models import Node
 
 
-def _is_healthy(node: Node) -> bool:
+def _heartbeat_age_seconds(node: Node) -> float | None:
     if node.last_heartbeat is None:
-        return False
+        return None
     hb = node.last_heartbeat
     if hb.tzinfo is None:
         hb = hb.replace(tzinfo=timezone.utc)
-    age = (datetime.now(timezone.utc) - hb).total_seconds()
-    return age <= settings.HEARTBEAT_STALE_SECONDS
+    return (datetime.now(timezone.utc) - hb).total_seconds()
+
+
+def _is_healthy(node: Node) -> bool:
+    age = _heartbeat_age_seconds(node)
+    return age is not None and age <= settings.HEARTBEAT_STALE_SECONDS
 
 
 def refresh_node_statuses(db: Session) -> None:
+    """healthy: heartbeating within HEARTBEAT_STALE_SECONDS. stale: recently
+    missed a heartbeat but not long enough to act on -- a node's Docker
+    runtime restarting is a real, observed case that recovers on its own
+    within under two minutes and shouldn't trigger anything. offline: no
+    heartbeat for NODE_OFFLINE_SECONDS or more -- long enough that
+    app/failover.py will reschedule its running deployments elsewhere."""
     for node in db.query(Node).all():
-        node.status = "healthy" if _is_healthy(node) else "stale"
+        if _is_healthy(node):
+            node.status = "healthy"
+            continue
+        age = _heartbeat_age_seconds(node)
+        if age is not None and age >= settings.NODE_OFFLINE_SECONDS:
+            node.status = "offline"
+        else:
+            node.status = "stale"
     db.commit()
 
 

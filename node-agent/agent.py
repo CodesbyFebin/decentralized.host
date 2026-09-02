@@ -20,7 +20,22 @@ CONTROL_PLANE_URL = os.getenv("CONTROL_PLANE_URL", "http://control-plane:8000")
 NODE_JOIN_SECRET = os.getenv("NODE_JOIN_SECRET", "dev-join-secret")
 NODE_NAME = os.getenv("NODE_NAME", os.uname().nodename)
 NODE_REGION = os.getenv("NODE_REGION", "local")
-REGISTRY_HOST = os.getenv("REGISTRY_HOST", "registry:5000")
+# "registry:5000" (the compose service name) looks like it should work via
+# Docker's per-network embedded DNS, but it structurally can't: pushes and
+# pulls are always resolved by the daemon itself (dockerd), not by the
+# calling container's network namespace, and the daemon's own resolver has
+# no knowledge of a specific compose project's container names -- confirmed
+# by a real, reproducible failure ("no such host") from both a node-agent
+# container AND a bare host-level `docker pull`, identical either way.
+# "localhost:5000" works because the registry is also published on the host
+# (`ports: 5000:5000` in docker-compose.yml) and 127.0.0.0/8 is trusted as
+# insecure by Docker by default -- no DNS or extra config needed. This is
+# correct for same-machine node-agents (the only case this project's own
+# docker-compose.yml sets up); a node-agent on a genuinely separate machine
+# needs REGISTRY_HOST set explicitly to that machine's real reachable
+# address, the same way a remote node already needs its own
+# ADVERTISE_ADDRESS (see README's "Adding a second node").
+REGISTRY_HOST = os.getenv("REGISTRY_HOST", "localhost:5000")
 HEARTBEAT_INTERVAL = int(os.getenv("HEARTBEAT_INTERVAL", "10"))
 POLL_INTERVAL = int(os.getenv("POLL_INTERVAL", "3"))
 LOG_API_PORT = int(os.getenv("LOG_API_PORT", "8100"))

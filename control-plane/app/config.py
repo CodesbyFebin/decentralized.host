@@ -12,6 +12,19 @@ class Settings:
     NODE_TOKEN_TTL_HOURS: int = int(os.getenv("NODE_TOKEN_TTL_HOURS", "24"))
     BASE_DOMAIN: str = os.getenv("BASE_DOMAIN", "127.0.0.1.nip.io")
     HEARTBEAT_STALE_SECONDS: int = int(os.getenv("HEARTBEAT_STALE_SECONDS", "30"))
+    # How long a node can go without a heartbeat before it's considered truly
+    # gone (not just briefly stale) and its running deployments get
+    # automatically rescheduled elsewhere -- see app/failover.py. Deliberately
+    # much bigger than HEARTBEAT_STALE_SECONDS: a node's Docker runtime
+    # restarting (observed taking 10-90s in practice) should not trigger a
+    # reschedule while it's still on its way back up.
+    NODE_OFFLINE_SECONDS: int = int(os.getenv("NODE_OFFLINE_SECONDS", "180"))
+    # How often the background loop checks for offline nodes with running
+    # deployments to reschedule. Independent of HEARTBEAT_INTERVAL (the
+    # node-agent's own heartbeat cadence, set on node-agent, not here).
+    FAILOVER_CHECK_INTERVAL_SECONDS: int = int(
+        os.getenv("FAILOVER_CHECK_INTERVAL_SECONDS", "20")
+    )
     ENABLE_BLOCKCHAIN: bool = os.getenv("ENABLE_BLOCKCHAIN", "false").lower() == "true"
     SOLANA_RPC_URL: str = os.getenv("SOLANA_RPC_URL", "https://api.devnet.solana.com")
     SOLANA_MINT_ADDRESS: str = os.getenv("SOLANA_MINT_ADDRESS", "")

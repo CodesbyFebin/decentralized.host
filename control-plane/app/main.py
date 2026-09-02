@@ -1,12 +1,14 @@
+import asyncio
 import logging
-import time
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 from sqlalchemy.exc import OperationalError
 
-from .database import Base, engine
+from .config import settings
+from .database import Base, SessionLocal, engine
+from .failover import check_and_reschedule
 from .routers import assistant, auth, blockchain, deployments, git_keys, nodes
 
 # There's no migration tool (Alembic, etc.) in this project -- for a single
@@ -33,8 +35,31 @@ app.add_middleware(
 )
 
 
+async def _failover_loop() -> None:
+    """Background task, not a request handler -- opens its own DB session
+    each pass since FastAPI's Depends(get_db) only works within a request.
+    Errors are caught and logged rather than left to crash the loop: one
+    bad pass (e.g. a transient DB hiccup) shouldn't permanently disable
+    automated failover for the life of the process."""
+    while True:
+        await asyncio.sleep(settings.FAILOVER_CHECK_INTERVAL_SECONDS)
+        db = SessionLocal()
+        try:
+            rescheduled = check_and_reschedule(db)
+            if rescheduled:
+                logger.info(f"Automated failover rescheduled: {rescheduled}")
+        except Exception:
+            logger.exception("Failover check pass failed")
+        finally:
+            db.close()
+
+
 @app.on_event("startup")
-def on_startup() -> None:
+async def on_startup() -> None:
+    # Deliberately async (not sync) so asyncio.create_task() below attaches
+    # to the actual running event loop -- confirmed by testing that a sync
+    # startup handler here left the failover loop silently never scheduled
+    # (Starlette runs sync startup handlers off the main loop thread).
     for attempt in range(30):
         try:
             Base.metadata.create_all(bind=engine)
@@ -42,10 +67,11 @@ def on_startup() -> None:
                 for stmt in STARTUP_MIGRATIONS:
                     conn.execute(text(stmt))
             logger.info("Database ready")
+            asyncio.create_task(_failover_loop())
             return
         except OperationalError:
             logger.info(f"Waiting for database... ({attempt + 1}/30)")
-            time.sleep(2)
+            await asyncio.sleep(2)
     raise RuntimeError("Database never became available")
 
 
