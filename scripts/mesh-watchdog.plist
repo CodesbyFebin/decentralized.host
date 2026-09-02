@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  LaunchAgent for the mesh watchdog. Template only -- __RUNTIME_DIR__ and
+  __HOME__ below are filled in by scripts/install-mesh-watchdog.sh at
+  install time (launchd plists can't reference environment variables or ~,
+  they need literal absolute paths). __RUNTIME_DIR__ ends up pointing at the
+  installed runtime copy under ~/Library/Application Support, not this
+  repo checkout -- see install-mesh-watchdog.sh for why.
+
+  Runs every 15 minutes: real protection for a Colima crash needs minutes,
+  not the "once a day" cadence of the GitHub Actions external check --
+  Colima was found stopping unpredictably (twice in under an hour on
+  2026-09-02), so this is deliberately tighter than daily. Also fires once
+  at load time (RunAtLoad) so a `launchctl load` immediately confirms it
+  works instead of waiting up to 15 minutes for the first run.
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>host.decentralized.mesh-watchdog</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>__RUNTIME_DIR__/mesh-watchdog.sh</string>
+  </array>
+  <key>StartInterval</key>
+  <integer>900</integer>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>__HOME__/Library/Logs/dhost-mesh-watchdog.stdout.log</string>
+  <key>StandardErrorPath</key>
+  <string>__HOME__/Library/Logs/dhost-mesh-watchdog.stderr.log</string>
+</dict>
+</plist>

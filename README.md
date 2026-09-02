@@ -281,6 +281,31 @@ you — a public IP/hostname for a real remote box, or the Docker network
 hostname for same-compose testing (the default). The scheduler picks
 whichever healthy node has the lowest combined CPU+RAM load.
 
+## Keeping the mesh up
+
+Two independent checks, for two different failure modes:
+
+- **`.github/workflows/mesh-health-check.yml`** — a scheduled GitHub Actions
+  job (daily, plus manual `workflow_dispatch`) that curls the public mesh
+  hostnames from outside and fails loudly if any of them are down. External
+  and read-only — it can observe the mesh but can't fix anything on the
+  machine it runs on.
+- **`scripts/mesh-watchdog.sh`** — a local script that checks Colima and
+  every `dhost-*` container on this machine and restarts what it finds
+  stopped. Exists because Colima was found stopping unpredictably (silently,
+  twice within an hour) while the Cloudflare Tunnel in front of it stayed
+  up — every request just 502'd until someone checked by hand. Install it
+  as a per-user LaunchAgent (runs every 15 minutes, no sudo) with:
+
+  ```bash
+  bash scripts/install-mesh-watchdog.sh
+  ```
+
+  Logs to `~/Library/Logs/dhost-mesh-watchdog.log`. Re-run the installer
+  after editing `scripts/mesh-watchdog.sh` — it runs from an installed copy
+  under `~/Library/Application Support`, not from this checkout, since
+  launchd can't read files under `~/Desktop` on this Mac.
+
 ## Configuration
 
 All runtime config lives in `.env` (copy `.env.example` if you don't have

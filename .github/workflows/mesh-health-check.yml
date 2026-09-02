@@ -1,0 +1,48 @@
+name: Mesh health check
+
+# Runs daily against the live, self-hosted mesh (not this repo's code) to
+# catch the exact failure mode found on 2026-09-02: the node this mesh runs
+# on going offline (Docker/Colima stopped, tunnel down, etc.) with nothing
+# noticing until someone happens to check. This is an external, read-only
+# check -- it has no access to the host machine and can only observe and
+# fail loudly, not restart anything. See scripts/mesh-watchdog.sh for the
+# local counterpart that actually heals the machine this runs on.
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  check-mesh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check public mesh hostnames
+        run: |
+          set -u
+          fail=0
+          declare -A expect=(
+            ["api.decentralized.host"]=200
+            ["console.decentralized.host"]=200
+            ["hello-world.decentralized.host"]=200
+            ["node-hello.decentralized.host"]=200
+            ["bestaiagents.decentralized.host"]=200
+            ["dashboard.decentralized.host"]=401
+          )
+          for host in "${!expect[@]}"; do
+            want="${expect[$host]}"
+            got=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 "https://$host/" || echo "000")
+            if [ "$got" = "$want" ]; then
+              echo "OK   $host -> $got"
+            else
+              echo "FAIL $host -> $got (expected $want)"
+              fail=1
+            fi
+          done
+          if [ "$fail" -eq 1 ]; then
+            echo ""
+            echo "One or more mesh hostnames are unhealthy. This checks the live" \
+                 "self-hosted mesh, not this repo's code -- a failure here means" \
+                 "the node the mesh runs on needs attention (see scripts/mesh-watchdog.sh)."
+            exit 1
+          fi
