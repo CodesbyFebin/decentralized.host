@@ -1,6 +1,6 @@
 # decentralized.host -- Complete Technical Reference for LLM Retrieval
 # Generated at build time from the real site data (registry.ts, docs.ts, guides.ts)
-# Generated: 2026-09-03T08:09:38.287Z
+# Generated: 2026-09-03T10:38:14.802Z
 
 ## Pages
 
@@ -442,7 +442,7 @@ H1: Backup & Recovery Tools
 Type: pillar
 Summary: Systems and practices for protecting data against loss and restoring it after failure.
 Claim status: IMPLEMENTED
-AEO answer: Systems and practices for protecting data against loss and restoring it after failure. Decentralized.Host has no automated backup/restore feature for deployed apps' data today -- an accepted, honestly-documented gap.
+AEO answer: Systems and practices for protecting data against loss and restoring it after failure. Decentralized.Host has no automated backup/restore feature for deployed apps' data today -- an accepted, honestly-documented gap, distinct from automated failover (which reschedules a container, not its data).
 
 
 ================================================================================
@@ -460,7 +460,7 @@ H1: Performance Optimization Tools
 Type: pillar
 Summary: Profiling and tuning infrastructure and application performance.
 Claim status: IMPLEMENTED
-AEO answer: Profiling and tuning infrastructure and application performance. No performance-profiling feature exists in Decentralized.Host.
+AEO answer: Profiling and tuning infrastructure and application performance. No profiling feature exists in Decentralized.Host, but this project did real, methodical performance debugging on its own marketing-site build -- a genuine example, not a product capability.
 
 
 ================================================================================
@@ -487,7 +487,7 @@ H1: Auto-scaling Tools
 Type: pillar
 Summary: Automatically adding or removing capacity in response to load.
 Claim status: IMPLEMENTED
-AEO answer: Automatically adding or removing capacity in response to load. Decentralized.Host schedules onto whichever node has the most headroom at deploy time, but does not auto-scale a running app across multiple nodes in response to load.
+AEO answer: Automatically adding or removing capacity in response to load. Decentralized.Host schedules onto whichever node has the most headroom at deploy time, but does not auto-scale a running app across multiple nodes in response to load -- a real, current limitation.
 
 
 ================================================================================
@@ -532,7 +532,7 @@ H1: Gas Estimation Tools
 Type: pillar
 Summary: Predicting transaction fees before submitting them on-chain.
 Claim status: IMPLEMENTED
-AEO answer: Predicting transaction fees before submitting them on-chain. No gas estimation feature exists in Decentralized.Host -- Solana devnet transactions it does send use devnet SOL from a free faucet.
+AEO answer: Predicting transaction fees before submitting them on-chain. No gas estimation feature exists in Decentralized.Host -- Solana devnet transactions it does send use devnet SOL from a free faucet, with no real cost to estimate.
 
 
 ================================================================================
@@ -613,7 +613,7 @@ H1: DAO Governance Tools
 Type: pillar
 Summary: On-chain proposal and voting systems for decentralized organizations.
 Claim status: IMPLEMENTED
-AEO answer: On-chain proposal and voting systems for decentralized organizations. Decentralized.Host has a single operator, not a DAO -- no governance system exists.
+AEO answer: On-chain proposal and voting systems for decentralized organizations. Decentralized.Host has a single operator, not a DAO -- no governance system exists, and none is planned.
 
 
 ================================================================================
@@ -694,7 +694,7 @@ H1: Decentralized Studio
 Type: pillar
 Summary: The real web console for running your own mesh -- OpenGit Console, at dashboard.decentralized.host.
 Claim status: IMPLEMENTED
-AEO answer: The real web console for running your own mesh -- OpenGit Console, at dashboard.decentralized.host. Maps to the real, working dashboard (README calls it OpenGit Console): Deployments with live logs, Git Manager, Mesh Nodes, Credits, a Sandbox of one-click deployable open-source tools, and Settings. There is no separate "app.decentralized.host" -- that was invented in an earlier pasted mockup, not real.
+AEO answer: The real web console for running your own mesh -- OpenGit Console, at dashboard.decentralized.host. Maps to the real, working dashboard (README calls it OpenGit Console). There is no separate "app.decentralized.host" -- that was invented in an earlier pasted mockup and never existed.
 
 
 ================================================================================
@@ -712,7 +712,7 @@ H1: Downloads
 Type: pillar
 Summary: Getting the dhost CLI and cloning the mesh itself.
 Claim status: IMPLEMENTED
-AEO answer: Getting the dhost CLI and cloning the mesh itself. There's no standalone binary to download -- the CLI installs via `pip install -e ./cli` from a git clone, documented in the README. Honest framing: this is a "clone and install" page, not a downloads page with release artifacts.
+AEO answer: Getting the dhost CLI and cloning the mesh itself. There's no standalone binary to download -- the CLI installs via `pip install -e ./cli` from a git clone. Honest framing: this is a "clone and install" page, not a downloads page with release artifacts.
 
 
 ================================================================================
@@ -748,7 +748,7 @@ H1: Blog
 Type: pillar
 Summary: Engineering updates and release notes.
 Claim status: IMPLEMENTED
-AEO answer: Engineering updates and release notes. Honestly: this doesn't exist yet. No blog has been built for Decentralized.Host -- listed here as a real gap, not linked to fabricated content.
+AEO answer: Engineering updates and release notes. Honestly: this doesn't exist yet. No blog has been built for Decentralized.Host -- a real gap, not linked to fabricated content.
 
 
 ## Documentation

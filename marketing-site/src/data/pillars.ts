@@ -231,8 +231,26 @@ export const PILLARS: Pillar[] = [
       { heading: "What genuinely works today via Decentralized.Host", body: 'This is one of the more concrete, tested overlaps: the dashboard\'s Sandbox tab can deploy real postgres:16-alpine, mysql:8, and mariadb:11 images with one click, through the actual POST /deployments pipeline -- verified live by actually deploying Postgres this way and confirming its logs show "database system is ready to accept connections." This required adding real environment-variable passthrough to the deploy pipeline specifically because Postgres refuses to boot without POSTGRES_PASSWORD set -- a genuine gap that existed until this was built. What this still isn\'t: a managed database product. There\'s no automated backup, no replica, no migration tooling -- it\'s "run a real database container on the mesh," not "outsource your database operations."' }
     ]
   },
-  { slug: 'email-server-tools', title: 'Email Server Tools', group: 'Decentralized Hosting', oneLine: 'Self-hosting SMTP/IMAP mail infrastructure.', written: false, relatesToProduct: false, productNote: 'No email hosting feature exists in Decentralized.Host.' },
-  { slug: 'backup-recovery-tools', title: 'Backup & Recovery Tools', group: 'Decentralized Hosting', oneLine: 'Systems and practices for protecting data against loss and restoring it after failure.', written: false, relatesToProduct: false, productNote: 'Decentralized.Host has no automated backup/restore feature for deployed apps\' data today -- an accepted, honestly-documented gap.' },
+  {
+    slug: 'email-server-tools', title: 'Email Server Tools', group: 'Decentralized Hosting',
+    oneLine: 'Self-hosting SMTP/IMAP mail infrastructure.',
+    written: true, relatesToProduct: false,
+    productNote: 'No email hosting feature exists in Decentralized.Host.',
+    sections: [
+      { heading: 'Why self-hosted email is unusually hard', body: 'Running your own SMTP server (Postfix, Exim) and IMAP server (Dovecot) is technically straightforward; the hard part is deliverability. Gmail, Outlook, and other major providers heavily filter mail from unfamiliar IPs, and a self-hosted server has none of the reputation a large provider has built up -- getting mail delivered (not silently dropped or spam-foldered) requires correct SPF, DKIM, and DMARC DNS records, a clean-reputation IP (many cloud/VPS IP ranges are pre-flagged), and reverse DNS matching your sending domain. Miss any of these and mail to major providers frequently just vanishes with no error.' },
+      { heading: 'Where this stands for Decentralized.Host', body: "This project sends no email at all -- no signup confirmations (there are no user accounts to confirm), no notification emails, nothing. That's a direct consequence of the single-operator trust model this whole product is built around: there's no multi-tenant signup flow that would need transactional email in the first place. If you deployed your own mail server through the mesh (nothing stops you shipping Postfix/Dovecot as a container), you'd own the full deliverability problem yourself -- the mesh gives you a running container and a subdomain, not SPF/DKIM/DMARC setup or IP reputation." }
+    ]
+  },
+  {
+    slug: 'backup-recovery-tools', title: 'Backup & Recovery Tools', group: 'Decentralized Hosting',
+    oneLine: 'Systems and practices for protecting data against loss and restoring it after failure.',
+    written: true, relatesToProduct: false,
+    productNote: "Decentralized.Host has no automated backup/restore feature for deployed apps' data today -- an accepted, honestly-documented gap, distinct from automated failover (which reschedules a container, not its data).",
+    sections: [
+      { heading: 'Backup vs. failover -- a distinction worth being precise about', body: "These solve different failure modes and are easy to conflate. Failover keeps a service running when a machine dies, by moving the workload elsewhere -- it says nothing about data that only existed on the dead machine's disk. Backup protects against data loss specifically -- corruption, accidental deletion, ransomware -- by keeping point-in-time copies you can restore from, independent of whether the original service is still running. A system can have excellent failover and zero real backup, or vice versa; a mature setup needs both, and the classic 3-2-1 rule (3 copies, 2 different media, 1 offsite) is really about backup, not uptime." },
+      { heading: "Decentralized.Host's real, honest position on this", body: 'Automated failover (a real, shipped feature) reschedules a deployment\'s CONTAINER to a healthy node when the original goes offline, pulling the already-built image from the mesh\'s shared registry -- but explicitly does not migrate any data the original container had written to its own filesystem; the failover documentation itself states this plainly ("in-container state is not migrated, only the image is restarted fresh"). Separately, there is no automated backup system for any deployed app\'s data at all -- if you deploy a database through the mesh (e.g. the dashboard Sandbox\'s one-click Postgres), backing up its data is entirely your own responsibility today. This is a real, tracked gap, not something quietly assumed to be someone else\'s problem.' }
+    ]
+  },
   {
     slug: 'monitoring-logging-tools', title: 'Monitoring & Logging Tools', group: 'Decentralized Hosting',
     oneLine: 'Observing system health and capturing logs for debugging and alerting.',
@@ -243,7 +261,16 @@ export const PILLARS: Pillar[] = [
       { heading: "What this project actually has, and its real gaps", body: 'Node agents heartbeat their CPU/RAM every few seconds to the control plane (real, live telemetry the scheduler uses to place new deployments), and the dashboard\'s Deployments view fetches a container\'s last 200 log lines directly from its node agent on demand -- both genuinely working, verified throughout this project\'s own incident debugging (e.g. diagnosing the automated-failover feature\'s test runs by reading real container logs this exact way). What\'s honestly missing: no log retention beyond what Docker itself keeps for a running container, no historical metrics graphs, and no alerting -- when the mesh went down during this project\'s own development (a stopped Colima runtime), nothing paged anyone; it was found by manual checking, which is exactly why a local watchdog script and a separate scheduled external health check were added afterward.' }
     ]
   },
-  { slug: 'performance-optimization-tools', title: 'Performance Optimization Tools', group: 'Decentralized Hosting', oneLine: 'Profiling and tuning infrastructure and application performance.', written: false, relatesToProduct: false, productNote: 'No performance-profiling feature exists in Decentralized.Host.' },
+  {
+    slug: 'performance-optimization-tools', title: 'Performance Optimization Tools', group: 'Decentralized Hosting',
+    oneLine: 'Profiling and tuning infrastructure and application performance.',
+    written: true, relatesToProduct: true,
+    productNote: 'No profiling feature exists in Decentralized.Host, but this project did real, methodical performance debugging on its own marketing-site build -- a genuine example, not a product capability.',
+    sections: [
+      { heading: 'The discipline, done right', body: 'Real performance work starts with measurement, not guessing: profile first (find where time or memory actually goes), form a specific hypothesis about the bottleneck, change exactly one thing, and measure again before trying the next idea -- changing several things at once makes it impossible to know which change mattered. The most common mistake is optimizing what\'s easy to change instead of what the profiler actually says is slow.' },
+      { heading: 'A real example from this exact project', body: 'This project\'s own marketing-site build had a genuine performance mystery worth citing as a real case study: prerendering pages on Vercel was taking 60-130+ seconds per route instead of under a second locally. Rather than guessing, each hypothesis was tested against real production build data in sequence: first, whether Chromium\'s binary was being re-extracted every launch (checked the actual source of the extraction logic -- it wasn\'t); then whether reusing one browser across routes was the cause (fixed, and it helped, isolating the remaining cost to browser LAUNCH time specifically, ~110-150s/route); then whether the --single-process flag was responsible (tested by removing it against real build data -- refuted, no change). The root cause past that point was never fully identified, and the project explicitly stopped guessing further rather than keep changing flags blindly -- an honest stopping point, documented as such in the code\'s own comments, rather than claiming a fix that wasn\'t verified.' }
+    ]
+  },
   {
     slug: 'security-hardening-tools', title: 'Security Hardening Tools', group: 'Decentralized Hosting',
     oneLine: 'Reducing attack surface and following secure-by-default configuration practices.',
@@ -254,8 +281,26 @@ export const PILLARS: Pillar[] = [
       { heading: "Decentralized.Host's own real security measures", body: 'The dhost engine runs a real, regex-based secret-scanning agent against every deployment\'s source before it ships -- if it flags a likely hardcoded credential, the deploy is refused outright, recorded as a failed release with the reason, not silently allowed through. This project also found and fixed a real secret-leak during its own development: a live deploy key was accidentally hardcoded in two MCP server test files, caught by grepping the working tree before a commit, not by any automated tool -- since fixed to read from the environment instead. Every container also runs with a fixed resource cap (256MB RAM, 1 vCPU) as a basic blast-radius limit. What\'s NOT built: no container-image vulnerability scanning, no non-root-by-default enforcement, no dependency-update automation for deployed apps -- real, current gaps, not hidden ones.' }
     ]
   },
-  { slug: 'firewall-configuration-tools', title: 'Firewall Configuration Tools', group: 'Decentralized Hosting', oneLine: 'Controlling which network traffic is allowed to reach a server.', written: false, relatesToProduct: false, productNote: "Decentralized.Host doesn't configure host firewalls -- that's left to however you secure the machine a node agent runs on." },
-  { slug: 'auto-scaling-tools', title: 'Auto-scaling Tools', group: 'Decentralized Hosting', oneLine: 'Automatically adding or removing capacity in response to load.', written: false, relatesToProduct: false, productNote: 'Decentralized.Host schedules onto whichever node has the most headroom at deploy time, but does not auto-scale a running app across multiple nodes in response to load.' },
+  {
+    slug: 'firewall-configuration-tools', title: 'Firewall Configuration Tools', group: 'Decentralized Hosting',
+    oneLine: 'Controlling which network traffic is allowed to reach a server.',
+    written: true, relatesToProduct: false,
+    productNote: "Decentralized.Host doesn't configure host firewalls -- that's left to however you secure the machine a node agent runs on.",
+    sections: [
+      { heading: 'The basic model', body: 'A firewall decides which network traffic is allowed to reach a machine, typically default-deny (block everything, then explicitly allow only what\'s needed -- SSH on a restricted IP range, HTTP/HTTPS on 80/443) rather than default-allow. Modern cloud providers usually offer this at two layers: a network-level security group/firewall (managed outside the OS, filtering before traffic even reaches the machine) and an OS-level firewall (ufw/iptables/nftables on Linux) as a second layer -- defense in depth, since a misconfiguration in one doesn\'t leave you fully exposed if the other is still correct.' },
+      { heading: "What this means for running a node", body: "A node agent needs exactly a few ports reachable: the log/build API port (8100 by default) from the control plane, and whatever ports the deployed containers themselves need routed through Traefik (typically just 80/443 on the machine running Traefik). Decentralized.Host doesn't manage any of this -- it assumes you've already secured the underlying machine (VPS or dedicated server) the normal way before installing Docker and running a node agent on it. This is a deliberate scope boundary stated elsewhere too (see VPS Management Tools): the mesh manages containers, not the host machine's own security posture." }
+    ]
+  },
+  {
+    slug: 'auto-scaling-tools', title: 'Auto-scaling Tools', group: 'Decentralized Hosting',
+    oneLine: 'Automatically adding or removing capacity in response to load.',
+    written: true, relatesToProduct: true,
+    productNote: 'Decentralized.Host schedules onto whichever node has the most headroom at deploy time, but does not auto-scale a running app across multiple nodes in response to load -- a real, current limitation.',
+    sections: [
+      { heading: 'What auto-scaling actually automates', body: 'Auto-scaling watches a metric (CPU%, request queue depth, response latency) against thresholds and adds or removes running instances automatically -- scale out when load rises, scale back in when it drops, so you pay for capacity roughly matched to actual demand rather than provisioning for peak load permanently. Kubernetes\' Horizontal Pod Autoscaler and cloud providers\' auto-scaling groups are the common implementations; the hard parts are avoiding thrashing (scaling up and down rapidly on noisy metrics) and handling the ramp-up delay (a new instance takes real time to boot and become ready, during which load is still high).' },
+      { heading: "Where this project's scheduling stops short of auto-scaling", body: "Decentralized.Host's scheduler does something related but meaningfully narrower: at the moment a deployment is created (or rescheduled during automated failover), it picks whichever healthy node currently has the lowest combined CPU+RAM load -- a real, load-aware placement decision. What it doesn't do is react to a running deployment's load AFTER placement: there's no mechanism that adds a second replica of an app because its one existing container is under heavy load, and no mechanism that removes capacity when load drops, because every deployment is pinned to exactly one container on one node by design (see Load Balancer Tools for the same underlying limitation from a different angle)." }
+    ]
+  },
   { slug: 'ci-cd-pipeline-tools', title: 'CI/CD Pipeline Tools', group: 'Decentralized Hosting', oneLine: 'Automating build, test, and deployment on every code change.', written: true, relatesToProduct: true,
     productNote: "Decentralized.Host's own git-push-to-deploy flow is a real, minimal CD pipeline; the project's own GitHub Actions workflows (marketing-site build/lint, Python compile checks, a daily live-mesh health check) are a separate, standard CI setup.",
     sections: [
@@ -295,7 +340,16 @@ export const PILLARS: Pillar[] = [
       { heading: "What this project actually holds, and doesn't", body: "Decentralized.Host's node-operator credit system is deliberately structured so the control plane never touches an operator's private key: an operator generates their own Solana keypair independently (standard solana-keygen or any wallet), then links only the public address to their node via dhost wallet <node_id> <pubkey>. The only private key the control plane itself holds is a separate payer keypair (SOLANA_PAYER_KEYPAIR_PATH), used purely to sign the minting transactions that send credits OUT to operators -- it never has custody of anyone else's funds. This is real devnet infrastructure with a genuine on-chain mint, not a simulation, but it's worth being precise about what \"wallet management\" means here: linking an address, not custodying a key." }
     ]
   },
-  { slug: 'gas-estimation-tools', title: 'Gas Estimation Tools', group: 'Web3 & Blockchain', oneLine: 'Predicting transaction fees before submitting them on-chain.', written: false, relatesToProduct: false, productNote: 'No gas estimation feature exists in Decentralized.Host -- Solana devnet transactions it does send use devnet SOL from a free faucet.' },
+  {
+    slug: 'gas-estimation-tools', title: 'Gas Estimation Tools', group: 'Web3 & Blockchain',
+    oneLine: 'Predicting transaction fees before submitting them on-chain.',
+    written: true, relatesToProduct: false,
+    productNote: 'No gas estimation feature exists in Decentralized.Host -- Solana devnet transactions it does send use devnet SOL from a free faucet, with no real cost to estimate.',
+    sections: [
+      { heading: 'Why gas estimation exists as a problem', body: "On Ethereum and similar EVM chains, every operation a transaction performs (storage writes, computation) costs \"gas,\" and gas price fluctuates with network demand -- submit with too low a price and a transaction can sit unconfirmed for hours or get dropped; overpay and you've wasted real money for no benefit. Estimation tools predict the current fair price by looking at recent block gas prices and pending mempool activity, often offering a fast/standard/slow tradeoff." },
+      { heading: 'Why this genuinely doesn\'t apply to Decentralized.Host', body: 'Solana\'s fee model is structurally different and much simpler -- transaction fees are a small, largely fixed amount per signature (a fraction of a cent, not a volatile market), so "gas estimation" in the Ethereum sense isn\'t really a problem Solana users face day to day. More directly: every Solana transaction this project sends (the SPL credit mints) happens on devnet, funded by a free public faucet -- there\'s no real cost being paid or estimated at all, on either chain\'s model.' }
+    ]
+  },
   {
     slug: 'token-standards-tools', title: 'Token Standards Tools', group: 'Web3 & Blockchain',
     oneLine: 'Working with fungible/non-fungible token specifications (ERC-20, SPL, etc).',
@@ -306,7 +360,16 @@ export const PILLARS: Pillar[] = [
       { heading: "Decentralized.Host's real usage", body: 'The project mints a real SPL fungible token ("DHOST Credits") using the standard SPL Token program -- not a custom contract, not a novel token design. Each mint is a genuine on-chain transaction with a real transaction signature and a working explorer.solana.com link (devnet cluster), recorded in a CreditLedger table so the dashboard\'s Credits tab shows an accurate history. This is real on-chain activity, worth being precise about the scope of: it\'s the simplest possible use of the token-standards ecosystem (mint-to-address via a standard program), not a demonstration of NFTs, custom tokenomics, or any of the more elaborate patterns this topic covers.' }
     ]
   },
-  { slug: 'nft-metadata-tools', title: 'NFT Metadata Tools', group: 'Web3 & Blockchain', oneLine: 'Generating and pinning the JSON metadata standard NFTs point to.', written: false, relatesToProduct: false, productNote: 'No NFT feature exists in Decentralized.Host.' },
+  {
+    slug: 'nft-metadata-tools', title: 'NFT Metadata Tools', group: 'Web3 & Blockchain',
+    oneLine: 'Generating and pinning the JSON metadata standard NFTs point to.',
+    written: true, relatesToProduct: false,
+    productNote: 'No NFT feature exists in Decentralized.Host.',
+    sections: [
+      { heading: 'How NFT metadata actually works', body: "An NFT's on-chain record is deliberately minimal -- typically just a token ID and a URI pointing somewhere else. The actual name, image, description, and attributes live in a separate JSON metadata file that URI points to, following a standard shape (ERC-721/1155's metadata JSON schema on Ethereum, Metaplex's token-metadata standard on Solana). That JSON file, and the image it references, are usually stored off-chain -- on IPFS for censorship-resistance (a CID baked into the NFT is much harder to rug than a URL on a company's server that can go offline), sometimes on Arweave for permanence." },
+      { heading: 'Why this project has no reason to touch this', body: 'Decentralized.Host mints exactly one thing on-chain: a fungible SPL token ("DHOST Credits") via the standard SPL Token program -- fungible tokens have no per-token metadata the way NFTs do (every unit is identical and interchangeable by definition), so there\'s no metadata JSON, no image, no IPFS pinning involved anywhere in this project\'s real blockchain integration.' }
+    ]
+  },
   { slug: 'defi-analytics-tools', title: 'DeFi Analytics Tools', group: 'Web3 & Blockchain', oneLine: 'Tracking yields, liquidity, and protocol activity across decentralized finance.', written: false, relatesToProduct: false, productNote: 'No DeFi feature exists in Decentralized.Host.' },
   { slug: 'bridge-monitoring-tools', title: 'Bridge Monitoring Tools', group: 'Web3 & Blockchain', oneLine: 'Watching cross-chain bridge activity and security.', written: false, relatesToProduct: false, productNote: 'No cross-chain bridge exists in Decentralized.Host -- it operates on Solana devnet only.' },
   { slug: 'node-management-tools', title: 'Node Management Tools', group: 'Web3 & Blockchain', oneLine: 'Running and maintaining blockchain full nodes or validators.', written: false, relatesToProduct: false, productNote: "Decentralized.Host's own \"nodes\" are Docker-hosting node agents, not blockchain nodes -- it connects to Solana's own public devnet RPC rather than running a validator." },
@@ -331,9 +394,36 @@ export const PILLARS: Pillar[] = [
     ]
   },
   { slug: 'ens-management-tools', title: 'ENS Management Tools', group: 'Web3 & Blockchain', oneLine: 'Registering and managing Ethereum Name Service domains and records.', written: false, relatesToProduct: false, productNote: 'No ENS integration exists in Decentralized.Host -- ordinary DNS is used for the real domain.' },
-  { slug: 'dao-governance-tools', title: 'DAO Governance Tools', group: 'Web3 & Blockchain', oneLine: 'On-chain proposal and voting systems for decentralized organizations.', written: false, relatesToProduct: false, productNote: 'Decentralized.Host has a single operator, not a DAO -- no governance system exists.' },
-  { slug: 'staking-calculator-tools', title: 'Staking Calculator Tools', group: 'Web3 & Blockchain', oneLine: 'Estimating returns from staking tokens to secure a network.', written: false, relatesToProduct: false, productNote: 'No staking feature exists in Decentralized.Host -- node-operator credits are earned via uptime heartbeats, not by staking anything.' },
-  { slug: 'yield-farming-tools', title: 'Yield Farming Tools', group: 'Web3 & Blockchain', oneLine: 'Optimizing returns across DeFi lending and liquidity protocols.', written: false, relatesToProduct: false, productNote: 'No DeFi/yield feature exists in Decentralized.Host.' },
+  {
+    slug: 'dao-governance-tools', title: 'DAO Governance Tools', group: 'Web3 & Blockchain',
+    oneLine: 'On-chain proposal and voting systems for decentralized organizations.',
+    written: true, relatesToProduct: false,
+    productNote: 'Decentralized.Host has a single operator, not a DAO -- no governance system exists, and none is planned.',
+    sections: [
+      { heading: 'How on-chain governance typically works', body: "A DAO (Decentralized Autonomous Organization) replaces a traditional company's board decisions with token-weighted or membership-weighted on-chain voting: someone submits a proposal (often after an off-chain discussion phase on a forum), token holders vote within a window, and if it passes, execution can be automatic (a smart contract carries out the approved action directly, common for treasury spending) or manual (a multisig of elected signers carries it out, common when the action is too complex to safely automate). Tools like Snapshot (off-chain, gasless voting signaling) and on-chain governance modules (Compound Governor, Aragon) are the common infrastructure." },
+      { heading: "Why this doesn't fit Decentralized.Host's actual model", body: 'This project is explicit about being single-operator, not decentralized in the governance sense: one person or team runs the control plane, decides the roadmap, and merges code -- there\'s no token, no voting mechanism, and no plan to add one. This is worth stating precisely because the product name ("Decentralized.Host") could otherwise suggest DAO-style governance; the actual meaning of "decentralized" here is about distributing container workloads across independently operated compute nodes, not about how decisions get made for the project itself.' }
+    ]
+  },
+  {
+    slug: 'staking-calculator-tools', title: 'Staking Calculator Tools', group: 'Web3 & Blockchain',
+    oneLine: 'Estimating returns from staking tokens to secure a network.',
+    written: true, relatesToProduct: false,
+    productNote: 'No staking feature exists in Decentralized.Host -- node-operator credits are earned via uptime heartbeats, not by staking anything.',
+    sections: [
+      { heading: 'What staking actually is', body: "Proof-of-stake networks (Solana included, at the protocol level) have validators lock up (stake) tokens as collateral backing their participation in consensus -- in exchange, they earn a share of network inflation/fees, and can lose a portion of their stake (slashing) for provable misbehavior. A staking calculator estimates expected annual return given a network's current inflation rate, total staked supply, and a validator's commission -- useful because these numbers shift as more of a network's supply gets staked." },
+      { heading: "Why node-operator credits work completely differently", body: 'Decentralized.Host\'s node-operator reward mechanism has no staking or collateral involved at all: an operator locks up nothing and risks nothing financially. Credits are minted directly to a linked wallet purely for verified uptime -- every HEARTBEATS_PER_REWARD healthy heartbeats triggers a real SPL token mint, no tokens ever change hands from the operator\'s side, and there\'s no slashing or loss mechanism. This is a proof-of-uptime reward pattern, not proof-of-stake -- a real, meaningful distinction from what this pillar\'s topic usually refers to.' }
+    ]
+  },
+  {
+    slug: 'yield-farming-tools', title: 'Yield Farming Tools', group: 'Web3 & Blockchain',
+    oneLine: 'Optimizing returns across DeFi lending and liquidity protocols.',
+    written: true, relatesToProduct: false,
+    productNote: 'No DeFi/yield feature exists in Decentralized.Host.',
+    sections: [
+      { heading: 'What yield farming actually is', body: 'Yield farming means moving capital between DeFi protocols (lending markets like Aave, liquidity pools like Uniswap) to chase the best available return, which shifts constantly as capital flows in and out of each pool. Providing liquidity typically earns trading fees plus, often, additional token incentives a protocol pays to bootstrap usage -- but carries real risks distinct from simply holding: impermanent loss (a liquidity pool\'s two assets diverging in price costs the provider value relative to just holding them) and smart-contract risk (a bug or exploit in the protocol itself).' },
+      { heading: "Where this project stands, plainly", body: "Decentralized.Host has no lending, liquidity pool, or yield mechanism of any kind -- the only value flow in the entire project is credits minted TO node operators for uptime, on Solana devnet, with no real monetary value (funded by a free faucet, not real capital). There's no way to \"farm\" anything here, and nothing to optimize a return on." }
+    ]
+  },
   { slug: 'multi-sig-wallet-tools', title: 'Multi-sig Wallet Tools', group: 'Web3 & Blockchain', oneLine: 'Requiring multiple signatures to authorize a transaction.', written: false, relatesToProduct: false, productNote: 'No multi-sig feature exists in Decentralized.Host -- the devnet payer keypair is a single key.' },
   {
     slug: 'signature-verification-tools', title: 'Signature Verification Tools', group: 'Web3 & Blockchain',
@@ -355,15 +445,96 @@ export const PILLARS: Pillar[] = [
   // from the original pasted mockup -- that subdomain doesn't exist for
   // this product. The real equivalent is dashboard.decentralized.host
   // (OpenGit Console) plus the dhost CLI, documented in /docs/.
-  { slug: 'decentralized-studio', title: 'Decentralized Studio', group: 'Platform', oneLine: 'The real web console for running your own mesh -- OpenGit Console, at dashboard.decentralized.host.', written: false, relatesToProduct: true, productNote: 'Maps to the real, working dashboard (README calls it OpenGit Console): Deployments with live logs, Git Manager, Mesh Nodes, Credits, a Sandbox of one-click deployable open-source tools, and Settings. There is no separate "app.decentralized.host" -- that was invented in an earlier pasted mockup, not real.' },
-  { slug: 'openhost', title: 'OpenHost', group: 'Platform', oneLine: 'Self-host your own mesh -- the actual getting-started path, not a separate product.', written: false, relatesToProduct: true, productNote: 'This is just Decentralized.Host itself -- "OpenHost" isn\'t a distinct product, it\'s this pillar directory\'s name for "go read the real getting-started docs and run docker compose up."' },
-  { slug: 'downloads', title: 'Downloads', group: 'Platform', oneLine: 'Getting the dhost CLI and cloning the mesh itself.', written: false, relatesToProduct: true, productNote: 'There\'s no standalone binary to download -- the CLI installs via `pip install -e ./cli` from a git clone, documented in the README. Honest framing: this is a "clone and install" page, not a downloads page with release artifacts.' },
-  { slug: 'how-it-works', title: 'How It Works', group: 'Platform', oneLine: 'The real deployment pipeline: ship → detect → build → schedule → route → monitor.', written: false, relatesToProduct: true, productNote: 'Maps to the real /architecture/ page -- control plane, node agents, scheduler, and Traefik routing, with real source file references.' },
-  { slug: 'use-cases', title: 'Use Cases', group: 'Platform', oneLine: 'What Decentralized.Host is actually good for today.', written: false, relatesToProduct: true, productNote: 'Maps to the real /features/ page\'s verified capability matrix -- no separate use-cases page exists yet.' },
-  { slug: 'documentation', title: 'Documentation', group: 'Platform', oneLine: 'Full CLI and API reference.', written: false, relatesToProduct: true, productNote: 'Maps directly to the real, existing /docs/ page.' },
-  { slug: 'guides', title: 'Guides', group: 'Platform', oneLine: 'Step-by-step walkthroughs for real workflows.', written: false, relatesToProduct: true, productNote: 'Maps directly to the real, existing /guides/ page.' },
-  { slug: 'blog', title: 'Blog', group: 'Platform', oneLine: 'Engineering updates and release notes.', written: false, relatesToProduct: false, productNote: 'Honestly: this doesn\'t exist yet. No blog has been built for Decentralized.Host -- listed here as a real gap, not linked to fabricated content.' },
-  { slug: 'pillars', title: 'Pillar Directory', group: 'Platform', oneLine: 'Browse all 69 topic pillars in one place.', written: false, relatesToProduct: true, productNote: 'This is the real, working directory page you\'re looking at (or its index) -- see /pillars/.' },
+  {
+    slug: 'decentralized-studio', title: 'Decentralized Studio', group: 'Platform',
+    oneLine: 'The real web console for running your own mesh -- OpenGit Console, at dashboard.decentralized.host.',
+    written: true, relatesToProduct: true,
+    productNote: 'Maps to the real, working dashboard (README calls it OpenGit Console). There is no separate "app.decentralized.host" -- that was invented in an earlier pasted mockup and never existed.',
+    sections: [
+      { heading: 'What this actually is', body: 'An earlier draft of this pillar directory referenced "Decentralized Studio" at a fictional app.decentralized.host domain -- that subdomain was never real, invented in a pasted mockup rather than checked against the actual product. The real equivalent is dashboard.decentralized.host, the OpenGit Console: a single-page vanilla-JS dashboard (no build step) with Dashboard, Deployments (live logs, teardown), Git Manager (real release history), Mesh Nodes, Credits (Solana devnet ledger), a Sandbox tab (17 real one-click deployable open-source tools, see the README), and Settings.' },
+      { heading: 'Access', body: "It's protected by HTTP Basic Auth when exposed beyond localhost, generated per-deployment (dashboard/.htpasswd, gitignored, never shipped in the repo). Locally, it runs at http://localhost:4001 via docker compose up. There's no separate signup or account system -- one shared deploy key configured in Settings authenticates every API call the dashboard makes, the same single-operator model documented across the rest of this project." }
+    ]
+  },
+  {
+    slug: 'openhost', title: 'OpenHost', group: 'Platform',
+    oneLine: 'Self-host your own mesh -- the actual getting-started path, not a separate product.',
+    written: true, relatesToProduct: true,
+    productNote: 'This is just Decentralized.Host itself -- "OpenHost" isn\'t a distinct product, it\'s this pillar directory\'s name for "go read the real getting-started docs and run docker compose up."',
+    sections: [
+      { heading: "Why this pillar exists as its own entry", body: 'The original 69-pillar list (matching an earlier pasted concept) included "OpenHost" as if it were a separate product alongside "Decentralized Studio" -- it isn\'t. There\'s exactly one real thing here: Decentralized.Host itself, the self-hosted Docker deployment mesh this whole directory is about. This pillar is kept as an honest redirect rather than silently dropped, so a visitor following the original 69-item structure doesn\'t hit a dead link.' },
+      { heading: 'The real getting-started path', body: 'Clone the repo, copy .env.example to .env, and run docker compose up -- brings up Postgres, the registry, Traefik, the control plane, and one node agent. Install the CLI with pip install -e ./cli, then dhost ship <name> from inside a project directory. The README\'s own quickstart section is the actual source of truth here, not this page -- see Documentation below.' }
+    ]
+  },
+  {
+    slug: 'downloads', title: 'Downloads', group: 'Platform',
+    oneLine: 'Getting the dhost CLI and cloning the mesh itself.',
+    written: true, relatesToProduct: true,
+    productNote: 'There\'s no standalone binary to download -- the CLI installs via `pip install -e ./cli` from a git clone. Honest framing: this is a "clone and install" page, not a downloads page with release artifacts.',
+    sections: [
+      { heading: 'What "downloading" this project actually means', body: 'There is no compiled binary, no installer, no npm/pip package published to a registry -- the only way to get dhost is git clone https://github.com/CodesbyFebin/decentralized.hosting.git, then pip install -e ./cli for the CLI specifically (an editable install, meaning it runs directly from the cloned source, not a separately packaged release). This is a real, current limitation for anyone wanting a quick "curl a binary" experience -- it\'s deliberately kept simple, not because a packaged release wouldn\'t be nicer, but because it genuinely doesn\'t exist yet.' },
+      { heading: 'What you actually get in the clone', body: 'The full monorepo: the control-plane (FastAPI), node-agent (Python), cli (dhost), dashboard (vanilla JS), git-server (SSH + hooks), and an optional blockchain/ directory for the Solana devnet credit system. Nothing is held back in a separate private repo -- the entire self-hosted mesh, MIT licensed, is what you clone.' }
+    ]
+  },
+  {
+    slug: 'how-it-works', title: 'How It Works', group: 'Platform',
+    oneLine: 'The real deployment pipeline: ship → detect → build → schedule → route → monitor.',
+    written: true, relatesToProduct: true,
+    productNote: 'Maps to the real /architecture/ page -- control plane, node agents, scheduler, and Traefik routing, with real source file references.',
+    sections: [
+      { heading: 'The real six-stage pipeline', body: 'Ship (dhost ship or a plain git push) → Detect Stack (heuristic framework detection -- FastAPI, Next.js, Django, or a Dockerfile-based fallback) → Build Container (the node agent builds the image and pushes it to the mesh\'s shared registry) → Schedule to Node (the weighted scheduler picks whichever healthy node has the lowest combined CPU+RAM load) → Route + TLS (Traefik\'s file provider picks up the new route, provisioning a real Let\'s Encrypt certificate in production) → Heartbeat Monitor (the node keeps reporting in; automated failover reschedules the deployment elsewhere if it stops).' },
+      { heading: 'Where to see the real thing, not a summary', body: 'This is a summary; the actual, authoritative version of this lives at /architecture/ on this site, with direct links to the real source files that implement each stage (control-plane/app/scheduler.py, node-agent/agent.py, cli/dhost/main.py). This pillar page exists mainly so the original 69-item structure has an entry here, rather than duplicating that page\'s content.' }
+    ]
+  },
+  {
+    slug: 'use-cases', title: 'Use Cases', group: 'Platform',
+    oneLine: 'What Decentralized.Host is actually good for today.',
+    written: true, relatesToProduct: true,
+    productNote: 'Maps to the real /features/ page\'s verified capability matrix -- no separate use-cases page exists yet.',
+    sections: [
+      { heading: 'What this is actually good for', body: 'Self-hosting a small number of your own apps across machines you or a small trusted group control -- a homelab with a few servers, a small team\'s side projects, a personal PaaS replacing a handful of paid hosting subscriptions. Deploying via git push or CLI without hand-writing a Dockerfile for common stacks. Real, single-operator infrastructure where one shared credential model is an acceptable tradeoff for simplicity.' },
+      { heading: 'What it is honestly NOT a good fit for yet', body: 'Multi-tenant hosting for customers who shouldn\'t trust each other (no per-user accounts or per-repo access control exists). Production workloads needing zero-downtime multi-replica scaling (each deployment is pinned to one container on one node). Anything needing automated backups of application data (not built). A public marketplace of node operators you don\'t already know (joining a mesh requires that mesh\'s shared secret, not open discovery). These aren\'t hidden limitations -- they\'re the same gaps documented across this project\'s own FAQ and roadmap.' }
+    ]
+  },
+  {
+    slug: 'documentation', title: 'Documentation', group: 'Platform',
+    oneLine: 'Full CLI and API reference.',
+    written: true, relatesToProduct: true,
+    productNote: 'Maps directly to the real, existing /docs/ page.',
+    sections: [
+      { heading: 'What lives there', body: 'The real /docs/ page on this site is the authoritative CLI and API reference: every dhost CLI subcommand (init, ship, update, logs, status, keys, rollback, wallet, node join), the control-plane\'s REST endpoints, and the machine-readable OpenAPI schema at /openapi.json for anyone who wants to generate a client or feed it to a tool. This pillar page exists as a directory entry pointing there, not a duplicate of that content.' },
+      { heading: 'Also worth knowing about', body: 'This project also publishes real, machine-readable summaries specifically for AI/LLM crawlers -- /llms.txt (a short index) and /llms-full.txt (the complete real content of every page, regenerated at build time from the same source data the human-facing pages use, so it can\'t drift out of sync with what a person actually sees).' }
+    ]
+  },
+  {
+    slug: 'guides', title: 'Guides', group: 'Platform',
+    oneLine: 'Step-by-step walkthroughs for real workflows.',
+    written: true, relatesToProduct: true,
+    productNote: 'Maps directly to the real, existing /guides/ page.',
+    sections: [
+      { heading: 'What lives there', body: 'The real /guides/ page walks through complete, real workflows end to end -- setting up a second node, configuring production TLS, setting up the optional Solana devnet node-operator credit system -- rather than just documenting individual commands in isolation the way /docs/ does. This pillar page is a directory entry pointing there.' },
+      { heading: 'How this differs from Documentation', body: 'Documentation is reference material (what does this command/endpoint do); Guides are task-oriented (how do I actually get a second real node running, step by step, including the parts that aren\'t obvious from the reference alone -- like why ADVERTISE_ADDRESS matters for a genuinely remote node, not just a same-machine test one).' }
+    ]
+  },
+  {
+    slug: 'blog', title: 'Blog', group: 'Platform',
+    oneLine: 'Engineering updates and release notes.',
+    written: true, relatesToProduct: false,
+    productNote: "Honestly: this doesn't exist yet. No blog has been built for Decentralized.Host -- a real gap, not linked to fabricated content.",
+    sections: [
+      { heading: 'A real gap, stated plainly', body: "There is no blog for this project. This pillar page exists because the original 69-item pillar list included one, and the honest thing to do with a listed item that doesn't exist is say so directly, not link to a placeholder page dressed up to look finished or quietly drop it without explanation." },
+      { heading: 'Where release information actually lives instead', body: 'Real engineering history exists, just not in blog form: the git commit log itself (each commit message on this project documents the actual reasoning, tradeoffs, and verification behind a change, often at real length), the CHANGELOG-equivalent release history in the dashboard\'s Git Manager tab (one row per real deploy, with its message and status), and GitHub\'s own commit/PR history. If a blog gets built, it would likely draw from this same real material rather than being written separately.' }
+    ]
+  },
+  {
+    slug: 'pillars', title: 'Pillar Directory', group: 'Platform',
+    oneLine: 'Browse all 69 topic pillars in one place.',
+    written: true, relatesToProduct: true,
+    productNote: 'This is the real, working directory page you\'re looking at (or its index) -- see /pillars/.',
+    sections: [
+      { heading: 'What this directory is, structurally', body: 'A searchable, filterable index of all 69 pillars (src/data/pillars.ts), grouped into the four categories this project settled on: Decentralized Infrastructure, Decentralized Hosting, Web3 & Blockchain, and Platform. Every pillar carries an honest relatesToProduct flag and a specific note -- never a vague implication that a topic is a shipped feature when it isn\'t.' },
+      { heading: 'How it grew, and how it keeps growing', body: 'This directory was built in batches, not all at once -- the first commit shipped the full 69-entry structure with 12 fully written pages, and each subsequent batch added more real content, the same incremental approach this project\'s other content (docs, guides, the roadmap) was built with. As of this page\'s last update, the written count is tracked live by this same page -- see the number at the top of /pillars/.' }
+    ]
+  },
 ];
 
 export const PILLAR_GROUPS: PillarGroup[] = ['Decentralized Infrastructure', 'Decentralized Hosting', 'Web3 & Blockchain', 'Platform'];
