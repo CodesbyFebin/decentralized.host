@@ -1,6 +1,6 @@
 # decentralized.host -- Complete Technical Reference for LLM Retrieval
 # Generated at build time from the real site data (registry.ts, docs.ts, guides.ts)
-# Generated: 2026-09-03T04:40:48.924Z
+# Generated: 2026-09-03T08:09:38.287Z
 
 ## Pages
 
@@ -280,7 +280,7 @@ H1: Decentralized Access Control Tools
 Type: pillar
 Summary: Token- or credential-gated permissions without a central admin panel.
 Claim status: IMPLEMENTED
-AEO answer: Token- or credential-gated permissions without a central admin panel. Decentralized.Host uses one shared Bearer deploy key and a flat SSH-key allowlist -- any registered key can push to any repo. No per-resource access control.
+AEO answer: Token- or credential-gated permissions without a central admin panel. Decentralized.Host uses one shared Bearer deploy key and a flat SSH-key allowlist -- any registered key can push to any repo. No per-resource access control -- a documented, intentional gap, not an oversight.
 
 
 ================================================================================
@@ -343,7 +343,7 @@ H1: Dedicated Server Tools
 Type: pillar
 Summary: Managing bare-metal servers you fully own or lease exclusively.
 Claim status: IMPLEMENTED
-AEO answer: Managing bare-metal servers you fully own or lease exclusively. Same relationship as VPS Management above -- a node agent can run on a dedicated server just as well as a VPS; Decentralized.Host doesn't provision or manage the physical machine itself.
+AEO answer: Managing bare-metal servers you fully own or lease exclusively. Same relationship as VPS Management -- a node agent can run on a dedicated server just as well as a VPS; Decentralized.Host doesn't provision or manage the physical machine itself.
 
 
 ================================================================================
@@ -379,7 +379,7 @@ H1: Load Balancer Tools
 Type: pillar
 Summary: Distributing incoming traffic across multiple backend instances.
 Claim status: IMPLEMENTED
-AEO answer: Distributing incoming traffic across multiple backend instances. Traefik acts as the mesh's edge router, but today it routes each subdomain to exactly one node's container -- it doesn't load-balance one app across multiple replicas yet.
+AEO answer: Distributing incoming traffic across multiple backend instances. Traefik acts as the mesh's edge router, but today it routes each subdomain to exactly one node's container -- it doesn't load-balance one app across multiple replicas yet, a real, current limitation.
 
 
 ================================================================================
@@ -424,7 +424,7 @@ H1: Database Hosting Tools
 Type: pillar
 Summary: Running and operating databases as a service, self-hosted or managed.
 Claim status: IMPLEMENTED
-AEO answer: Running and operating databases as a service, self-hosted or managed. Decentralized.Host's own control plane runs on a self-hosted PostgreSQL container -- it doesn't offer managed databases for deployed apps, but nothing stops you deploying Postgres/MySQL/MariaDB yourself through it (the dashboard's Sandbox tab can one-click-deploy all three for exactly this).
+AEO answer: Running and operating databases as a service, self-hosted or managed. Decentralized.Host's own control plane runs on a self-hosted PostgreSQL container -- it doesn't offer managed databases for deployed apps, but the dashboard's Sandbox tab can one-click-deploy real Postgres/MySQL/MariaDB instances through the same real pipeline.
 
 
 ================================================================================
@@ -469,7 +469,7 @@ H1: Security Hardening Tools
 Type: pillar
 Summary: Reducing attack surface and following secure-by-default configuration practices.
 Claim status: IMPLEMENTED
-AEO answer: Reducing attack surface and following secure-by-default configuration practices. The dhost engine's security-scan agent runs a real regex-based secret scan on every deploy, and will block a deployment it flags -- see /security/ for the full, honest scope of what is and isn't checked.
+AEO answer: Reducing attack surface and following secure-by-default configuration practices. The dhost engine's security-scan agent runs a real regex-based secret scan on every deploy and blocks anything it flags -- see /security/ for the full, honest scope of what is and isn't checked.
 
 
 ================================================================================
@@ -649,7 +649,7 @@ H1: Signature Verification Tools
 Type: pillar
 Summary: Confirming a message or transaction was really signed by a given key.
 Claim status: IMPLEMENTED
-AEO answer: Confirming a message or transaction was really signed by a given key. SSH public-key signatures authenticate every git push to the mesh's git server -- standard SSH auth, not a custom crypto-signature scheme.
+AEO answer: Confirming a message or transaction was really signed by a given key. SSH public-key signatures authenticate every git push to the mesh's git server -- standard SSH auth, not a custom crypto-signature scheme, but the same underlying cryptographic idea.
 
 
 ================================================================================
