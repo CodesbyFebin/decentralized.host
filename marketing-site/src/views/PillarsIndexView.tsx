@@ -39,9 +39,10 @@ export const PillarsIndexView: React.FC<Props> = ({ onNavigate }) => {
           69 topic pillars across decentralized infrastructure, self-hosting, and Web3 --
           a deliberately broad content directory, not a product feature list. Each page says
           plainly whether the topic actually connects to what Decentralized.Host does.{' '}
-          <span className="text-emerald-400 font-semibold">{writtenCount} of 69</span> have full
-          write-ups today; the rest carry a short, honest summary while more get written in
-          batches, the same way this project's own docs grew.
+          <span className="text-emerald-400 font-semibold">{writtenCount} of 69</span>{' '}
+          {writtenCount >= PILLARS.length
+            ? 'have full write-ups -- built in batches over several passes, the same way this project\'s own docs grew, rather than all at once.'
+            : 'have full write-ups today; the rest carry a short, honest summary while more get written in batches, the same way this project\'s own docs grew.'}
         </p>
       </div>
 

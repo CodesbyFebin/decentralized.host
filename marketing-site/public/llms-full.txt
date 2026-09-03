@@ -1,6 +1,6 @@
 # decentralized.host -- Complete Technical Reference for LLM Retrieval
 # Generated at build time from the real site data (registry.ts, docs.ts, guides.ts)
-# Generated: 2026-09-03T10:38:14.802Z
+# Generated: 2026-09-03T11:33:38.486Z
 
 ## Pages
 
@@ -235,7 +235,7 @@ H1: Decentralized Governance Tools
 Type: pillar
 Summary: On-chain voting and proposal systems for collective decision-making.
 Claim status: IMPLEMENTED
-AEO answer: On-chain voting and proposal systems for collective decision-making. No governance system of any kind exists in Decentralized.Host -- it has a single operator.
+AEO answer: On-chain voting and proposal systems for collective decision-making. No governance system of any kind exists in Decentralized.Host -- it has a single operator, and this is by design, not an interim state waiting for governance to be added.
 
 
 ================================================================================
@@ -298,7 +298,7 @@ H1: Decentralized Backup Tools
 Type: pillar
 Summary: Redundant backups spread across independent peers instead of one provider's snapshot system.
 Claim status: IMPLEMENTED
-AEO answer: Redundant backups spread across independent peers instead of one provider's snapshot system. Decentralized.Host has no automated backup system for deployed apps' data today.
+AEO answer: Redundant backups spread across independent peers instead of one provider's snapshot system. Decentralized.Host has no automated backup system for deployed apps' data today -- neither centralized nor decentralized.
 
 
 ================================================================================
@@ -316,7 +316,7 @@ H1: Decentralized Search Tools
 Type: pillar
 Summary: Indexing and search over peer-distributed content.
 Claim status: IMPLEMENTED
-AEO answer: Indexing and search over peer-distributed content. No search feature exists in Decentralized.Host beyond the marketing site's own Cmd+K page search.
+AEO answer: Indexing and search over peer-distributed content. No search feature exists in Decentralized.Host beyond the marketing site's own Cmd+K page search, which is a plain, centralized, client-side index -- not decentralized.
 
 
 ================================================================================
@@ -568,7 +568,7 @@ H1: Bridge Monitoring Tools
 Type: pillar
 Summary: Watching cross-chain bridge activity and security.
 Claim status: IMPLEMENTED
-AEO answer: Watching cross-chain bridge activity and security. No cross-chain bridge exists in Decentralized.Host -- it operates on Solana devnet only.
+AEO answer: Watching cross-chain bridge activity and security. No cross-chain bridge exists in Decentralized.Host -- it operates on Solana devnet only, with nothing crossing chains.
 
 
 ================================================================================
@@ -604,7 +604,7 @@ H1: ENS Management Tools
 Type: pillar
 Summary: Registering and managing Ethereum Name Service domains and records.
 Claim status: IMPLEMENTED
-AEO answer: Registering and managing Ethereum Name Service domains and records. No ENS integration exists in Decentralized.Host -- ordinary DNS is used for the real domain.
+AEO answer: Registering and managing Ethereum Name Service domains and records. No ENS integration exists in Decentralized.Host -- ordinary DNS is used for the real domain, registered through Hostinger with Cloudflare as authoritative nameserver.
 
 
 ================================================================================
@@ -640,7 +640,7 @@ H1: Multi-sig Wallet Tools
 Type: pillar
 Summary: Requiring multiple signatures to authorize a transaction.
 Claim status: IMPLEMENTED
-AEO answer: Requiring multiple signatures to authorize a transaction. No multi-sig feature exists in Decentralized.Host -- the devnet payer keypair is a single key.
+AEO answer: Requiring multiple signatures to authorize a transaction. No multi-sig feature exists in Decentralized.Host -- the devnet payer keypair is a single key, a real, deliberate single-point-of-trust matching the rest of the project's single-operator model.
 
 
 ================================================================================

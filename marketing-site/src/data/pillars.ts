@@ -73,7 +73,16 @@ export const PILLARS: Pillar[] = [
       { heading: 'The practical tradeoff', body: 'Ordinary DNS resolvers (browsers, OSes, ISPs) understand ENS and Handshake names only through a bridge -- either a browser extension, a gateway service that translates alice.eth into a normal HTTPS URL, or ENS names being made resolvable via a .limo/.eth.link gateway. That bridge is itself a centralization point in practice, even though the underlying name registry isn\'t. This project\'s own domain resolution story is much simpler and worth being honest about: decentralized.host is a normal ICANN domain (registered via Hostinger), with Cloudflare as the authoritative nameserver -- chosen for reliability and because Traefik\'s routing (matching real HTTP Host headers) doesn\'t need or benefit from a decentralized naming layer.' }
     ]
   },
-  { slug: 'decentralized-messaging-tools', title: 'Decentralized Messaging Tools', group: 'Decentralized Infrastructure', oneLine: 'Peer-to-peer or federated messaging protocols without one company owning the whole network.', written: false, relatesToProduct: false, productNote: 'No messaging feature exists in Decentralized.Host.' },
+  {
+    slug: 'decentralized-messaging-tools', title: 'Decentralized Messaging Tools', group: 'Decentralized Infrastructure',
+    oneLine: 'Peer-to-peer or federated messaging protocols without one company owning the whole network.',
+    written: true, relatesToProduct: false,
+    productNote: 'No messaging feature exists in Decentralized.Host.',
+    sections: [
+      { heading: 'Two different decentralization models', body: "Federated messaging (Matrix, and email/XMPP before it) works like email at the protocol level: anyone can run their own server, servers talk to each other, and a user on one server can message a user on another -- no single company owns the whole network, but any given server operator still sees traffic passing through their own server. Fully peer-to-peer messaging (Signal's underlying protocol used peer-to-peer patterns in parts of its design; Briar goes further, routing over Tor or direct Bluetooth/Wi-Fi with no server at all) removes the server entirely, at real cost to reliability -- both parties typically need to be online simultaneously, or messages queue until they are." },
+      { heading: 'Why this has no bearing on Decentralized.Host', body: 'This project sends no messages between users -- there are no user accounts to message between in the first place (the single-operator trust model means there\'s no multi-party communication layer to decentralize). The word "decentralized" in this project\'s name refers specifically to distributing container compute across independently operated nodes, not to any form of interpersonal communication.' }
+    ]
+  },
   {
     slug: 'decentralized-database-tools', title: 'Decentralized Database Tools', group: 'Decentralized Infrastructure',
     oneLine: 'Distributed, multi-writer databases without one operator holding the only copy.',
@@ -84,8 +93,26 @@ export const PILLARS: Pillar[] = [
       { heading: 'Why this distinction matters in practice', body: "Operational distribution (multiple nodes, no single point of failure) solves availability and scale; it doesn't require giving up control of who can write. Trust distribution (no single party controls the data) solves a different problem -- collusion-resistance and censorship-resistance -- at a real cost in write latency and complexity (consensus rounds are slower than a single node committing a transaction). Decentralized.Host's own control-plane database is deliberately the simple end of this spectrum: one PostgreSQL instance, no replication, no distributed consensus -- correct for a single-operator mesh where the control plane itself isn't meant to be trust-distributed, and a real gap (no automated backup exists yet) that's tracked honestly rather than hidden." }
     ]
   },
-  { slug: 'decentralized-file-sharing-tools', title: 'Decentralized File Sharing Tools', group: 'Decentralized Infrastructure', oneLine: 'Peer-to-peer file transfer and sync without a central file host.', written: false, relatesToProduct: false, productNote: 'No file-sharing feature exists in Decentralized.Host.' },
-  { slug: 'decentralized-authentication-tools', title: 'Decentralized Authentication Tools', group: 'Decentralized Infrastructure', oneLine: 'Wallet-based and cryptographic login flows instead of a central account database.', written: false, relatesToProduct: false, productNote: 'Decentralized.Host uses a single shared deploy key and SSH keys for git push -- no per-user accounts, decentralized or otherwise.' },
+  {
+    slug: 'decentralized-file-sharing-tools', title: 'Decentralized File Sharing Tools', group: 'Decentralized Infrastructure',
+    oneLine: 'Peer-to-peer file transfer and sync without a central file host.',
+    written: true, relatesToProduct: false,
+    productNote: 'No file-sharing feature exists in Decentralized.Host.',
+    sections: [
+      { heading: 'How this differs from a central file host', body: "A central host (Dropbox, Google Drive) stores the one authoritative copy on its own servers and serves it to every requester. Peer-to-peer file sharing instead has the file (or pieces of it) live directly on participants' own machines -- BitTorrent is the canonical example: a file is split into pieces, peers download different pieces from different other peers simultaneously, and a peer that has a piece can immediately start serving it to others (swarming), which is why popular torrents often download faster the more people are sharing them, the opposite of a central server under heavy load." },
+      { heading: "Where this project's real file transfer happens instead", body: 'Decentralized.Host does move files around, just not peer-to-peer: `dhost ship` uploads a compressed tarball of your project directly to the control plane over a normal authenticated HTTPS POST, which forwards it to the chosen node agent for building. This is conventional client-server file transfer, not P2P -- appropriate here since the whole point is a trusted control plane routing a specific build to a specific node, not distributing a file to many anonymous peers.' }
+    ]
+  },
+  {
+    slug: 'decentralized-authentication-tools', title: 'Decentralized Authentication Tools', group: 'Decentralized Infrastructure',
+    oneLine: 'Wallet-based and cryptographic login flows instead of a central account database.',
+    written: true, relatesToProduct: true,
+    productNote: 'Decentralized.Host uses a single shared deploy key and SSH keys for git push -- no per-user accounts, decentralized or otherwise.',
+    sections: [
+      { heading: 'What this typically means', body: 'Rather than a username/password checked against a company\'s account database, decentralized authentication proves identity cryptographically: "Sign-In with Ethereum" (a standardized flow, EIP-4361) has a site ask your wallet to sign a specific, time-limited message, and if the signature checks out against your public address, you\'re authenticated -- no password to leak, no central database of credentials to breach, though the site still needs its own session/authorization logic on top.' },
+      { heading: "How Decentralized.Host actually authenticates today", body: 'Two real mechanisms, neither decentralized in this sense: a single shared Bearer token (DEPLOY_API_KEY) authenticates every control-plane API call -- effectively one password for the whole mesh, by design, for a single-operator MVP. Git push access is authenticated via standard SSH public-key auth against a flat allowlist (any registered key can push to any repo). Both are real, working authentication -- just centralized-by-design rather than decentralized, and explicitly documented as a scope limitation rather than something dressed up as more sophisticated.' }
+    ]
+  },
   {
     slug: 'decentralized-payment-tools', title: 'Decentralized Payment Tools', group: 'Decentralized Infrastructure',
     oneLine: 'Peer-to-peer value transfer without a payment processor in the middle.',
@@ -96,11 +123,56 @@ export const PILLARS: Pillar[] = [
       { heading: "What Decentralized.Host actually does here, and doesn't", body: 'The only payment-shaped thing in this project is real but narrow: when ENABLE_BLOCKCHAIN is on, the control plane mints a real SPL token ("DHOST Credits") to a node operator\'s linked wallet every few healthy heartbeats, via a genuine on-chain mint transaction on Solana\'s public devnet. That\'s a reward mechanism, not a payment system -- there\'s no invoicing, no developer paying for compute, no mainnet path today, and devnet SOL/tokens are funded by a free faucet with no real monetary value. The roadmap\'s Phase 4 mentions an eventual, optional mainnet migration as planned, not built.' }
     ]
   },
-  { slug: 'decentralized-governance-tools', title: 'Decentralized Governance Tools', group: 'Decentralized Infrastructure', oneLine: 'On-chain voting and proposal systems for collective decision-making.', written: false, relatesToProduct: false, productNote: 'No governance system of any kind exists in Decentralized.Host -- it has a single operator.' },
-  { slug: 'decentralized-oracle-tools', title: 'Decentralized Oracle Tools', group: 'Decentralized Infrastructure', oneLine: 'Getting real-world data onto a blockchain via multiple independent reporters instead of one trusted feed.', written: false, relatesToProduct: false, productNote: 'No oracle functionality exists in Decentralized.Host.' },
-  { slug: 'decentralized-registry-tools', title: 'Decentralized Registry Tools', group: 'Decentralized Infrastructure', oneLine: 'On-chain or peer-verified name/asset registries.', written: false, relatesToProduct: true, productNote: "Decentralized.Host runs its own private Docker image registry as part of the mesh (so nodes can pull built images) -- but it's a plain, centrally-run registry:2 instance, not a decentralized one." },
-  { slug: 'decentralized-marketplace-tools', title: 'Decentralized Marketplace Tools', group: 'Decentralized Infrastructure', oneLine: 'Peer-to-peer buying and selling without a platform taking a cut in the middle.', written: false, relatesToProduct: false, productNote: 'No marketplace exists in Decentralized.Host -- the roadmap\'s Phase 4 mentions a future public compute marketplace as planned, not built.' },
-  { slug: 'decentralized-reputation-tools', title: 'Decentralized Reputation Tools', group: 'Decentralized Infrastructure', oneLine: 'Portable, verifiable track records not owned by one platform.', written: false, relatesToProduct: false, productNote: 'No reputation system exists in Decentralized.Host.' },
+  {
+    slug: 'decentralized-governance-tools', title: 'Decentralized Governance Tools', group: 'Decentralized Infrastructure',
+    oneLine: 'On-chain voting and proposal systems for collective decision-making.',
+    written: true, relatesToProduct: false,
+    productNote: 'No governance system of any kind exists in Decentralized.Host -- it has a single operator, and this is by design, not an interim state waiting for governance to be added.',
+    sections: [
+      { heading: 'The general infrastructure category', body: "This overlaps with DAO Governance Tools but is broader: it covers any collective-decision infrastructure, not just token-voting DAOs specifically -- multi-sig-gated treasury changes, off-chain signaling (Snapshot-style polls that inform but don't automatically execute a decision), and hybrid models where a small elected council executes what a broader vote approved." },
+      { heading: "Decentralized.Host's actual, deliberate governance model", body: 'One person or team makes every decision -- roadmap, code merges, infrastructure changes -- with no voting mechanism of any kind. This is stated as an intentional MVP scope choice throughout the project\'s own documentation (the FAQ, the roadmap), not a placeholder for governance that\'s coming later. Worth being direct about: nothing here suggests this will change.' }
+    ]
+  },
+  {
+    slug: 'decentralized-oracle-tools', title: 'Decentralized Oracle Tools', group: 'Decentralized Infrastructure',
+    oneLine: 'Getting real-world data onto a blockchain via multiple independent reporters instead of one trusted feed.',
+    written: true, relatesToProduct: false,
+    productNote: 'No oracle functionality exists in Decentralized.Host.',
+    sections: [
+      { heading: 'Why oracles exist at all', body: "Blockchains can't natively see the outside world -- a smart contract can't directly ask \"what's the current ETH/USD price\" or \"did this flight land on time.\" An oracle bridges that gap by bringing external data on-chain, and a decentralized oracle (Chainlink is the dominant example) does this via multiple independent node operators reporting the same data, with the result aggregated (often a median) so no single reporter can manipulate the feed -- important because a bad price feed has directly caused real, large exploits in DeFi history when a single trusted source was compromised or manipulated." },
+      { heading: "Why this project doesn't need one", body: 'Decentralized.Host\'s only on-chain activity is minting a fixed-amount SPL credit token to a node operator\'s wallet based on a heartbeat count the control plane itself already knows -- there\'s no external, real-world data (a price, an event outcome) that needs to be brought on-chain for this to work, so there\'s no oracle problem to solve here at all.' }
+    ]
+  },
+  {
+    slug: 'decentralized-registry-tools', title: 'Decentralized Registry Tools', group: 'Decentralized Infrastructure',
+    oneLine: 'On-chain or peer-verified name/asset registries.',
+    written: true, relatesToProduct: true,
+    productNote: "Decentralized.Host runs its own private Docker image registry as part of the mesh (so nodes can pull built images) -- but it's a plain, centrally-run registry:2 instance, not a decentralized one.",
+    sections: [
+      { heading: 'What a decentralized registry actually is', body: 'A registry maps names to something authoritative -- a domain to an IP, a name to an owner, a package name to its publisher. Decentralizing it (ENS for names, or a package registry with signed, peer-verifiable entries) means no single company can unilaterally reassign, censor, or delete an entry; verification happens against a shared, tamper-evident record instead of trusting one operator\'s database.' },
+      { heading: "This project's own registry, and why it's the ordinary kind on purpose", body: 'The mesh runs a real Docker registry (the official registry:2 image) so that once a node agent builds an image, ANY node in the mesh can pull that exact image without rebuilding -- this is precisely the mechanism that makes automated failover fast (the new node pulls the already-built image rather than rebuilding from source). It\'s centrally operated by whoever runs that mesh\'s control plane, with no peer verification or decentralized trust model -- correctly so, since it\'s an internal implementation detail of one trusted mesh, not a public naming system that needs censorship resistance.' }
+    ]
+  },
+  {
+    slug: 'decentralized-marketplace-tools', title: 'Decentralized Marketplace Tools', group: 'Decentralized Infrastructure',
+    oneLine: 'Peer-to-peer buying and selling without a platform taking a cut in the middle.',
+    written: true, relatesToProduct: true,
+    productNote: 'No marketplace exists in Decentralized.Host -- the roadmap\'s Phase 4 mentions a future public compute marketplace as planned, not built.',
+    sections: [
+      { heading: 'How a decentralized marketplace typically works', body: 'Rather than a platform (eBay, Amazon) matching buyers and sellers and taking a cut on every transaction, a decentralized marketplace uses smart contracts to hold funds in escrow and release them automatically when conditions are met (delivery confirmed, a dispute period passes) -- removing the platform\'s custody of funds and often its transaction fee, at the cost of needing the contract logic itself to correctly handle disputes, which is genuinely hard to get right without SOME trusted arbiter for edge cases.' },
+      { heading: "Where this fits Decentralized.Host's real roadmap", body: 'This is the one topic in this pillar directory with a real, if distant, roadmap connection: Phase 4 explicitly lists "a public marketplace for community node operators to contribute capacity across meshes they don\'t own" as planned. Today, though, there is no marketplace of any kind -- joining a mesh as a node operator requires that specific mesh\'s shared join secret (a private arrangement, not a public marketplace), and this is worth being precise about rather than implying the marketplace already exists in some form.' }
+    ]
+  },
+  {
+    slug: 'decentralized-reputation-tools', title: 'Decentralized Reputation Tools', group: 'Decentralized Infrastructure',
+    oneLine: 'Portable, verifiable track records not owned by one platform.',
+    written: true, relatesToProduct: false,
+    productNote: 'No reputation system exists in Decentralized.Host.',
+    sections: [
+      { heading: 'The portability problem this solves', body: "A reputation score on a centralized platform (an Uber rating, an eBay seller score) is trapped there -- it can't move with you to a competitor, and the platform can reset or revoke it unilaterally. Decentralized reputation systems try to make a track record portable and independently verifiable: attestations signed by counterparties, stored somewhere that isn't controlled by any single platform (on-chain, or in a verifiable-credential format), so a new platform could in principle trust a reputation earned elsewhere without asking the original platform's permission." },
+      { heading: 'The one loosely related thing this project does', body: 'Node-operator credits (verified uptime heartbeats, minted as real on-chain SPL tokens) function as a weak, narrow form of on-chain track record -- an operator\'s accumulated credits are a real, publicly-verifiable signal of how much uptime they\'ve contributed, viewable via a real explorer.solana.com link. But this exists purely as a reward mechanism, not a designed reputation system -- there\'s no scoring, no portability to other meshes, and no attempt to build general-purpose reputation infrastructure.' }
+    ]
+  },
   {
     slug: 'decentralized-access-control-tools', title: 'Decentralized Access Control Tools', group: 'Decentralized Infrastructure',
     oneLine: 'Token- or credential-gated permissions without a central admin panel.',
@@ -121,10 +193,46 @@ export const PILLARS: Pillar[] = [
       { heading: "Where Decentralized.Host stands on this", body: "This project doesn't implement application-level encryption of any kind -- what it has is ordinary transport security: TLS (via Traefik's Let's Encrypt automation, see SSL/TLS Certificate Tools) protects data in transit between a client and the server, the same as almost every real website, and that's it. There's no E2EE for logs, no threshold scheme for the Solana payer keypair (a single key, held by whoever runs the control plane), and no plan on the roadmap to add either -- worth stating plainly rather than implying more cryptographic sophistication than exists." }
     ]
   },
-  { slug: 'decentralized-backup-tools', title: 'Decentralized Backup Tools', group: 'Decentralized Infrastructure', oneLine: 'Redundant backups spread across independent peers instead of one provider\'s snapshot system.', written: false, relatesToProduct: false, productNote: 'Decentralized.Host has no automated backup system for deployed apps\' data today.' },
-  { slug: 'decentralized-sync-tools', title: 'Decentralized Sync Tools', group: 'Decentralized Infrastructure', oneLine: 'Multi-device or multi-peer data sync without a central sync server.', written: false, relatesToProduct: false, productNote: 'No sync feature exists in Decentralized.Host.' },
-  { slug: 'decentralized-search-tools', title: 'Decentralized Search Tools', group: 'Decentralized Infrastructure', oneLine: 'Indexing and search over peer-distributed content.', written: false, relatesToProduct: false, productNote: 'No search feature exists in Decentralized.Host beyond the marketing site\'s own Cmd+K page search.' },
-  { slug: 'decentralized-analytics-tools', title: 'Decentralized Analytics Tools', group: 'Decentralized Infrastructure', oneLine: 'Usage and telemetry analysis without one party owning all the data.', written: false, relatesToProduct: false, productNote: 'Decentralized.Host reports node CPU/RAM/heartbeat telemetry to its own control plane -- centrally, not decentralized analytics.' },
+  {
+    slug: 'decentralized-backup-tools', title: 'Decentralized Backup Tools', group: 'Decentralized Infrastructure',
+    oneLine: 'Redundant backups spread across independent peers instead of one provider\'s snapshot system.',
+    written: true, relatesToProduct: false,
+    productNote: 'Decentralized.Host has no automated backup system for deployed apps\' data today -- neither centralized nor decentralized.',
+    sections: [
+      { heading: 'How this differs from a normal cloud backup', body: "A normal backup (a cloud snapshot, an S3 bucket) still has one company as the custodian -- if their infrastructure fails catastrophically or they go out of business, your backup can go with it. Decentralized backup tools (Storj, Sia, or IPFS+Filecoin used specifically for backup) spread encrypted, redundant copies across many independent storage providers, so no single provider's failure takes out your backup -- the tradeoff is usually restore speed (reassembling from many peers can be slower than pulling from one fast cloud provider) and more moving parts to get right." },
+      { heading: "Why this matters for this project's own honest gap", body: 'Decentralized.Host has no backup system at all right now -- not centralized, not decentralized. If you deploy a stateful app (a database, via the dashboard\'s Sandbox tab) through the mesh, protecting its data is entirely on you today. This is listed plainly in the project\'s own honest limitations (see Backup & Recovery Tools) rather than glossed over, and a decentralized backup approach specifically isn\'t on the roadmap -- if backup gets built, the more likely path is a conventional scheduled-snapshot mechanism, matching the project\'s otherwise conventional infrastructure choices.' }
+    ]
+  },
+  {
+    slug: 'decentralized-sync-tools', title: 'Decentralized Sync Tools', group: 'Decentralized Infrastructure',
+    oneLine: 'Multi-device or multi-peer data sync without a central sync server.',
+    written: true, relatesToProduct: false,
+    productNote: 'No sync feature exists in Decentralized.Host.',
+    sections: [
+      { heading: 'How peer sync differs from cloud sync', body: 'Dropbox-style sync routes every change through a central server, which then pushes it to your other devices. Peer-to-peer sync tools (Syncthing is the best-known open-source example) instead have your own devices talk directly to each other -- no cloud intermediary sees your files at all, sync happens over your local network when devices are on the same LAN, or over the internet via relay/NAT traversal when they\'re not, and there\'s no third party that could be subpoenaed for your data or that could suffer a breach exposing it.' },
+      { heading: 'How this connects, indirectly, to this project', body: 'Decentralized.Host has no sync feature of its own, but Syncthing itself is one of the 17 real, one-click deployable tools in the dashboard\'s Sandbox tab (live-verified: it generates its own config on first boot, its GUI is reachable, and it successfully joins a relay) -- so while the mesh doesn\'t sync anything itself, it can genuinely run a real sync tool for you as one more deployed container.' }
+    ]
+  },
+  {
+    slug: 'decentralized-search-tools', title: 'Decentralized Search Tools', group: 'Decentralized Infrastructure',
+    oneLine: 'Indexing and search over peer-distributed content.',
+    written: true, relatesToProduct: true,
+    productNote: 'No search feature exists in Decentralized.Host beyond the marketing site\'s own Cmd+K page search, which is a plain, centralized, client-side index -- not decentralized.',
+    sections: [
+      { heading: 'Why search is hard to decentralize', body: 'Search fundamentally needs a comprehensive index to be useful -- Google\'s value comes largely from having crawled and indexed most of the web in one place. Decentralized search projects (Presearch uses a hybrid model with distributed nodes and its own token incentive; some IPFS-adjacent tools index content-addressed data specifically) have to solve indexing without one party controlling the whole index, which is a genuinely unsolved problem at Google-scale -- most decentralized search efforts today cover a narrower slice (a specific content type, or federated with a centralized index underneath) rather than a full open-web replacement.' },
+      { heading: "This project's own, much simpler search", body: 'The marketing site has a real Cmd+K search modal that searches this site\'s own page registry client-side -- a small, static, plain index of this project\'s own pages, nothing peer-distributed or decentralized about it. Worth naming directly: this is ordinary site search, included here only because "search" as a topic belongs in this directory, not because this project does anything novel with it.' }
+    ]
+  },
+  {
+    slug: 'decentralized-analytics-tools', title: 'Decentralized Analytics Tools', group: 'Decentralized Infrastructure',
+    oneLine: 'Usage and telemetry analysis without one party owning all the data.',
+    written: true, relatesToProduct: true,
+    productNote: 'Decentralized.Host reports node CPU/RAM/heartbeat telemetry to its own control plane -- centrally, not decentralized analytics.',
+    sections: [
+      { heading: 'What decentralization means for analytics specifically', body: 'Standard web analytics (Google Analytics) send every visitor\'s behavior to one company, which sees aggregate data across the entire web, not just your site. Privacy-focused alternatives (Plausible, Fathom) at least keep analytics siloed per-site, but still centralize your own site\'s data with one vendor. A genuinely decentralized analytics model would need each data point verified and aggregated without any single party holding the raw underlying data -- a much harder, less-solved problem, with few mature real-world implementations.' },
+      { heading: "The real telemetry this project actually has", body: 'Node agents report their own CPU/RAM every few seconds directly to this mesh\'s own control plane -- real, live, and used for actual scheduling decisions (not just dashboards), but entirely centralized within that one mesh\'s trust boundary. The marketing site itself has no third-party analytics at all -- no Google Analytics, no tracking pixels -- which is itself a real, verifiable fact about this project rather than a claim about decentralized analytics infrastructure it doesn\'t have.' }
+    ]
+  },
 
   // ---------- Decentralized Hosting ----------
   {
@@ -370,9 +478,36 @@ export const PILLARS: Pillar[] = [
       { heading: 'Why this project has no reason to touch this', body: 'Decentralized.Host mints exactly one thing on-chain: a fungible SPL token ("DHOST Credits") via the standard SPL Token program -- fungible tokens have no per-token metadata the way NFTs do (every unit is identical and interchangeable by definition), so there\'s no metadata JSON, no image, no IPFS pinning involved anywhere in this project\'s real blockchain integration.' }
     ]
   },
-  { slug: 'defi-analytics-tools', title: 'DeFi Analytics Tools', group: 'Web3 & Blockchain', oneLine: 'Tracking yields, liquidity, and protocol activity across decentralized finance.', written: false, relatesToProduct: false, productNote: 'No DeFi feature exists in Decentralized.Host.' },
-  { slug: 'bridge-monitoring-tools', title: 'Bridge Monitoring Tools', group: 'Web3 & Blockchain', oneLine: 'Watching cross-chain bridge activity and security.', written: false, relatesToProduct: false, productNote: 'No cross-chain bridge exists in Decentralized.Host -- it operates on Solana devnet only.' },
-  { slug: 'node-management-tools', title: 'Node Management Tools', group: 'Web3 & Blockchain', oneLine: 'Running and maintaining blockchain full nodes or validators.', written: false, relatesToProduct: false, productNote: "Decentralized.Host's own \"nodes\" are Docker-hosting node agents, not blockchain nodes -- it connects to Solana's own public devnet RPC rather than running a validator." },
+  {
+    slug: 'defi-analytics-tools', title: 'DeFi Analytics Tools', group: 'Web3 & Blockchain',
+    oneLine: 'Tracking yields, liquidity, and protocol activity across decentralized finance.',
+    written: true, relatesToProduct: false,
+    productNote: 'No DeFi feature exists in Decentralized.Host.',
+    sections: [
+      { heading: 'What these tools actually track', body: "DeFi analytics platforms (DeFiLlama is the best-known example) aggregate on-chain data across many protocols into comparable metrics -- Total Value Locked (TVL, how much capital sits in a protocol's contracts), trading volume, yield rates, and protocol-level risk signals -- since raw on-chain data alone is just a firehose of transactions, not directly comparable insight, and a real understanding of a protocol's health means pulling data from many contracts and normalizing it consistently." },
+      { heading: 'Why there\'s nothing to analyze here', body: 'Decentralized.Host has no lending, liquidity, or trading activity of any kind -- the only value-bearing on-chain activity is a fixed-amount SPL credit mint to node operators, which is a simple, deterministic event with no yield, no liquidity, and nothing resembling a DeFi protocol\'s activity to track.' }
+    ]
+  },
+  {
+    slug: 'bridge-monitoring-tools', title: 'Bridge Monitoring Tools', group: 'Web3 & Blockchain',
+    oneLine: 'Watching cross-chain bridge activity and security.',
+    written: true, relatesToProduct: false,
+    productNote: 'No cross-chain bridge exists in Decentralized.Host -- it operates on Solana devnet only, with nothing crossing chains.',
+    sections: [
+      { heading: 'Why bridges need dedicated monitoring', body: "A cross-chain bridge moves value between otherwise-incompatible blockchains, usually by locking an asset on the source chain and minting a representative token on the destination chain (or vice versa to redeem). Bridges have historically been the single largest category of blockchain security losses -- billions across incidents like Ronin and Wormhole -- because the lock/mint logic concentrates enormous value in one place and has repeatedly had subtle validation bugs. Bridge monitoring tools watch for anomalies (a mint happening without a corresponding lock, unusual volume spikes) as an early-warning layer, precisely because the stakes of a bridge failure are so high." },
+      { heading: 'Why this genuinely has no bearing here', body: 'Decentralized.Host operates entirely on one chain, Solana, and specifically only its public devnet -- there is no bridge, no cross-chain asset, and nothing moving between chains anywhere in this project. This is one of the more clear-cut "doesn\'t apply" pillars in this directory.' }
+    ]
+  },
+  {
+    slug: 'node-management-tools', title: 'Node Management Tools', group: 'Web3 & Blockchain',
+    oneLine: 'Running and maintaining blockchain full nodes or validators.',
+    written: true, relatesToProduct: true,
+    productNote: "Decentralized.Host's own \"nodes\" are Docker-hosting node agents, not blockchain nodes -- it connects to Solana's own public devnet RPC rather than running a validator.",
+    sections: [
+      { heading: 'A genuine, important naming collision', body: 'This pillar\'s topic -- running a blockchain full node or validator (syncing and verifying the entire chain state, or actively participating in consensus and earning rewards for it) -- is a completely different thing from what "node" means everywhere else in Decentralized.Host. Blockchain node operation typically means real hardware requirements (fast SSD, meaningful bandwidth for chain sync), meaningful uptime commitments, and for a validator, real slashing risk if you misbehave or go offline at the wrong time.' },
+      { heading: "What a Decentralized.Host \"node\" actually is instead", body: "A node in this project is simply a machine running the node-agent daemon -- a lightweight Python process that talks to Docker locally and reports heartbeats to the control plane. It has nothing to do with blockchain consensus: the project's Solana integration talks to Solana's own free public devnet RPC endpoint (api.devnet.solana.com) rather than running any Solana infrastructure of its own. Two genuinely unrelated uses of the word \"node\" that are worth explicitly distinguishing, since conflating them would misrepresent what running a Decentralized.Host node actually involves." }
+    ]
+  },
   {
     slug: 'blockchain-explorer-tools', title: 'Blockchain Explorer Tools', group: 'Web3 & Blockchain',
     oneLine: 'Browsing and searching on-chain transaction history.',
@@ -393,7 +528,16 @@ export const PILLARS: Pillar[] = [
       { heading: 'Where this fits (and doesn\'t) with Decentralized.Host', body: "This distinction matters enough that the project's own FAQ addresses it head-on: despite the name, \"Decentralized\" in Decentralized.Host refers to distributing container workloads across independently operated compute nodes, not to content-addressed storage -- there's no IPFS dependency anywhere in the control plane, node agent, or CLI. If you want to actually run an IPFS node, the dashboard's Sandbox tab can deploy the real ipfs/kubo image with one click (verified live) -- but that's IPFS running as one more deployed app on the mesh, not something the mesh itself is built on." }
     ]
   },
-  { slug: 'ens-management-tools', title: 'ENS Management Tools', group: 'Web3 & Blockchain', oneLine: 'Registering and managing Ethereum Name Service domains and records.', written: false, relatesToProduct: false, productNote: 'No ENS integration exists in Decentralized.Host -- ordinary DNS is used for the real domain.' },
+  {
+    slug: 'ens-management-tools', title: 'ENS Management Tools', group: 'Web3 & Blockchain',
+    oneLine: 'Registering and managing Ethereum Name Service domains and records.',
+    written: true, relatesToProduct: false,
+    productNote: 'No ENS integration exists in Decentralized.Host -- ordinary DNS is used for the real domain, registered through Hostinger with Cloudflare as authoritative nameserver.',
+    sections: [
+      { heading: 'What ENS management involves', body: 'Beyond the initial registration (a smart-contract transaction, paid in ETH gas, renewable annually like a normal domain), ENS names carry a resolver contract that maps the name to records -- not just an Ethereum address, but potentially a website content hash (for IPFS-hosted sites), other cryptocurrency addresses, and text records for social profiles. Managing an ENS name well means keeping these records current and understanding that, unlike DNS, changes are on-chain transactions with real gas costs, not free instant edits.' },
+      { heading: "This project's actual domain setup, for direct comparison", body: 'decentralized.host is an ordinary ICANN domain, and its full DNS story (Cloudflare as authoritative nameserver, a real ISP-DNS-caching debugging story, real CAA records narrowed to Let\'s Encrypt) is covered in depth on the Domain Management Tools and DNS Management Tools pillars -- genuinely useful context on how a real domain for this exact kind of project is actually run, in contrast to the ENS alternative this pillar covers.' }
+    ]
+  },
   {
     slug: 'dao-governance-tools', title: 'DAO Governance Tools', group: 'Web3 & Blockchain',
     oneLine: 'On-chain proposal and voting systems for decentralized organizations.',
@@ -424,7 +568,16 @@ export const PILLARS: Pillar[] = [
       { heading: "Where this project stands, plainly", body: "Decentralized.Host has no lending, liquidity pool, or yield mechanism of any kind -- the only value flow in the entire project is credits minted TO node operators for uptime, on Solana devnet, with no real monetary value (funded by a free faucet, not real capital). There's no way to \"farm\" anything here, and nothing to optimize a return on." }
     ]
   },
-  { slug: 'multi-sig-wallet-tools', title: 'Multi-sig Wallet Tools', group: 'Web3 & Blockchain', oneLine: 'Requiring multiple signatures to authorize a transaction.', written: false, relatesToProduct: false, productNote: 'No multi-sig feature exists in Decentralized.Host -- the devnet payer keypair is a single key.' },
+  {
+    slug: 'multi-sig-wallet-tools', title: 'Multi-sig Wallet Tools', group: 'Web3 & Blockchain',
+    oneLine: 'Requiring multiple signatures to authorize a transaction.',
+    written: true, relatesToProduct: true,
+    productNote: 'No multi-sig feature exists in Decentralized.Host -- the devnet payer keypair is a single key, a real, deliberate single-point-of-trust matching the rest of the project\'s single-operator model.',
+    sections: [
+      { heading: 'The core idea', body: "A multi-sig wallet requires M-of-N signatures (e.g., 2 of 3 designated keyholders) to authorize a transaction, rather than any single key being sufficient -- protecting against one compromised or lost key being catastrophic, and often used for DAO treasuries or team-controlled funds where no individual should unilaterally control significant value. Gnosis Safe is the dominant EVM implementation; Solana has its own native multi-sig program support (Squads is a common interface for it)." },
+      { heading: "This project's actual, single-key model", body: 'The Solana devnet payer keypair that mints credit tokens is a single private key, held by whoever runs the control plane, stored at a configurable file path (SOLANA_PAYER_KEYPAIR_PATH) -- no multi-sig, no threshold scheme. This is a genuinely appropriate match for what\'s actually at stake: the key only mints valueless devnet tokens, funded by a free faucet, so multi-sig\'s real security benefit (protecting against catastrophic loss of REAL value) doesn\'t apply here the way it would for a mainnet treasury.' }
+    ]
+  },
   {
     slug: 'signature-verification-tools', title: 'Signature Verification Tools', group: 'Web3 & Blockchain',
     oneLine: 'Confirming a message or transaction was really signed by a given key.',
@@ -435,10 +588,46 @@ export const PILLARS: Pillar[] = [
       { heading: "The real signature verification in this project", body: "Every git push to Decentralized.Host's git server is authenticated by exactly this mechanism: your SSH client signs the connection with your private key, and the server verifies it against a public key from its authorized-keys allowlist before granting access -- standard OpenSSH, not custom code. Solana transactions (the credit-minting mints) are similarly signature-verified by Solana's own runtime using Ed25519, using the payer keypair's signature -- again, existing, standard infrastructure this project calls into rather than reimplements. Worth being precise: no custom signature scheme exists anywhere in this project; it uses two different, well-established ones (SSH and Solana's native Ed25519) for their respective real purposes." }
     ]
   },
-  { slug: 'abi-encoder-decoder-tools', title: 'ABI Encoder/Decoder Tools', group: 'Web3 & Blockchain', oneLine: 'Converting between human-readable contract calls and the binary format the EVM expects.', written: false, relatesToProduct: false, productNote: 'No EVM/ABI interaction exists in Decentralized.Host -- its one blockchain integration is Solana, which doesn\'t use ABI encoding.' },
-  { slug: 'transaction-simulator-tools', title: 'Transaction Simulator Tools', group: 'Web3 & Blockchain', oneLine: 'Dry-running a transaction to predict its effects before submitting it.', written: false, relatesToProduct: false, productNote: 'No transaction simulation feature exists in Decentralized.Host.' },
-  { slug: 'gas-optimization-tools', title: 'Gas Optimization Tools', group: 'Web3 & Blockchain', oneLine: 'Reducing the on-chain execution cost of contract code.', written: false, relatesToProduct: false, productNote: 'No smart-contract code exists in Decentralized.Host to optimize.' },
-  { slug: 'web3-authentication-tools', title: 'Web3 Authentication Tools', group: 'Web3 & Blockchain', oneLine: '"Sign in with wallet" flows using a cryptographic signature instead of a password.', written: false, relatesToProduct: false, productNote: 'Decentralized.Host has no user login system, wallet-based or otherwise -- a single shared deploy key authenticates every API call.' },
+  {
+    slug: 'abi-encoder-decoder-tools', title: 'ABI Encoder/Decoder Tools', group: 'Web3 & Blockchain',
+    oneLine: 'Converting between human-readable contract calls and the binary format the EVM expects.',
+    written: true, relatesToProduct: false,
+    productNote: 'No EVM/ABI interaction exists in Decentralized.Host -- its one blockchain integration is Solana, which doesn\'t use ABI encoding.',
+    sections: [
+      { heading: 'What ABI encoding actually is', body: 'The EVM only understands raw bytes -- calling a function like transfer(address,uint256) on-chain requires encoding the function selector (a 4-byte hash of the function signature) plus the arguments into a specific binary layout the ABI (Application Binary Interface) specification defines. Tools like ethers.js/viem\'s encodeFunctionData, or standalone decoders, translate between this binary format and human-readable calls -- essential for debugging a raw transaction\'s calldata, or for any tool that needs to construct a contract call without a full SDK.' },
+      { heading: "Why this is architecturally irrelevant here", body: "Solana's programs use a completely different calling convention (typically Borsh serialization for instruction data, not EVM-style ABI encoding), and Decentralized.Host's Solana integration goes through the solana-py/solders SDK's own high-level instruction builders rather than hand-encoding anything -- there's no ABI of any kind involved, EVM or otherwise, anywhere in this project." }
+    ]
+  },
+  {
+    slug: 'transaction-simulator-tools', title: 'Transaction Simulator Tools', group: 'Web3 & Blockchain',
+    oneLine: 'Dry-running a transaction to predict its effects before submitting it.',
+    written: true, relatesToProduct: false,
+    productNote: 'No transaction simulation feature exists in Decentralized.Host.',
+    sections: [
+      { heading: 'Why simulation matters', body: "Submitting a transaction that reverts still costs real gas on most chains, and a complex DeFi transaction's actual effects (exact token amounts received after slippage, whether an approval is missing) aren't always obvious from the raw call alone. Simulators (Tenderly is a well-known example) execute a transaction against current chain state without actually broadcasting it, showing the exact state changes, gas cost, and any revert reason in advance -- letting a user or dApp catch a failing transaction before paying to submit it." },
+      { heading: 'Why this project has no need for one', body: 'Decentralized.Host\'s only on-chain transaction is a deterministic SPL token mint via a standard, well-understood program -- there\'s no complex contract interaction, no slippage, and no meaningful uncertainty about outcome that simulation would help resolve. The project\'s own testing approach for this instead was direct, real verification: minting real devnet tokens and confirming the resulting transaction on a real explorer link, rather than simulating an outcome in advance.' }
+    ]
+  },
+  {
+    slug: 'gas-optimization-tools', title: 'Gas Optimization Tools', group: 'Web3 & Blockchain',
+    oneLine: 'Reducing the on-chain execution cost of contract code.',
+    written: true, relatesToProduct: false,
+    productNote: 'No smart-contract code exists in Decentralized.Host to optimize.',
+    sections: [
+      { heading: 'What gas optimization actually involves', body: 'Every EVM opcode a contract executes costs gas, so optimization means restructuring contract code to do the same job with fewer, cheaper operations -- packing multiple small values into one storage slot (storage writes are among the most expensive operations), avoiding redundant storage reads by caching in memory, choosing cheaper data types, and minimizing external calls. Tools like Foundry\'s gas snapshots or Hardhat\'s gas reporter measure exactly where a contract\'s gas cost concentrates so developers can target the worst offenders.' },
+      { heading: 'Why this project has nothing to optimize', body: 'Decentralized.Host has written zero lines of on-chain contract code -- its Solana integration calls existing, already-optimized programs (the standard SPL Token program) rather than deploying custom logic. There\'s no gas/compute-unit cost this project controls or could meaningfully reduce; whatever cost the SPL Token program itself has is fixed, well-established infrastructure this project has no reason to touch.' }
+    ]
+  },
+  {
+    slug: 'web3-authentication-tools', title: 'Web3 Authentication Tools', group: 'Web3 & Blockchain',
+    oneLine: '"Sign in with wallet" flows using a cryptographic signature instead of a password.',
+    written: true, relatesToProduct: true,
+    productNote: 'Decentralized.Host has no user login system, wallet-based or otherwise -- a single shared deploy key authenticates every API call.',
+    sections: [
+      { heading: 'How wallet-based sign-in works', body: 'The standard flow (Sign-In with Ethereum, EIP-4361, or Solana\'s equivalent wallet-adapter patterns) has a site generate a unique, time-limited message, ask the user\'s wallet extension to sign it, and verify the returned signature matches the claimed public address -- proving control of that address without ever transmitting a private key or password. The site then typically issues its own session token for subsequent requests, same as any login system, just with wallet signature replacing password as the initial proof.' },
+      { heading: "Why Decentralized.Host doesn't have (or need) this", body: 'There are no per-user accounts anywhere in this project to log into -- the single-operator trust model means one shared Bearer deploy key authenticates every API call, for every operation, with no concept of "which user is this." Even the node-operator credit system, which DOES involve a real wallet address, only uses it as a payout destination (dhost wallet <node_id> <pubkey>) -- it\'s never used to authenticate a login, since there\'s no login system for it to authenticate into.' }
+    ]
+  },
 
   // ---------- Platform (meta pillars) ----------
   // Mapped to what actually exists, not the "app.decentralized.host" domain
