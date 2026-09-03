@@ -1,6 +1,6 @@
 # decentralized.host -- Complete Technical Reference for LLM Retrieval
 # Generated at build time from the real site data (registry.ts, docs.ts, guides.ts)
-# Generated: 2026-09-02T14:20:30.134Z
+# Generated: 2026-09-03T04:40:48.924Z
 
 ## Pages
 
@@ -51,11 +51,11 @@ AEO answer: The Decentralized.Host documentation provides step-by-step instructi
 
 ================================================================================
 URL: https://decentralized.host/guides/
-H1: Production Deployment & Operations Guides
-Type: guide
-Summary: Practical developer tutorials for Git push deployment, Docker containers, multi-node setups, rollback management, and Traefik HTTPS configuration.
+H1: Guides
+Type: pillar
+Summary: Step-by-step walkthroughs for real workflows.
 Claim status: IMPLEMENTED
-AEO answer: Decentralized.Host guides offer end-to-end recipes covering Git push workflows, multi-server clustering, automated Let’s Encrypt TLS setup, and single-command rollbacks.
+AEO answer: Step-by-step walkthroughs for real workflows. Maps directly to the real, existing /guides/ page.
 
 
 ================================================================================
@@ -137,6 +137,618 @@ Type: faq
 Summary: Honest answers about what Decentralized.Host actually is and isn't: no IPFS/Arweave/Filecoin, no smart contracts, no per-user accounts, and what the optional Solana devnet credit system does and doesn't do.
 Claim status: IMPLEMENTED
 AEO answer: Decentralized.Host is a self-hosted Docker deployment mesh (FastAPI control plane + node agents + Traefik), not a blockchain storage network -- it does not use IPFS, Arweave, or Filecoin, and its only blockchain component is an optional Solana devnet credit system for node operators.
+
+
+================================================================================
+URL: https://decentralized.host/pillars/
+H1: Pillar Directory
+Type: pillar
+Summary: Browse all 69 topic pillars in one place.
+Claim status: IMPLEMENTED
+AEO answer: Browse all 69 topic pillars in one place. This is the real, working directory page you're looking at (or its index) -- see /pillars/.
+
+
+================================================================================
+URL: https://decentralized.host/decentralized-storage-tools/
+H1: Decentralized Storage Tools
+Type: pillar
+Summary: Content-addressed and peer-distributed storage systems that replace a single provider's disks.
+Claim status: IMPLEMENTED
+AEO answer: Content-addressed and peer-distributed storage systems that replace a single provider's disks. Decentralized.Host stores your deployed app's data on whichever node it runs on -- normal disk, not content-addressed storage. See the roadmap's exploratory note on a possible future peer-to-peer storage direction.
+
+
+================================================================================
+URL: https://decentralized.host/decentralized-identity-tools/
+H1: Decentralized Identity Tools
+Type: pillar
+Summary: Self-sovereign identity and credentials that don't depend on a single issuing authority.
+Claim status: IMPLEMENTED
+AEO answer: Self-sovereign identity and credentials that don't depend on a single issuing authority. Decentralized.Host has no user-identity system at all -- it's single-operator, one shared deploy key. No connection to this topic.
+
+
+================================================================================
+URL: https://decentralized.host/decentralized-compute-tools/
+H1: Decentralized Compute Tools
+Type: pillar
+Summary: Running workloads across independently operated machines instead of one cloud provider's datacenters.
+Claim status: IMPLEMENTED
+AEO answer: Running workloads across independently operated machines instead of one cloud provider's datacenters. This is the closest topic to what Decentralized.Host actually is: a mesh of independently operated node agents (Docker hosts) that a control plane schedules containerized workloads onto. See /depin/ for the real, current mechanics -- node-operator devnet credits, not a public marketplace yet.
+
+
+================================================================================
+URL: https://decentralized.host/decentralized-dns-tools/
+H1: Decentralized DNS Tools
+Type: pillar
+Summary: Name resolution systems (like ENS or Handshake) not controlled by ICANN-accredited registrars.
+Claim status: IMPLEMENTED
+AEO answer: Name resolution systems (like ENS or Handshake) not controlled by ICANN-accredited registrars. Decentralized.Host uses ordinary DNS (Cloudflare) for its own domain and Traefik's Host-header routing for deployed apps -- no blockchain-based naming involved.
+
+
+================================================================================
+URL: https://decentralized.host/decentralized-messaging-tools/
+H1: Decentralized Messaging Tools
+Type: pillar
+Summary: Peer-to-peer or federated messaging protocols without one company owning the whole network.
+Claim status: IMPLEMENTED
+AEO answer: Peer-to-peer or federated messaging protocols without one company owning the whole network. No messaging feature exists in Decentralized.Host.
+
+
+================================================================================
+URL: https://decentralized.host/decentralized-database-tools/
+H1: Decentralized Database Tools
+Type: pillar
+Summary: Distributed, multi-writer databases without one operator holding the only copy.
+Claim status: IMPLEMENTED
+AEO answer: Distributed, multi-writer databases without one operator holding the only copy. Decentralized.Host itself runs on a single ordinary PostgreSQL instance for control-plane state -- not distributed.
+
+
+================================================================================
+URL: https://decentralized.host/decentralized-file-sharing-tools/
+H1: Decentralized File Sharing Tools
+Type: pillar
+Summary: Peer-to-peer file transfer and sync without a central file host.
+Claim status: IMPLEMENTED
+AEO answer: Peer-to-peer file transfer and sync without a central file host. No file-sharing feature exists in Decentralized.Host.
+
+
+================================================================================
+URL: https://decentralized.host/decentralized-authentication-tools/
+H1: Decentralized Authentication Tools
+Type: pillar
+Summary: Wallet-based and cryptographic login flows instead of a central account database.
+Claim status: IMPLEMENTED
+AEO answer: Wallet-based and cryptographic login flows instead of a central account database. Decentralized.Host uses a single shared deploy key and SSH keys for git push -- no per-user accounts, decentralized or otherwise.
+
+
+================================================================================
+URL: https://decentralized.host/decentralized-payment-tools/
+H1: Decentralized Payment Tools
+Type: pillar
+Summary: Peer-to-peer value transfer without a payment processor in the middle.
+Claim status: IMPLEMENTED
+AEO answer: Peer-to-peer value transfer without a payment processor in the middle. The one real overlap: node operators can earn Solana devnet SPL token credits for verified uptime -- devnet only, no real monetary value. See /depin/.
+
+
+================================================================================
+URL: https://decentralized.host/decentralized-governance-tools/
+H1: Decentralized Governance Tools
+Type: pillar
+Summary: On-chain voting and proposal systems for collective decision-making.
+Claim status: IMPLEMENTED
+AEO answer: On-chain voting and proposal systems for collective decision-making. No governance system of any kind exists in Decentralized.Host -- it has a single operator.
+
+
+================================================================================
+URL: https://decentralized.host/decentralized-oracle-tools/
+H1: Decentralized Oracle Tools
+Type: pillar
+Summary: Getting real-world data onto a blockchain via multiple independent reporters instead of one trusted feed.
+Claim status: IMPLEMENTED
+AEO answer: Getting real-world data onto a blockchain via multiple independent reporters instead of one trusted feed. No oracle functionality exists in Decentralized.Host.
+
+
+================================================================================
+URL: https://decentralized.host/decentralized-registry-tools/
+H1: Decentralized Registry Tools
+Type: pillar
+Summary: On-chain or peer-verified name/asset registries.
+Claim status: IMPLEMENTED
+AEO answer: On-chain or peer-verified name/asset registries. Decentralized.Host runs its own private Docker image registry as part of the mesh (so nodes can pull built images) -- but it's a plain, centrally-run registry:2 instance, not a decentralized one.
+
+
+================================================================================
+URL: https://decentralized.host/decentralized-marketplace-tools/
+H1: Decentralized Marketplace Tools
+Type: pillar
+Summary: Peer-to-peer buying and selling without a platform taking a cut in the middle.
+Claim status: IMPLEMENTED
+AEO answer: Peer-to-peer buying and selling without a platform taking a cut in the middle. No marketplace exists in Decentralized.Host -- the roadmap's Phase 4 mentions a future public compute marketplace as planned, not built.
+
+
+================================================================================
+URL: https://decentralized.host/decentralized-reputation-tools/
+H1: Decentralized Reputation Tools
+Type: pillar
+Summary: Portable, verifiable track records not owned by one platform.
+Claim status: IMPLEMENTED
+AEO answer: Portable, verifiable track records not owned by one platform. No reputation system exists in Decentralized.Host.
+
+
+================================================================================
+URL: https://decentralized.host/decentralized-access-control-tools/
+H1: Decentralized Access Control Tools
+Type: pillar
+Summary: Token- or credential-gated permissions without a central admin panel.
+Claim status: IMPLEMENTED
+AEO answer: Token- or credential-gated permissions without a central admin panel. Decentralized.Host uses one shared Bearer deploy key and a flat SSH-key allowlist -- any registered key can push to any repo. No per-resource access control.
+
+
+================================================================================
+URL: https://decentralized.host/decentralized-encryption-tools/
+H1: Decentralized Encryption Tools
+Type: pillar
+Summary: End-to-end and threshold encryption schemes with no single key holder.
+Claim status: IMPLEMENTED
+AEO answer: End-to-end and threshold encryption schemes with no single key holder. No encryption feature beyond standard TLS exists in Decentralized.Host.
+
+
+================================================================================
+URL: https://decentralized.host/decentralized-backup-tools/
+H1: Decentralized Backup Tools
+Type: pillar
+Summary: Redundant backups spread across independent peers instead of one provider's snapshot system.
+Claim status: IMPLEMENTED
+AEO answer: Redundant backups spread across independent peers instead of one provider's snapshot system. Decentralized.Host has no automated backup system for deployed apps' data today.
+
+
+================================================================================
+URL: https://decentralized.host/decentralized-sync-tools/
+H1: Decentralized Sync Tools
+Type: pillar
+Summary: Multi-device or multi-peer data sync without a central sync server.
+Claim status: IMPLEMENTED
+AEO answer: Multi-device or multi-peer data sync without a central sync server. No sync feature exists in Decentralized.Host.
+
+
+================================================================================
+URL: https://decentralized.host/decentralized-search-tools/
+H1: Decentralized Search Tools
+Type: pillar
+Summary: Indexing and search over peer-distributed content.
+Claim status: IMPLEMENTED
+AEO answer: Indexing and search over peer-distributed content. No search feature exists in Decentralized.Host beyond the marketing site's own Cmd+K page search.
+
+
+================================================================================
+URL: https://decentralized.host/decentralized-analytics-tools/
+H1: Decentralized Analytics Tools
+Type: pillar
+Summary: Usage and telemetry analysis without one party owning all the data.
+Claim status: IMPLEMENTED
+AEO answer: Usage and telemetry analysis without one party owning all the data. Decentralized.Host reports node CPU/RAM/heartbeat telemetry to its own control plane -- centrally, not decentralized analytics.
+
+
+================================================================================
+URL: https://decentralized.host/vps-management-tools/
+H1: VPS Management Tools
+Type: pillar
+Summary: Provisioning, monitoring, and maintaining virtual private servers.
+Claim status: IMPLEMENTED
+AEO answer: Provisioning, monitoring, and maintaining virtual private servers. A Decentralized.Host node agent is designed to run directly on a VPS you already manage -- it doesn't provision or manage the VPS itself (no server creation, no OS patching), only the Docker workloads scheduled onto it.
+
+
+================================================================================
+URL: https://decentralized.host/dedicated-server-tools/
+H1: Dedicated Server Tools
+Type: pillar
+Summary: Managing bare-metal servers you fully own or lease exclusively.
+Claim status: IMPLEMENTED
+AEO answer: Managing bare-metal servers you fully own or lease exclusively. Same relationship as VPS Management above -- a node agent can run on a dedicated server just as well as a VPS; Decentralized.Host doesn't provision or manage the physical machine itself.
+
+
+================================================================================
+URL: https://decentralized.host/cdn-configuration-tools/
+H1: CDN Configuration Tools
+Type: pillar
+Summary: Configuring content delivery networks to cache and serve assets close to users.
+Claim status: IMPLEMENTED
+AEO answer: Configuring content delivery networks to cache and serve assets close to users. The marketing site itself sits behind Cloudflare's CDN/proxy; deployed apps route through Traefik directly, with no CDN layer of their own today.
+
+
+================================================================================
+URL: https://decentralized.host/dns-management-tools/
+H1: DNS Management Tools
+Type: pillar
+Summary: Creating and maintaining the DNS records that point domain names at real infrastructure.
+Claim status: IMPLEMENTED
+AEO answer: Creating and maintaining the DNS records that point domain names at real infrastructure. Decentralized.Host relies on real DNS in two concrete ways: Cloudflare CAA/A/CNAME records for the marketing domain, and each deployed app getting a subdomain (<name>.<BASE_DOMAIN>) that Traefik routes by Host header.
+
+
+================================================================================
+URL: https://decentralized.host/ssl-tls-certificate-tools/
+H1: SSL/TLS Certificate Tools
+Type: pillar
+Summary: Issuing, renewing, and configuring the certificates that make HTTPS work.
+Claim status: IMPLEMENTED
+AEO answer: Issuing, renewing, and configuring the certificates that make HTTPS work. Traefik automates real Let's Encrypt certificate issuance for every deployed app in Decentralized.Host's production config -- see SECURITY.md for the actual TLS chain and its real limitations.
+
+
+================================================================================
+URL: https://decentralized.host/load-balancer-tools/
+H1: Load Balancer Tools
+Type: pillar
+Summary: Distributing incoming traffic across multiple backend instances.
+Claim status: IMPLEMENTED
+AEO answer: Distributing incoming traffic across multiple backend instances. Traefik acts as the mesh's edge router, but today it routes each subdomain to exactly one node's container -- it doesn't load-balance one app across multiple replicas yet.
+
+
+================================================================================
+URL: https://decentralized.host/reverse-proxy-tools/
+H1: Reverse Proxy Tools
+Type: pillar
+Summary: Software that sits in front of backend services, routing and terminating traffic on their behalf.
+Claim status: IMPLEMENTED
+AEO answer: Software that sits in front of backend services, routing and terminating traffic on their behalf. Traefik is the real reverse proxy Decentralized.Host runs -- every deployed app and the control plane/dashboard route through it, configured dynamically per-deployment.
+
+
+================================================================================
+URL: https://decentralized.host/container-orchestration-tools/
+H1: Container Orchestration Tools
+Type: pillar
+Summary: Systems that decide where containers run, keep them running, and reschedule them on failure.
+Claim status: IMPLEMENTED
+AEO answer: Systems that decide where containers run, keep them running, and reschedule them on failure. Decentralized.Host is a container orchestrator in the functional sense -- a control plane schedules containers onto nodes and automatically reschedules them off a node that goes offline -- just a much smaller, single-purpose one than Kubernetes.
+
+
+================================================================================
+URL: https://decentralized.host/kubernetes-tools/
+H1: Kubernetes Tools
+Type: pillar
+Summary: The dominant open-source container orchestration platform and its surrounding ecosystem.
+Claim status: IMPLEMENTED
+AEO answer: The dominant open-source container orchestration platform and its surrounding ecosystem. Decentralized.Host doesn't use Kubernetes at all, and isn't a Kubernetes distribution -- it's a much smaller, single-purpose scheduler over plain Docker. See Container Orchestration Tools above for the honest comparison.
+
+
+================================================================================
+URL: https://decentralized.host/docker-management-tools/
+H1: Docker Management Tools
+Type: pillar
+Summary: Building, running, and operating Docker containers and images day to day.
+Claim status: IMPLEMENTED
+AEO answer: Building, running, and operating Docker containers and images day to day. Docker is the literal runtime Decentralized.Host is built on -- node agents talk to the Docker Engine directly via its API to build, run, and restart every deployed container.
+
+
+================================================================================
+URL: https://decentralized.host/database-hosting-tools/
+H1: Database Hosting Tools
+Type: pillar
+Summary: Running and operating databases as a service, self-hosted or managed.
+Claim status: IMPLEMENTED
+AEO answer: Running and operating databases as a service, self-hosted or managed. Decentralized.Host's own control plane runs on a self-hosted PostgreSQL container -- it doesn't offer managed databases for deployed apps, but nothing stops you deploying Postgres/MySQL/MariaDB yourself through it (the dashboard's Sandbox tab can one-click-deploy all three for exactly this).
+
+
+================================================================================
+URL: https://decentralized.host/email-server-tools/
+H1: Email Server Tools
+Type: pillar
+Summary: Self-hosting SMTP/IMAP mail infrastructure.
+Claim status: IMPLEMENTED
+AEO answer: Self-hosting SMTP/IMAP mail infrastructure. No email hosting feature exists in Decentralized.Host.
+
+
+================================================================================
+URL: https://decentralized.host/backup-recovery-tools/
+H1: Backup & Recovery Tools
+Type: pillar
+Summary: Systems and practices for protecting data against loss and restoring it after failure.
+Claim status: IMPLEMENTED
+AEO answer: Systems and practices for protecting data against loss and restoring it after failure. Decentralized.Host has no automated backup/restore feature for deployed apps' data today -- an accepted, honestly-documented gap.
+
+
+================================================================================
+URL: https://decentralized.host/monitoring-logging-tools/
+H1: Monitoring & Logging Tools
+Type: pillar
+Summary: Observing system health and capturing logs for debugging and alerting.
+Claim status: IMPLEMENTED
+AEO answer: Observing system health and capturing logs for debugging and alerting. The dashboard's Deployments view streams a container's last 200 log lines live, and node heartbeats report CPU/RAM -- real but basic; no long-term log retention, metrics history, or alerting exists yet.
+
+
+================================================================================
+URL: https://decentralized.host/performance-optimization-tools/
+H1: Performance Optimization Tools
+Type: pillar
+Summary: Profiling and tuning infrastructure and application performance.
+Claim status: IMPLEMENTED
+AEO answer: Profiling and tuning infrastructure and application performance. No performance-profiling feature exists in Decentralized.Host.
+
+
+================================================================================
+URL: https://decentralized.host/security-hardening-tools/
+H1: Security Hardening Tools
+Type: pillar
+Summary: Reducing attack surface and following secure-by-default configuration practices.
+Claim status: IMPLEMENTED
+AEO answer: Reducing attack surface and following secure-by-default configuration practices. The dhost engine's security-scan agent runs a real regex-based secret scan on every deploy, and will block a deployment it flags -- see /security/ for the full, honest scope of what is and isn't checked.
+
+
+================================================================================
+URL: https://decentralized.host/firewall-configuration-tools/
+H1: Firewall Configuration Tools
+Type: pillar
+Summary: Controlling which network traffic is allowed to reach a server.
+Claim status: IMPLEMENTED
+AEO answer: Controlling which network traffic is allowed to reach a server. Decentralized.Host doesn't configure host firewalls -- that's left to however you secure the machine a node agent runs on.
+
+
+================================================================================
+URL: https://decentralized.host/auto-scaling-tools/
+H1: Auto-scaling Tools
+Type: pillar
+Summary: Automatically adding or removing capacity in response to load.
+Claim status: IMPLEMENTED
+AEO answer: Automatically adding or removing capacity in response to load. Decentralized.Host schedules onto whichever node has the most headroom at deploy time, but does not auto-scale a running app across multiple nodes in response to load.
+
+
+================================================================================
+URL: https://decentralized.host/ci-cd-pipeline-tools/
+H1: CI/CD Pipeline Tools
+Type: pillar
+Summary: Automating build, test, and deployment on every code change.
+Claim status: IMPLEMENTED
+AEO answer: Automating build, test, and deployment on every code change. Decentralized.Host's own git-push-to-deploy flow is a real, minimal CD pipeline; the project's own GitHub Actions workflows (marketing-site build/lint, Python compile checks, a daily live-mesh health check) are a separate, standard CI setup.
+
+
+================================================================================
+URL: https://decentralized.host/domain-management-tools/
+H1: Domain Management Tools
+Type: pillar
+Summary: Registering, renewing, and configuring domain names.
+Claim status: IMPLEMENTED
+AEO answer: Registering, renewing, and configuring domain names. decentralized.host itself is registered through Hostinger with Cloudflare as the authoritative nameserver -- ordinary domain management, no special tooling built for it.
+
+
+================================================================================
+URL: https://decentralized.host/smart-contract-tools/
+H1: Smart Contract Tools
+Type: pillar
+Summary: Writing, testing, deploying, and auditing on-chain contract code.
+Claim status: IMPLEMENTED
+AEO answer: Writing, testing, deploying, and auditing on-chain contract code. Decentralized.Host's Solana integration mints existing SPL tokens via a Python client script -- it doesn't write or deploy custom smart contracts.
+
+
+================================================================================
+URL: https://decentralized.host/wallet-management-tools/
+H1: Wallet Management Tools
+Type: pillar
+Summary: Generating, securing, and using cryptocurrency wallet keypairs.
+Claim status: IMPLEMENTED
+AEO answer: Generating, securing, and using cryptocurrency wallet keypairs. Node operators link a Solana devnet wallet address (dhost wallet <node_id> <pubkey>) to receive credits -- the control plane never holds a user's private key, only a payer keypair for minting on devnet.
+
+
+================================================================================
+URL: https://decentralized.host/gas-estimation-tools/
+H1: Gas Estimation Tools
+Type: pillar
+Summary: Predicting transaction fees before submitting them on-chain.
+Claim status: IMPLEMENTED
+AEO answer: Predicting transaction fees before submitting them on-chain. No gas estimation feature exists in Decentralized.Host -- Solana devnet transactions it does send use devnet SOL from a free faucet.
+
+
+================================================================================
+URL: https://decentralized.host/token-standards-tools/
+H1: Token Standards Tools
+Type: pillar
+Summary: Working with fungible/non-fungible token specifications (ERC-20, SPL, etc).
+Claim status: IMPLEMENTED
+AEO answer: Working with fungible/non-fungible token specifications (ERC-20, SPL, etc). Decentralized.Host mints a real SPL token ("DHOST Credits") on Solana devnet -- a standard fungible-token mint, nothing custom.
+
+
+================================================================================
+URL: https://decentralized.host/nft-metadata-tools/
+H1: NFT Metadata Tools
+Type: pillar
+Summary: Generating and pinning the JSON metadata standard NFTs point to.
+Claim status: IMPLEMENTED
+AEO answer: Generating and pinning the JSON metadata standard NFTs point to. No NFT feature exists in Decentralized.Host.
+
+
+================================================================================
+URL: https://decentralized.host/defi-analytics-tools/
+H1: DeFi Analytics Tools
+Type: pillar
+Summary: Tracking yields, liquidity, and protocol activity across decentralized finance.
+Claim status: IMPLEMENTED
+AEO answer: Tracking yields, liquidity, and protocol activity across decentralized finance. No DeFi feature exists in Decentralized.Host.
+
+
+================================================================================
+URL: https://decentralized.host/bridge-monitoring-tools/
+H1: Bridge Monitoring Tools
+Type: pillar
+Summary: Watching cross-chain bridge activity and security.
+Claim status: IMPLEMENTED
+AEO answer: Watching cross-chain bridge activity and security. No cross-chain bridge exists in Decentralized.Host -- it operates on Solana devnet only.
+
+
+================================================================================
+URL: https://decentralized.host/node-management-tools/
+H1: Node Management Tools
+Type: pillar
+Summary: Running and maintaining blockchain full nodes or validators.
+Claim status: IMPLEMENTED
+AEO answer: Running and maintaining blockchain full nodes or validators. Decentralized.Host's own "nodes" are Docker-hosting node agents, not blockchain nodes -- it connects to Solana's own public devnet RPC rather than running a validator.
+
+
+================================================================================
+URL: https://decentralized.host/blockchain-explorer-tools/
+H1: Blockchain Explorer Tools
+Type: pillar
+Summary: Browsing and searching on-chain transaction history.
+Claim status: IMPLEMENTED
+AEO answer: Browsing and searching on-chain transaction history. Every real credit mint links to a genuine explorer.solana.com transaction (devnet cluster) -- Decentralized.Host doesn't build its own explorer, it links to the real one.
+
+
+================================================================================
+URL: https://decentralized.host/ipfs-tools/
+H1: IPFS Tools
+Type: pillar
+Summary: Working with the InterPlanetary File System -- adding, pinning, and retrieving content-addressed files.
+Claim status: IMPLEMENTED
+AEO answer: Working with the InterPlanetary File System -- adding, pinning, and retrieving content-addressed files. Decentralized.Host does not use IPFS -- explicitly, in its own FAQ: it's a Docker deployment mesh, not a blockchain storage network. See the /faq/ page's direct answer on this.
+
+
+================================================================================
+URL: https://decentralized.host/ens-management-tools/
+H1: ENS Management Tools
+Type: pillar
+Summary: Registering and managing Ethereum Name Service domains and records.
+Claim status: IMPLEMENTED
+AEO answer: Registering and managing Ethereum Name Service domains and records. No ENS integration exists in Decentralized.Host -- ordinary DNS is used for the real domain.
+
+
+================================================================================
+URL: https://decentralized.host/dao-governance-tools/
+H1: DAO Governance Tools
+Type: pillar
+Summary: On-chain proposal and voting systems for decentralized organizations.
+Claim status: IMPLEMENTED
+AEO answer: On-chain proposal and voting systems for decentralized organizations. Decentralized.Host has a single operator, not a DAO -- no governance system exists.
+
+
+================================================================================
+URL: https://decentralized.host/staking-calculator-tools/
+H1: Staking Calculator Tools
+Type: pillar
+Summary: Estimating returns from staking tokens to secure a network.
+Claim status: IMPLEMENTED
+AEO answer: Estimating returns from staking tokens to secure a network. No staking feature exists in Decentralized.Host -- node-operator credits are earned via uptime heartbeats, not by staking anything.
+
+
+================================================================================
+URL: https://decentralized.host/yield-farming-tools/
+H1: Yield Farming Tools
+Type: pillar
+Summary: Optimizing returns across DeFi lending and liquidity protocols.
+Claim status: IMPLEMENTED
+AEO answer: Optimizing returns across DeFi lending and liquidity protocols. No DeFi/yield feature exists in Decentralized.Host.
+
+
+================================================================================
+URL: https://decentralized.host/multi-sig-wallet-tools/
+H1: Multi-sig Wallet Tools
+Type: pillar
+Summary: Requiring multiple signatures to authorize a transaction.
+Claim status: IMPLEMENTED
+AEO answer: Requiring multiple signatures to authorize a transaction. No multi-sig feature exists in Decentralized.Host -- the devnet payer keypair is a single key.
+
+
+================================================================================
+URL: https://decentralized.host/signature-verification-tools/
+H1: Signature Verification Tools
+Type: pillar
+Summary: Confirming a message or transaction was really signed by a given key.
+Claim status: IMPLEMENTED
+AEO answer: Confirming a message or transaction was really signed by a given key. SSH public-key signatures authenticate every git push to the mesh's git server -- standard SSH auth, not a custom crypto-signature scheme.
+
+
+================================================================================
+URL: https://decentralized.host/abi-encoder-decoder-tools/
+H1: ABI Encoder/Decoder Tools
+Type: pillar
+Summary: Converting between human-readable contract calls and the binary format the EVM expects.
+Claim status: IMPLEMENTED
+AEO answer: Converting between human-readable contract calls and the binary format the EVM expects. No EVM/ABI interaction exists in Decentralized.Host -- its one blockchain integration is Solana, which doesn't use ABI encoding.
+
+
+================================================================================
+URL: https://decentralized.host/transaction-simulator-tools/
+H1: Transaction Simulator Tools
+Type: pillar
+Summary: Dry-running a transaction to predict its effects before submitting it.
+Claim status: IMPLEMENTED
+AEO answer: Dry-running a transaction to predict its effects before submitting it. No transaction simulation feature exists in Decentralized.Host.
+
+
+================================================================================
+URL: https://decentralized.host/gas-optimization-tools/
+H1: Gas Optimization Tools
+Type: pillar
+Summary: Reducing the on-chain execution cost of contract code.
+Claim status: IMPLEMENTED
+AEO answer: Reducing the on-chain execution cost of contract code. No smart-contract code exists in Decentralized.Host to optimize.
+
+
+================================================================================
+URL: https://decentralized.host/web3-authentication-tools/
+H1: Web3 Authentication Tools
+Type: pillar
+Summary: "Sign in with wallet" flows using a cryptographic signature instead of a password.
+Claim status: IMPLEMENTED
+AEO answer: "Sign in with wallet" flows using a cryptographic signature instead of a password. Decentralized.Host has no user login system, wallet-based or otherwise -- a single shared deploy key authenticates every API call.
+
+
+================================================================================
+URL: https://decentralized.host/decentralized-studio/
+H1: Decentralized Studio
+Type: pillar
+Summary: The real web console for running your own mesh -- OpenGit Console, at dashboard.decentralized.host.
+Claim status: IMPLEMENTED
+AEO answer: The real web console for running your own mesh -- OpenGit Console, at dashboard.decentralized.host. Maps to the real, working dashboard (README calls it OpenGit Console): Deployments with live logs, Git Manager, Mesh Nodes, Credits, a Sandbox of one-click deployable open-source tools, and Settings. There is no separate "app.decentralized.host" -- that was invented in an earlier pasted mockup, not real.
+
+
+================================================================================
+URL: https://decentralized.host/openhost/
+H1: OpenHost
+Type: pillar
+Summary: Self-host your own mesh -- the actual getting-started path, not a separate product.
+Claim status: IMPLEMENTED
+AEO answer: Self-host your own mesh -- the actual getting-started path, not a separate product. This is just Decentralized.Host itself -- "OpenHost" isn't a distinct product, it's this pillar directory's name for "go read the real getting-started docs and run docker compose up."
+
+
+================================================================================
+URL: https://decentralized.host/downloads/
+H1: Downloads
+Type: pillar
+Summary: Getting the dhost CLI and cloning the mesh itself.
+Claim status: IMPLEMENTED
+AEO answer: Getting the dhost CLI and cloning the mesh itself. There's no standalone binary to download -- the CLI installs via `pip install -e ./cli` from a git clone, documented in the README. Honest framing: this is a "clone and install" page, not a downloads page with release artifacts.
+
+
+================================================================================
+URL: https://decentralized.host/how-it-works/
+H1: How It Works
+Type: pillar
+Summary: The real deployment pipeline: ship → detect → build → schedule → route → monitor.
+Claim status: IMPLEMENTED
+AEO answer: The real deployment pipeline: ship → detect → build → schedule → route → monitor. Maps to the real /architecture/ page -- control plane, node agents, scheduler, and Traefik routing, with real source file references.
+
+
+================================================================================
+URL: https://decentralized.host/use-cases/
+H1: Use Cases
+Type: pillar
+Summary: What Decentralized.Host is actually good for today.
+Claim status: IMPLEMENTED
+AEO answer: What Decentralized.Host is actually good for today. Maps to the real /features/ page's verified capability matrix -- no separate use-cases page exists yet.
+
+
+================================================================================
+URL: https://decentralized.host/documentation/
+H1: Documentation
+Type: pillar
+Summary: Full CLI and API reference.
+Claim status: IMPLEMENTED
+AEO answer: Full CLI and API reference. Maps directly to the real, existing /docs/ page.
+
+
+================================================================================
+URL: https://decentralized.host/blog/
+H1: Blog
+Type: pillar
+Summary: Engineering updates and release notes.
+Claim status: IMPLEMENTED
+AEO answer: Engineering updates and release notes. Honestly: this doesn't exist yet. No blog has been built for Decentralized.Host -- listed here as a real gap, not linked to fabricated content.
 
 
 ## Documentation

@@ -119,6 +119,14 @@ export const Navbar: React.FC<Props> = ({ currentPath, onNavigate, onOpenSearch,
                       <div className="text-[11px] text-white/50 font-sans mt-0.5">{p.desc}</div>
                     </button>
                   ))}
+                  <div className="border-t border-white/10 mt-1 pt-1">
+                    <button
+                      onClick={() => handleNavClick('/pillars/')}
+                      className="w-full text-left p-2 rounded hover:bg-white/5 transition-colors block text-xs font-bold text-[#00FF41] font-mono uppercase tracking-wider"
+                    >
+                      Browse All 69 Pillars →
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -216,6 +224,12 @@ export const Navbar: React.FC<Props> = ({ currentPath, onNavigate, onOpenSearch,
                   <span className="text-[10px] text-[#00FF41]">View</span>
                 </button>
               ))}
+              <button
+                onClick={() => handleNavClick('/pillars/')}
+                className="w-full text-left p-2 rounded bg-white/5 hover:bg-white/10 text-[#00FF41] font-bold uppercase tracking-wider"
+              >
+                Browse All 69 Pillars →
+              </button>
             </div>
           </div>
 

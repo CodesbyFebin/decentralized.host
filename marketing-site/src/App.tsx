@@ -19,8 +19,11 @@ import { AboutView } from './views/AboutView';
 import { OpenSourceView } from './views/OpenSourceView';
 import { FAQView } from './views/FAQView';
 import { MachineReadableViewer } from './views/MachineReadableViewer';
+import { PillarsIndexView } from './views/PillarsIndexView';
+import { PillarDetailView } from './views/PillarDetailView';
 import { MatrixRain } from './components/MatrixRain';
 import { CONTENT_REGISTRY } from './data/registry';
+import { getPillar } from './data/pillars';
 
 export default function App() {
   // Determine initial path from URL hash or pathname
@@ -171,9 +174,18 @@ export default function App() {
         return <MachineReadableViewer endpoint="robots.txt" onNavigate={handleNavigate} />;
       case '/openapi.json':
         return <MachineReadableViewer endpoint="openapi.json" onNavigate={handleNavigate} />;
-      default:
-        // Default to HomeView if unmatched
+      case '/pillars/':
+      case '/pillars':
+        return <PillarsIndexView onNavigate={handleNavigate} />;
+      default: {
+        // Pillar detail pages are flat top-level slugs (e.g. /docker-management-tools/),
+        // not nested under /pillars/ -- check the registry before falling back to Home.
+        const slug = p.replace(/^\//, '').replace(/\/$/, '');
+        if (getPillar(slug)) {
+          return <PillarDetailView slug={slug} onNavigate={handleNavigate} />;
+        }
         return <HomeView onNavigate={handleNavigate} onOpenAudit={() => setAuditOpen(true)} />;
+      }
     }
   };
 

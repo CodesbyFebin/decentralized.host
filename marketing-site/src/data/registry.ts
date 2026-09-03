@@ -1,6 +1,7 @@
 import { PageFrontmatter } from '../types';
+import { PILLARS } from './pillars';
 
-export const CONTENT_REGISTRY: Record<string, PageFrontmatter> = {
+const BASE_REGISTRY: Record<string, PageFrontmatter> = {
   '/': {
     id: 'page-home',
     slug: '/',
@@ -319,5 +320,66 @@ export const CONTENT_REGISTRY: Record<string, PageFrontmatter> = {
     publishedAt: '2026-09-01T00:00:00Z',
     updatedAt: '2026-09-02T00:00:00Z',
     extractableAnswer: 'Decentralized.Host is a self-hosted Docker deployment mesh (FastAPI control plane + node agents + Traefik), not a blockchain storage network -- it does not use IPFS, Arweave, or Filecoin, and its only blockchain component is an optional Solana devnet credit system for node operators.'
+  },
+  '/pillars/': {
+    id: 'page-pillars',
+    slug: '/pillars/',
+    title: 'Pillar Directory — 69 Topics — Decentralized.Host',
+    description: 'A 69-page topic directory across decentralized infrastructure, self-hosting, and Web3 -- a broad content strategy, not a map of product features. Each page states honestly whether it connects to the real product.',
+    h1: 'Decentralized.Host Pillar Directory',
+    intent: 'Topic Directory & Content Discovery',
+    primaryEntity: 'Decentralized.Host Pillar Directory',
+    secondaryEntities: ['decentralized infrastructure', 'self-hosting', 'DevOps', 'Web3', 'blockchain'],
+    contentType: 'cluster',
+    audience: 'developers',
+    claimStatus: 'IMPLEMENTED',
+    sources: ['src/data/pillars.ts'],
+    relatedPages: ['/', '/features/', '/docs/'],
+    canonical: 'https://decentralized.host/pillars/',
+    schemaTypes: ['CollectionPage', 'BreadcrumbList'],
+    publishedAt: '2026-09-03T00:00:00Z',
+    updatedAt: '2026-09-03T00:00:00Z',
+    extractableAnswer: 'The Decentralized.Host Pillar Directory is a 69-page topic index spanning decentralized infrastructure, self-hosting/DevOps, and Web3/blockchain concepts -- a broad content strategy independent of the product\'s actual feature set, with each page honestly stating whether the topic connects to the real product.'
   }
+};
+
+// Every pillar in src/data/pillars.ts gets a lightweight, generated
+// CONTENT_REGISTRY entry -- so sitemap.xml, llms.txt, and prerender.ts (all
+// of which iterate this registry) pick up all 69 real routes automatically,
+// without hand-writing 69 near-identical PageFrontmatter blocks by hand.
+function pillarFrontmatter(): Record<string, PageFrontmatter> {
+  const out: Record<string, PageFrontmatter> = {};
+  for (const p of PILLARS) {
+    const slugPath = `/${p.slug}/`;
+    out[slugPath] = {
+      id: `page-pillar-${p.slug}`,
+      slug: slugPath,
+      title: `${p.title} — Decentralized.Host Pillar Directory`,
+      description: p.oneLine,
+      h1: p.title,
+      intent: 'Topic Reference',
+      primaryEntity: p.title,
+      secondaryEntities: [p.group],
+      contentType: 'pillar',
+      audience: 'developers',
+      // Not a product-feature claim -- IMPLEMENTED here just means "this
+      // reference page itself is real and published," not that the topic
+      // is a shipped capability. See the page's own relatesToProduct note
+      // for the honest product-connection statement.
+      claimStatus: 'IMPLEMENTED',
+      sources: ['src/data/pillars.ts'],
+      relatedPages: ['/pillars/'],
+      canonical: `https://decentralized.host/${p.slug}/`,
+      schemaTypes: ['TechArticle', 'BreadcrumbList'],
+      publishedAt: '2026-09-03T00:00:00Z',
+      updatedAt: '2026-09-03T00:00:00Z',
+      extractableAnswer: `${p.oneLine} ${p.productNote}`
+    };
+  }
+  return out;
+}
+
+export const CONTENT_REGISTRY: Record<string, PageFrontmatter> = {
+  ...BASE_REGISTRY,
+  ...pillarFrontmatter()
 };
