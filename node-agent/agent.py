@@ -142,7 +142,9 @@ def remove_traefik_config(name: str) -> None:
         path.unlink()
 
 
-def _start_container(name: str, image: str, port: int, subdomain: str) -> "docker.models.containers.Container":
+def _start_container(
+    name: str, image: str, port: int, subdomain: str, env: dict | None = None
+) -> "docker.models.containers.Container":
     """(Re)creates the container for `name` from `image` and wires up Traefik routing."""
     container_name = f"dhost-{name}"
     try:
@@ -160,6 +162,7 @@ def _start_container(name: str, image: str, port: int, subdomain: str) -> "docke
         restart_policy={"Name": "unless-stopped"},
         mem_limit="256m",
         nano_cpus=1_000_000_000,  # 1 vCPU cap
+        environment=env or None,
     )
     container.reload()
     # Use the container's name, not its IP, as Traefik's routing target.
@@ -179,11 +182,12 @@ def run_deployment(deployment: dict) -> None:
     image = deployment["image"]
     port = deployment.get("container_port", 8080)
     subdomain = deployment.get("subdomain")
+    env = deployment.get("env") or None
 
     try:
         logger.info(f"Pulling {image}...")
         docker_client.images.pull(image)
-        container = _start_container(name, image, port, subdomain)
+        container = _start_container(name, image, port, subdomain, env=env)
         report_status(deployment["id"], "running", container_id=container.id)
     except Exception as e:
         logger.error(f"Failed to run deployment {name}: {e}")

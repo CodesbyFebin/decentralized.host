@@ -88,6 +88,9 @@
       <a href="#" onclick="showSection('credits');return false" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm" data-section="credits">
         <span class="text-lg">💎</span><span class="text-slate-300">Credits</span>
       </a>
+      <a href="#" onclick="showSection('sandbox');return false" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm" data-section="sandbox">
+        <span class="text-lg">🧪</span><span class="text-slate-300">Sandbox</span>
+      </a>
       <a href="#" onclick="showSection('assistant');return false" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm" data-section="assistant">
         <span class="text-lg">🤖</span><span class="text-slate-300">Assistant</span>
       </a>
@@ -243,6 +246,28 @@
         </div>
       </section>
 
+      <!-- Sandbox -->
+      <section id="sec-sandbox" class="fade-in hidden">
+        <p class="text-slate-400 mb-2">100 well-known open-source self-hosting tools. <span id="sandbox-real-count" class="text-neon-green font-bold"></span> genuinely deploy with one click through the real <code class="mono text-neon-green">POST /deployments</code> pipeline -- pulled from the mesh's registry (or Docker Hub for these) and run for real, no build step, same as any other deployment here. The rest are reference-only, each with the specific real reason it doesn't fit a single-click container (needs a cluster, needs command-line args this mesh's pipeline can't pass, exceeds the mesh's fixed 256MB per-container memory limit, etc.) -- never a vague "coming soon."</p>
+        <div class="flex gap-3 mb-6 flex-wrap items-center">
+          <input id="sandbox-search" placeholder="Search 100 tools..." class="flex-1 min-w-[240px] px-3 py-2 text-sm" oninput="renderSandbox()">
+          <select id="sandbox-filter" class="px-3 py-2 text-sm" onchange="renderSandbox()">
+            <option value="all">All categories</option>
+            <option value="Compute">Compute</option>
+            <option value="Storage">Storage</option>
+            <option value="Network">Network</option>
+            <option value="CI/CD">CI/CD</option>
+            <option value="Monitor">Monitor</option>
+            <option value="Web/App">Web/App</option>
+            <option value="P2P">P2P</option>
+          </select>
+          <label class="flex items-center gap-2 text-sm text-slate-400 cursor-pointer">
+            <input type="checkbox" id="sandbox-real-only" onchange="renderSandbox()"> Real deploys only
+          </label>
+        </div>
+        <div id="sandbox-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      </section>
+
       <!-- Settings -->
       <section id="sec-settings" class="fade-in hidden">
         <p class="text-slate-400 mb-6">The only two settings this console has -- who it talks to, and how it authenticates.</p>
@@ -261,6 +286,7 @@
   </main>
 </div>
 
+<script src="sandbox-catalog.js"></script>
 <script>
 // ---------- config ----------
 function apiBase() { return localStorage.getItem('dhost_api') || 'http://localhost:8000'; }
@@ -274,7 +300,7 @@ function saveSettings() {
 }
 
 // ---------- nav ----------
-const TITLES = { overview:'Dashboard', launchpad:'Launchpad', deployments:'Deployments', git:'Git Manager', nodes:'Mesh Nodes', credits:'Credits', assistant:'Assistant', settings:'Settings' };
+const TITLES = { overview:'Dashboard', launchpad:'Launchpad', deployments:'Deployments', git:'Git Manager', nodes:'Mesh Nodes', credits:'Credits', sandbox:'Sandbox', assistant:'Assistant', settings:'Settings' };
 function showSection(id) {
   document.querySelectorAll('main section').forEach(s => s.classList.add('hidden'));
   document.getElementById(`sec-${id}`).classList.remove('hidden');
@@ -621,11 +647,79 @@ function refreshSection(id) {
   if (id === 'git') populateGitSelect().then(refreshReleases);
   if (id === 'nodes') refreshNodes();
   if (id === 'credits') refreshNodes().then(refreshCredits);
+  if (id === 'sandbox') renderSandbox();
   if (id === 'assistant') refreshAssistantStatus();
+}
+
+// ---------- Sandbox ----------
+function renderSandbox() {
+  const term = (document.getElementById('sandbox-search').value || '').toLowerCase();
+  const cat = document.getElementById('sandbox-filter').value;
+  const realOnly = document.getElementById('sandbox-real-only').checked;
+  const realCount = SANDBOX_CATALOG.filter(a => a.real).length;
+  document.getElementById('sandbox-real-count').textContent = `${realCount} of ${SANDBOX_CATALOG.length}`;
+
+  const filtered = SANDBOX_CATALOG.filter(a =>
+    (cat === 'all' || a.cat === cat) &&
+    (!realOnly || a.real) &&
+    (a.name.toLowerCase().includes(term) || a.desc.toLowerCase().includes(term))
+  );
+
+  const grid = document.getElementById('sandbox-grid');
+  grid.innerHTML = filtered.map(a => {
+    const safeId = a.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    return `
+    <div class="card p-5">
+      <div class="flex items-start justify-between gap-2 mb-2">
+        <span class="font-bold text-white">${a.name}</span>
+        <span class="text-[10px] uppercase tracking-wide px-2 py-0.5 rounded ${a.real ? 'bg-neon-green/10 text-neon-green' : 'bg-slate-700/40 text-slate-400'}">${a.real ? 'Real deploy' : a.cat}</span>
+      </div>
+      <p class="text-xs text-slate-400 mb-3">${a.desc}</p>
+      ${a.real
+        ? `<p class="text-[11px] text-slate-500 mb-3 italic">${a.note}</p>
+           <button id="sandbox-btn-${safeId}" class="btn-primary w-full py-2 rounded-lg text-xs" onclick="deploySandboxApp('${a.name}')">Deploy</button>`
+        : `<p class="text-[11px] text-amber-400/80 mb-3">Reference only: ${a.refReason}</p>
+           <button class="app-btn w-full py-2 rounded-lg text-xs border border-slate-700 text-slate-600 cursor-not-allowed" disabled>Not one-click</button>`
+      }
+      <div id="sandbox-result-${safeId}" class="mt-2 text-[11px]"></div>
+    </div>`;
+  }).join('') || `<p class="text-slate-600 text-sm col-span-full">No tools match.</p>`;
+}
+
+async function deploySandboxApp(name) {
+  const app = SANDBOX_CATALOG.find(a => a.name === name);
+  if (!app || !app.real) return;
+  const safeId = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  const btn = document.getElementById(`sandbox-btn-${safeId}`);
+  const result = document.getElementById(`sandbox-result-${safeId}`);
+  const deployName = `sandbox-${safeId}`;
+  btn.disabled = true; btn.textContent = 'Deploying...';
+  result.innerHTML = '';
+  try {
+    const resp = await fetch(`${apiBase()}/deployments`, {
+      method: 'POST',
+      headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: deployName, image: app.image, container_port: app.port, env: app.env || {} }),
+    });
+    if (!resp.ok) throw new Error(await resp.text());
+    const d = await resp.json();
+    result.innerHTML = `<span class="text-neon-green">Deployed as <span class="mono">${d.name}</span> -- </span><a href="#" onclick="showSection('deployments');return false" class="text-neon-blue hover:underline">view in Deployments →</a>`;
+    btn.textContent = 'Redeploy';
+  } catch (e) {
+    result.innerHTML = `<span class="text-red-400">${(e.message || 'Deploy failed').slice(0, 200)}</span>`;
+    btn.textContent = 'Deploy';
+  } finally {
+    btn.disabled = false;
+  }
 }
 function refreshAll() {
   refreshHealth();
   const active = document.querySelector('.nav-item.active')?.dataset.section || 'overview';
+  // Sandbox is a static catalog, not live mesh state -- re-rendering it on
+  // every 5s poll would wipe in-flight "Deploying..." button state (and
+  // any result message) out from under the user. It's rendered once on
+  // showSection() and again on explicit search/filter changes only.
+  if (active === 'sandbox') return;
   refreshSection(active);
 }
 refreshAll();

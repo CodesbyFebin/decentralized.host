@@ -63,6 +63,13 @@ class DeploymentCreate(BaseModel):
     name: str
     image: str
     container_port: int = 8080
+    # Passed straight through to the container's environment (e.g. Postgres'
+    # required POSTGRES_PASSWORD, or Elasticsearch's discovery.type). Only
+    # the /deployments (create_deployment) path -- deploying an existing
+    # image directly, no build -- supports this; dhost ship/git push don't
+    # take env vars from the caller at all, so this is deliberately scoped
+    # to that one endpoint rather than a general feature.
+    env: dict[str, str] = {}
 
 
 class DeploymentOut(BaseModel):
@@ -73,6 +80,7 @@ class DeploymentOut(BaseModel):
     node_id: Optional[str] = None
     container_id: Optional[str] = None
     container_port: int
+    env: dict[str, str] = {}
     subdomain: Optional[str] = None
     url: Optional[str] = None
     error: Optional[str] = None

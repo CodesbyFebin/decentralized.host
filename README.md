@@ -118,7 +118,17 @@ Traefik routes app.127.0.0.1.nip.io -> the container the node agent just started
   detected, previewed (with an optional real Gemini note if
   `GOOGLE_API_KEY` is set on the control plane), and shipped through the
   exact same `/deployments/ship` pipeline as the CLI. No Dockerfile written
-  to your repo, no local Docker or Git involved either way. No Analytics or
+  to your repo, no local Docker or Git involved either way. A **Sandbox**
+  tab lists 100 well-known open-source self-hosting tools
+  (`dashboard/public/sandbox-catalog.js`) — 17 of them genuinely deploy with
+  one click through the real `POST /deployments` endpoint (an existing
+  pre-built image, no build step, same pipeline any deployment here uses),
+  each individually verified to actually boot; the other 83 are reference
+  entries with the specific real reason they don't fit a single-click
+  container (needs a cluster, needs launch arguments this mesh's deploy
+  pipeline can't pass through, exceeds the mesh's fixed 256MB
+  per-container memory limit, etc.) — never a vague "coming soon." No
+  Analytics or
   chat-based AI Assistant pages — those would need fabricated data or a
   much bigger feature (a tool-using conversational agent) than "dashboard,"
   so they were left out rather than faked. Protected by HTTP Basic Auth

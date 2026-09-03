@@ -1,3 +1,4 @@
+import json
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -19,6 +20,7 @@ def _deployment_out(d: Deployment) -> DeploymentOut:
     return DeploymentOut(
         id=d.id, name=d.name, image=d.image, status=d.status, node_id=d.node_id,
         container_id=d.container_id, container_port=d.container_port,
+        env=json.loads(d.env) if d.env else {},
         subdomain=d.subdomain, url=url, error=d.error,
         created_at=d.created_at, updated_at=d.updated_at,
     )

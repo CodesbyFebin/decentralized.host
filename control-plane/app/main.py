@@ -20,6 +20,7 @@ from .routers import assistant, auth, blockchain, deployments, git_keys, nodes
 STARTUP_MIGRATIONS = [
     "ALTER TABLE nodes ADD COLUMN IF NOT EXISTS advertise_address VARCHAR",
     "ALTER TABLE releases ADD COLUMN IF NOT EXISTS engine_report TEXT",
+    "ALTER TABLE deployments ADD COLUMN IF NOT EXISTS env TEXT",
 ]
 
 logging.basicConfig(level=logging.INFO)

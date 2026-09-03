@@ -52,6 +52,11 @@ class Deployment(Base):
     node_id = Column(String, ForeignKey("nodes.id"), nullable=True)
     container_id = Column(String, nullable=True)
     container_port = Column(Integer, default=8080)
+    # JSON-encoded dict, e.g. {"POSTGRES_PASSWORD": "..."} -- only ever set
+    # via create_deployment() (deploying an existing image directly); ship
+    # via CLI/git doesn't take caller-supplied env vars. Nullable/empty for
+    # every deployment created before this existed.
+    env = Column(Text, nullable=True)
     subdomain = Column(String, nullable=True)
     error = Column(Text, nullable=True)
     created_at = Column(DateTime, default=_now)

@@ -80,6 +80,7 @@ def _deployment_out(d: Deployment) -> DeploymentOut:
     return DeploymentOut(
         id=d.id, name=d.name, image=d.image, status=d.status, node_id=d.node_id,
         container_id=d.container_id, container_port=d.container_port,
+        env=json.loads(d.env) if d.env else {},
         subdomain=d.subdomain, url=url, error=d.error,
         created_at=d.created_at, updated_at=d.updated_at,
     )
@@ -223,9 +224,12 @@ def create_deployment(payload: DeploymentCreate, db: Session = Depends(get_db)):
     existing = db.query(Deployment).filter(Deployment.name == payload.name).first()
     subdomain = f"{payload.name}.{settings.BASE_DOMAIN}"
 
+    env_json = json.dumps(payload.env) if payload.env else None
+
     if existing:
         existing.image = payload.image
         existing.container_port = payload.container_port
+        existing.env = env_json
         existing.node_id = node.id
         existing.status = "pending"
         existing.error = None
@@ -236,6 +240,7 @@ def create_deployment(payload: DeploymentCreate, db: Session = Depends(get_db)):
             name=payload.name,
             image=payload.image,
             container_port=payload.container_port,
+            env=env_json,
             node_id=node.id,
             subdomain=subdomain,
             status="pending",
